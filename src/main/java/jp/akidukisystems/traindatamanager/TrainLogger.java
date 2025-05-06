@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 
 import com.google.gson.Gson;
 
+import jp.ngt.rtm.entity.npc.macro.TrainCommand;
 import jp.ngt.rtm.entity.train.EntityTrainBase;
 import jp.ngt.rtm.entity.train.util.TrainState;
 import jp.ngt.rtm.entity.vehicle.EntityVehicleBase;
@@ -14,34 +15,50 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.event.world.WorldEvent;
 
+@SideOnly(Side.CLIENT)
 public class TrainLogger {
     private int tickCounter = 0;
-    public float movedDistance = 0;
-    NetworkManager networkManager = null;
+    
+    private NetworkManager networkManager = null;
 
-    EntityTrainBase train;
-    EntityVehicleBase vehicle;
+    private EntityTrainBase train;
+    private EntityVehicleBase vehicle;
 
     // ID取得
-    int id;
-    int id2;
+    public int id;
+    public int id2;
 
     // ステータスを取得
-    byte doorState;
+    public byte doorState;
 
     // 速度とノッチ位置取得
-    float speed;
-    int notch;
+    public float speed;
+    public int notch;
 
     // BC MR圧力
-    int bc;
-    int mr;
+    public int bc;
+    public int mr;
 
     // 脱線・コンプレッサ
-    boolean isOnRail;
-    boolean isComplessorActive;
+    public boolean isOnRail;
+    public boolean isComplessorActive;
+
+    public float movedDistance;
+
+    private static final Gson gson = new Gson();
+    private static final float SCALE_SPEED = 72f;
+    private static final int SCALE_BC = 3;
+    private static final float SCALE_MR = 0.311f;
+    private static final float SCALE_DISTANCE = 1000f /3600f /4f;
+
+    private boolean isFirst = true;
+
+    enum commands {
+        NOTCH, DOOR, MOVE, DISTANCE
+    }
 
     @SubscribeEvent
     public void onLoad(WorldEvent.Load event) {
@@ -52,16 +69,44 @@ public class TrainLogger {
         networkManager = new NetworkManager();
         networkManager.serverInit(ConfigManager.networkPort);
         networkManager.serverWaitingClient();
+
+        this.id = 0;
+        this.id2 = 0;
+
+        // ステータスを取得
+        this.doorState = 0;
+
+        // 速度とノッチ位置取得
+        this.speed = 0f;
+        this.notch = 0;
+
+        // BC MR圧力
+        this.bc = 0;
+        this.mr = 0;
+
+        // 脱線・コンプレッサ
+        this.isOnRail = false;
+        this.isComplessorActive = false;
+
+        this.movedDistance = 0f;
     }
 
     // MARK: INIT
-    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
+        if (event.player != Minecraft.getMinecraft().player) return;
 
         // Client側じゃないなら帰る
         if (!event.player.world.isRemote) return;
+
+        // 通信できてないなら帰る
+        if (networkManager == null) return;
+
+        if (isFirst) {
+            networkManager.serverStartRead();
+            isFirst = false;
+        }
 
         // お前列車に乗ってんの？
         if (event.player.isRiding() && event.player.getRidingEntity() instanceof EntityTrainBase) {
@@ -69,17 +114,13 @@ public class TrainLogger {
             // データ取得
             String getData = null;
 
-            try {
-                getData = networkManager.serverReciveString();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            getData = networkManager.getLatestReceivedString();
 
             // jsonパース
             // データあるのとデータ送信するtickなら初期化
 
             tickCounter++;
-            if (getData != null || tickCounter < 10) {
+            if (getData != null || tickCounter >= 10) {
                 // 列車の情報を取得
                 this.train = (EntityTrainBase) event.player.getRidingEntity();
                 this.vehicle = (EntityVehicleBase) event.player.getRidingEntity();
@@ -104,35 +145,40 @@ public class TrainLogger {
                 this.isComplessorActive = this.train.complessorActive;
 
                 // 値を正規化
-                this.speed *= 72f;
-                this.bc *= 3;
-                this.mr *= 0.311f;
+                this.speed *= SCALE_SPEED;
+                this.bc *= SCALE_BC;
+                this.mr *= SCALE_MR;
             }
 
             if (getData != null) {
-                Gson gson = new Gson();
                 GsonManager getDataParsed = gson.fromJson(getData, GsonManager.class);
-                
-                switch (getDataParsed.doAny) {
-                    case "notch":
+
+                NetworkCommands command = NetworkCommands.fromString(getDataParsed.doAny);
+
+                switch (command) {
+                    case NOTCH:
                         int notchLevel = getDataParsed.notch;
                         if((-9<notchLevel) && (notchLevel<6)) {
                             this.train.setNotch(notchLevel);
                         }
                         break;
-
-                    case "door":
+                
+                    case DOOR:
                         byte doorStatus = (byte) getDataParsed.door;
                         if(doorStatus < 4) {
                             this.vehicle.setVehicleState(TrainState.TrainStateType.Door, doorStatus);
                         }
                         break;
-
-                    case "move":
-                        movedDistance = getDataParsed.move;
+                
+                    case MOVE:
+                        this.movedDistance = getDataParsed.move;
                         break;
-                    
+                
+                    case UNKNOWN:
                     default:
+                        if (ConfigManager.isLogging) {
+                            System.out.println("Unknown command: " + getDataParsed.doAny);
+                        }
                         break;
                 }
 
@@ -145,28 +191,18 @@ public class TrainLogger {
             // MARK: SEND
             // 1秒ごとに距離を積算する
             // なぜか2倍の値になるので/2する
-            movedDistance += (float)this.speed *(1000f /3600f) /4f;
+            this.movedDistance += (float)this.speed * SCALE_DISTANCE;
             
             // 出力 jsonにするよ～
-            Gson gson = new Gson();
             GsonManager gsonManager = new GsonManager("send", "none", this.id, this.id2, this.speed, this.notch, this.doorState, this.bc, this.mr, this.movedDistance, this.isOnRail, this.isComplessorActive);
 
             // 送信
             String json = gson.toJson(gsonManager);
             if (ConfigManager.isLogging) System.out.println(json);
 
-            try {
-                networkManager.serverSendString(json);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            networkManager.serverSendString(json);
         } else {
-            // 列車に乗ってないね
-            try {
-                networkManager.serverSendString("{\"type\":\"notRidingTrain\"}");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            networkManager.serverSendString("{\"type\":\"notRidingTrain\"}");
         }
     }
 
@@ -175,11 +211,7 @@ public class TrainLogger {
     @SubscribeEvent
     public void disconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
         System.out.println("disconnected.");
-        try {
-            networkManager.serverSendString("{\"type\":\"kill\"}");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        networkManager.serverSendString("{\"type\":\"kill\"}");
         networkManager.serverClose();
     }
 }

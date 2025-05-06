@@ -14,6 +14,7 @@ public class TDMCore {
     public static final String MODID = "traindatamanager";
     public static final String NAME = "Train Data Manager";
     public static final String VERSION = "1.0";
+    private static final TrainLogger LOGGER_INSTANCE = new TrainLogger();
 
     // ロガー
     private static Logger logger;
@@ -35,6 +36,6 @@ public class TDMCore {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         // イベントバス登録
-        MinecraftForge.EVENT_BUS.register(new TrainLogger());
+        MinecraftForge.EVENT_BUS.register(LOGGER_INSTANCE);
     }
 }

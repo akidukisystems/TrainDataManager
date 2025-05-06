@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Queue;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class NetworkManager {
     ServerSocket server;
@@ -11,7 +12,8 @@ public class NetworkManager {
     PrintWriter writer = null;
     Socket s2c = null;
 
-    private static final Queue<String> receivedDataQueue = new ConcurrentLinkedQueue<>();
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    AtomicReference<String> sharedData = new AtomicReference<>(null);
 
     public void serverInit(int port) {
         try {
@@ -23,6 +25,7 @@ public class NetworkManager {
 
     public void serverWaitingClient() {
         try {
+            server.setSoTimeout(1000);
             s2c = server.accept();
             System.out.println("Connected s2c");
             reader = new BufferedReader(new InputStreamReader(s2c.getInputStream()));
@@ -32,13 +35,13 @@ public class NetworkManager {
         }
     }
 
-    public String serverReciveString() throws IOException {
-        new Thread(() -> {
+    public void serverStartRead() {
+        executor.submit(() -> {
             while (true) {
                 try {
                     String data = reader.readLine();
                     if (data != null) {
-                        receivedDataQueue.add(data);
+                        sharedData.set(data);
                     } else {
                         break;
                     }
@@ -47,29 +50,29 @@ public class NetworkManager {
                     break;
                 }
             }
-        }).start();
-
-        return receivedDataQueue.poll();
+        });
     }
 
-    public void serverSendString(String data) throws IOException {
-        new Thread(() -> {
-            try {
-                writer.println(data);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+    public String getLatestReceivedString()  {
+        String data = sharedData.get();
+        sharedData.set(null);
+        return data;
+    }
+
+    public void serverSendString(String data) {
+        writer.println(data);
     }
 
     public void serverClose() {
         try {
-            if (reader != null) reader.close();
             if (writer != null) writer.close();
+            if (reader != null) reader.close();
             if (s2c != null) s2c.close();
             if (server != null) server.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        sharedData.set(null);
+        executor.shutdown();
     }
 }
