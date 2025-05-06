@@ -53,11 +53,13 @@ public class NetworkManager {
     }
 
     public void serverSendString(String data) throws IOException {
-        try {
-            writer.println(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new Thread(() -> {
+            try {
+                writer.println(data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     public void serverClose() {

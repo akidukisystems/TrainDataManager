@@ -1,0 +1,1 @@
+copy "C:\Users\akiduki\Desktop\ƒQ[ƒ€\mods1122\build\libs\traindatamanager-1.0.jar" "R:\RTM1.12.2\mods\traindatamanager-1.0.jar" /y
