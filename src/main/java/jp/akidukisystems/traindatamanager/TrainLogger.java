@@ -32,7 +32,12 @@ public class TrainLogger {
     public int id2;
 
     // ステータスを取得
-    public byte doorState;
+    public byte stateDoor;
+    public byte stateLight;
+    public byte stateRollsign;
+    public byte stateReverser;
+    public byte statePantogtraph;
+    public byte stateInteriorLight;
 
     // 速度とノッチ位置取得
     public float speed;
@@ -74,7 +79,13 @@ public class TrainLogger {
         this.id2 = 0;
 
         // ステータスを取得
-        this.doorState = 0;
+        this.stateDoor = 0;
+        this.stateLight = 0;
+        this.stateRollsign = 0;
+        this.stateReverser = 0;
+        this.statePantogtraph = 0;
+        this.stateInteriorLight = 0;
+
 
         // 速度とノッチ位置取得
         this.speed = 0f;
@@ -130,7 +141,12 @@ public class TrainLogger {
                 this.id2 = this.vehicle.getEntityId();
 
                 // ステータスを取得
-                this.doorState = this.vehicle.getVehicleState(TrainState.TrainStateType.Door);
+                this.stateDoor = this.vehicle.getVehicleState(TrainState.TrainStateType.Door);
+                this.stateLight = this.vehicle.getVehicleState(TrainState.TrainStateType.Light);
+                this.stateRollsign = this.vehicle.getVehicleState(TrainState.TrainStateType.Destination);
+                this.stateReverser = this.vehicle.getVehicleState(TrainState.TrainStateType.Role);
+                this.statePantogtraph = this.vehicle.getVehicleState(TrainState.TrainStateType.Pantograph);
+                this.stateInteriorLight = this.vehicle.getVehicleState(TrainState.TrainStateType.InteriorLight);
 
                 // 速度とノッチ位置取得
                 this.speed = this.train.getSpeed();
@@ -194,7 +210,32 @@ public class TrainLogger {
             this.movedDistance += (float)this.speed * SCALE_DISTANCE;
             
             // 出力 jsonにするよ～
-            GsonManager gsonManager = new GsonManager("send", "none", this.id, this.id2, this.speed, this.notch, this.doorState, this.bc, this.mr, this.movedDistance, this.isOnRail, this.isComplessorActive);
+            GsonManager gsonManager = new GsonManager(
+                "send", 
+                "none", 
+
+                this.id, 
+                this.id2, 
+
+                this.speed, 
+                this.notch, 
+                this.bc, 
+                this.mr, 
+
+                this.stateDoor, 
+                this.stateLight, 
+                this.stateRollsign, 
+                this.stateReverser, 
+                this.statePantogtraph, 
+                this.stateInteriorLight, 
+
+                this.movedDistance, 
+
+                this.isOnRail, 
+                this.isComplessorActive
+            );
+
+            
 
             // 送信
             String json = gson.toJson(gsonManager);
@@ -212,6 +253,7 @@ public class TrainLogger {
     public void disconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
         System.out.println("disconnected.");
         networkManager.serverSendString("{\"type\":\"kill\"}");
+        isFirst = true;
         networkManager.serverClose();
     }
 }
