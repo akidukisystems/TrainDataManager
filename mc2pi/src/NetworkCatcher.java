@@ -205,6 +205,8 @@ public class NetworkCatcher {
                         buttonCommand = null;
                         buttonDo = -1;
                         blinkTimer.stop();
+                        buttonAction.setBackground(Color.WHITE);
+                        buttonDoorOpenL.setBackground(Color.WHITE);
                     } else {
                         buttonCommand = "door";
                         buttonDo = DOOR_LEFT;
@@ -219,6 +221,8 @@ public class NetworkCatcher {
                         buttonCommand = null;
                         buttonDo = -1;
                         blinkTimer.stop();
+                        buttonAction.setBackground(Color.WHITE);
+                        buttonDoorOpenR.setBackground(Color.WHITE);
                     } else {
                         buttonCommand = "door";
                         buttonDo = DOOR_RIGHT;
@@ -233,6 +237,8 @@ public class NetworkCatcher {
                         buttonCommand = null;
                         buttonDo = -1;
                         blinkTimer.stop();
+                        buttonAction.setBackground(Color.WHITE);
+                        buttonDoorClose.setBackground(Color.WHITE);
                     } else {
                         buttonCommand = "door";
                         buttonDo = DOOR_CLOSE;
@@ -244,8 +250,6 @@ public class NetworkCatcher {
             buttonAction.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    System.out.println(buttonCommand);
-                    System.out.println(buttonDo);
                     switch (buttonCommand) {
                         case "door":
                             sendCommand("send", buttonCommand, buttonDo);
