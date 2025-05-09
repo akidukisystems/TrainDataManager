@@ -33,6 +33,8 @@ public class NetworkCatcher {
     int bc = 0;
     int mr = 0;
     float move = 0f;
+    int moveTo = 1;
+    int reverser = 0;
 
     String distanceSetText = "0";
 
@@ -46,6 +48,13 @@ public class NetworkCatcher {
     JLabel labelMR;
     JLabel labelDistance;
     JLabel labelNotchPos;
+
+    JButton buttonReverserSetF;
+    JButton buttonReverserSetN;
+    JButton buttonReverserSetB;
+
+    JButton buttonSetDistanceUp;
+    JButton buttonSetDistanceDown;
 
     public static void main(String[] args) throws IOException {
         NetworkCatcher clientObject = new NetworkCatcher();
@@ -143,6 +152,13 @@ public class NetworkCatcher {
             JButton buttonResetDistance = new JButton("キロ程リセット");
             buttonResetDistance.setBounds(0, 100, 150, 50);
 
+            buttonReverserSetF = new JButton("前");
+            buttonReverserSetF.setBounds(150, 100, 50, 50);
+            buttonReverserSetN = new JButton("中");
+            buttonReverserSetN.setBounds(200, 100, 50, 50);
+            buttonReverserSetB = new JButton("後");
+            buttonReverserSetB.setBounds(250, 100, 50, 50);
+
             JFrame distanceReset = new JFrame("キロ程リセット");
             distanceReset.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
             distanceReset.setSize(640, 480);
@@ -171,6 +187,10 @@ public class NetworkCatcher {
             buttonSetDistancePeriod.setBounds(250, 50, 50, 50);
             JButton buttonSetDistance = new JButton("設定");
             buttonSetDistance.setBounds(300, 50, 100, 50);
+            buttonSetDistanceUp = new JButton("上り");
+            buttonSetDistanceUp.setBounds(0, 100, 100, 50);
+            buttonSetDistanceDown = new JButton("下り");
+            buttonSetDistanceDown.setBounds(100, 100, 100, 50);
 
             labelSpeed = new JLabel("N/A");
             labelSpeed.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -268,6 +288,9 @@ public class NetworkCatcher {
                     buttonDoorClose.setBackground(Color.WHITE);
                 }
             });
+            buttonReverserSetF.addActionListener(_ -> sendCommand("send", "reverser", 0));
+            buttonReverserSetN.addActionListener(_ -> sendCommand("send", "reverser", 1));
+            buttonReverserSetB.addActionListener(_ -> sendCommand("send", "reverser", 2));
 
             buttonSetDistance0.addActionListener(_ -> distanceSetText += "0");
             buttonSetDistance1.addActionListener(_ -> distanceSetText += "1");
@@ -280,6 +303,8 @@ public class NetworkCatcher {
             buttonSetDistance8.addActionListener(_ -> distanceSetText += "8");
             buttonSetDistance9.addActionListener(_ -> distanceSetText += "9");
             buttonSetDistancePeriod.addActionListener(_ -> distanceSetText += ".");
+            buttonSetDistanceUp.addActionListener(_ -> sendCommand("send", "moveTo", 0));
+            buttonSetDistanceDown.addActionListener(_ -> sendCommand("send", "moveTo", 1));
 
             buttonSetDistance.addActionListener(new ActionListener() {
                 @Override
@@ -341,6 +366,9 @@ public class NetworkCatcher {
             p.add(labelMR);
             p.add(labelDistance);
             p.add(labelNotchPos);
+            p.add(buttonReverserSetF);
+            p.add(buttonReverserSetN);
+            p.add(buttonReverserSetB);
 
             q.add(buttonSetDistance0);
             q.add(buttonSetDistance1);
@@ -354,6 +382,8 @@ public class NetworkCatcher {
             q.add(buttonSetDistance9);
             q.add(buttonSetDistancePeriod);
             q.add(buttonSetDistance);
+            q.add(buttonSetDistanceUp);
+            q.add(buttonSetDistanceDown);
 
             buttonAction.setBackground(Color.WHITE);
             buttonDoorOpenL.setBackground(Color.WHITE);
@@ -362,6 +392,10 @@ public class NetworkCatcher {
 
             frame.getContentPane().add(p, BorderLayout.CENTER);
             distanceReset.getContentPane().add(q, BorderLayout.CENTER);
+
+            buttonReverserSetF.setEnabled(false);
+            buttonReverserSetN.setEnabled(false);
+            buttonReverserSetB.setEnabled(false);
 
             // 表示
             frame.setVisible(true);
@@ -384,6 +418,8 @@ public class NetworkCatcher {
                             bc = jsonObj.getInt("bc");
                             mr = jsonObj.getInt("mr");
                             move = jsonObj.getFloat("move");
+                            moveTo = jsonObj.getInt("moveTo");
+                            reverser = jsonObj.getInt("reverser");
 
                             SwingUtilities.invokeLater(() -> {
                                 labelSpeed.setText(String.format("%dkm/h", (int) speed));
@@ -391,14 +427,53 @@ public class NetworkCatcher {
                                 labelMR.setText(String.format("%dkpa", mr));
                                 labelDistance.setText(String.format("%.1fkm", move / 1000f));
                                 
+                                Boolean canChangeReverser = false;
                                 if (notch == NOTCH_EB) {
                                     labelNotchPos.setText("EB");
+                                    canChangeReverser = true;
                                 } else if (notch == NOTCH_N) {
                                     labelNotchPos.setText("N");
                                 } else if (notch > NOTCH_N) {
                                     labelNotchPos.setText(String.format("P%d", notch));
                                 } else {
                                     labelNotchPos.setText(String.format("B%d", notch *-1));
+                                }
+
+                                if (moveTo == 0) {
+                                    buttonSetDistanceUp.setEnabled(false);
+                                    buttonSetDistanceDown.setEnabled(true);
+                                } else {
+                                    buttonSetDistanceUp.setEnabled(true);
+                                    buttonSetDistanceDown.setEnabled(false);
+                                }
+
+                                if (canChangeReverser) {
+                                    switch (reverser) {
+                                        case 0:
+                                            buttonReverserSetF.setEnabled(false);
+                                            buttonReverserSetN.setEnabled(true);
+                                            buttonReverserSetB.setEnabled(true);
+                                            break;
+
+                                        case 1:
+                                            buttonReverserSetF.setEnabled(true);
+                                            buttonReverserSetN.setEnabled(false);
+                                            buttonReverserSetB.setEnabled(true);
+                                            break;
+
+                                        case 2:
+                                            buttonReverserSetF.setEnabled(true);
+                                            buttonReverserSetN.setEnabled(true);
+                                            buttonReverserSetB.setEnabled(false);
+                                            break;
+                                    
+                                        default:
+                                            break;
+                                    }
+                                } else {
+                                    buttonReverserSetF.setEnabled(false);
+                                    buttonReverserSetN.setEnabled(false);
+                                    buttonReverserSetB.setEnabled(false);
                                 }
                             });
 
@@ -416,6 +491,9 @@ public class NetworkCatcher {
                                 labelMR.setText("N/A");
                                 labelDistance.setText("N/A");
                                 labelNotchPos.setText("N/A");
+                                buttonReverserSetF.setEnabled(false);
+                                buttonReverserSetN.setEnabled(false);
+                                buttonReverserSetB.setEnabled(false);
                             break;
                         
                         default:

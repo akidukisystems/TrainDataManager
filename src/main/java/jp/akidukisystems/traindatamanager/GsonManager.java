@@ -22,6 +22,7 @@ public class GsonManager {
     public int interiorlight;
 
     public float move;
+    public int moveTo;
 
     public boolean isOnRail;
     public boolean isComplessorActive;
@@ -46,10 +47,11 @@ public class GsonManager {
         int interiorlight, 
 
         float move, 
+        int moveTo,
 
         boolean isOnRail, 
         boolean isComplessorActive
-        ) {
+    ) {
         this.type = type;
         this.doAny = doAny;
 
@@ -69,6 +71,7 @@ public class GsonManager {
         this.interiorlight = interiorlight;
 
         this.move = move;
+        this.moveTo = moveTo;
 
         this.isOnRail = isOnRail;
         this.isComplessorActive = isComplessorActive;

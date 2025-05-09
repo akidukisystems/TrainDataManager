@@ -52,6 +52,7 @@ public class TrainLogger {
     public boolean isComplessorActive;
 
     public float movedDistance;
+    public int moveTo;
 
     private static final Gson gson = new Gson();
     private static final float SCALE_SPEED = 72f;
@@ -62,7 +63,7 @@ public class TrainLogger {
     private boolean isFirst = true;
 
     enum commands {
-        NOTCH, DOOR, MOVE, DISTANCE
+        NOTCH, DOOR, MOVE, MOVETO, DISTANCE, REVERSER
     }
 
     @SubscribeEvent
@@ -99,7 +100,10 @@ public class TrainLogger {
         this.isOnRail = false;
         this.isComplessorActive = false;
 
+        // 移動距離
+        // moveTo = 0...上り（カウントダウン）　1...下り（カウントアップ）
         this.movedDistance = 0f;
+        this.moveTo = 1;
     }
 
     // MARK: INIT
@@ -189,6 +193,14 @@ public class TrainLogger {
                     case MOVE:
                         this.movedDistance = getDataParsed.move;
                         break;
+
+                    case MOVETO:
+                        this.moveTo = getDataParsed.moveTo;
+                        break;
+
+                    case REVERSER:
+                        this.vehicle.setVehicleState(TrainState.TrainStateType.Role, (byte)getDataParsed.reverser);
+                        break;
                 
                     case UNKNOWN:
                     default:
@@ -207,7 +219,17 @@ public class TrainLogger {
             // MARK: SEND
             // 1秒ごとに距離を積算する
             // なぜか2倍の値になるので/2する
-            this.movedDistance += (float)this.speed * SCALE_DISTANCE;
+
+            // 上りで0未満になってしまうならカウントアップ
+            float move1sec = (float)this.speed * SCALE_DISTANCE;
+            if ((moveTo == 0) && ((this.movedDistance - move1sec) < 0f )) moveTo = 1;
+
+            if (moveTo == 0) {
+                this.movedDistance -= move1sec;
+            } else {
+                this.movedDistance += move1sec;
+            }
+            
             
             // 出力 jsonにするよ～
             GsonManager gsonManager = new GsonManager(
@@ -230,12 +252,11 @@ public class TrainLogger {
                 this.stateInteriorLight, 
 
                 this.movedDistance, 
+                this.moveTo,
 
                 this.isOnRail, 
                 this.isComplessorActive
             );
-
-            
 
             // 送信
             String json = gson.toJson(gsonManager);

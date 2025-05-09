@@ -4,6 +4,8 @@ public enum NetworkCommands {
     NOTCH,
     DOOR,
     MOVE,
+    MOVETO,
+    REVERSER,
     UNKNOWN;
 
     public static NetworkCommands fromString(String value) {
