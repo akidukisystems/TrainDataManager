@@ -10,6 +10,8 @@ import jp.ngt.rtm.entity.npc.macro.TrainCommand;
 import jp.ngt.rtm.entity.train.EntityTrainBase;
 import jp.ngt.rtm.entity.train.util.TrainState;
 import jp.ngt.rtm.entity.vehicle.EntityVehicleBase;
+import jp.kaiz.atsassistmod.api.TrainControllerClient;
+import jp.kaiz.atsassistmod.api.TrainControllerClientManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
@@ -51,6 +53,14 @@ public class TrainLogger {
     public boolean isOnRail;
     public boolean isComplessorActive;
 
+    // ATSA
+    private TrainControllerClient tcc;
+    public int speedLimit;
+    public boolean isTASCEnable;
+    public boolean isTASCBraking;
+    public boolean isTASCStopPos;
+
+    // キロ程
     public float movedDistance;
     public int moveTo;
 
@@ -87,7 +97,6 @@ public class TrainLogger {
         this.statePantogtraph = 0;
         this.stateInteriorLight = 0;
 
-
         // 速度とノッチ位置取得
         this.speed = 0f;
         this.notch = 0;
@@ -99,6 +108,12 @@ public class TrainLogger {
         // 脱線・コンプレッサ
         this.isOnRail = false;
         this.isComplessorActive = false;
+
+        // ATSA
+        this.speedLimit = Integer.MAX_VALUE;
+        this.isTASCEnable = false;
+        this.isTASCBraking = false;
+        this.isTASCStopPos = false;
 
         // 移動距離
         // moveTo = 0...上り（カウントダウン）　1...下り（カウントアップ）
@@ -163,6 +178,14 @@ public class TrainLogger {
                 // 脱線・コンプレッサ
                 this.isOnRail = this.train.onRail;
                 this.isComplessorActive = this.train.complessorActive;
+
+                // ATSA
+                if ((tcc = TrainControllerClientManager.getTCC(train)) != null) {
+                    this.speedLimit = tcc.getATCSpeed();
+                    this.isTASCEnable = true;
+                    this.isTASCBraking = tcc.isTASC();
+                    this.isTASCStopPos = false;
+                }
 
                 // 値を正規化
                 this.speed *= SCALE_SPEED;
@@ -250,6 +273,11 @@ public class TrainLogger {
                 this.stateReverser, 
                 this.statePantogtraph, 
                 this.stateInteriorLight, 
+
+                this.speedLimit,
+                this.isTASCEnable,
+                this.isTASCBraking,
+                this.isTASCStopPos,
 
                 this.movedDistance, 
                 this.moveTo,

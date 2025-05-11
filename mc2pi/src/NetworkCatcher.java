@@ -1,12 +1,21 @@
-import java.io.*;
-import java.net.*;
-import javax.swing.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import org.json.JSONObject;
 
@@ -21,11 +30,36 @@ public class NetworkCatcher {
     public static final int NOTCH_MAX = -7;
     public static final int NOTCH_N = 0;
 
+    public static final int ATS_OPERATING = 0;
+    public static final int ATS_POWER = 1;
+    public static final int ATS_P_ERROR = 2;
+    public static final int ATS_P_ACTIVE = 3;
+    public static final int ATS_P_BRAKE_RELEASE = 4;
+    public static final int ATS_P_BRAKE_OPERATING = 5;
+    public static final int ATS_P_NEAR_PATTERN = 6;
+    public static final int ATS_P_POWER = 7;
+
+    public static final int TRAINSTAT_PARKING = 0;
+    public static final int TRAINSTAT_CONSTANT_SPEED = 1;
+    public static final int TRAINSTAT_DS_BRAKE = 2;
+    public static final int TRAINSTAT_SNOW_BRAKE = 3;
+    public static final int TRAINSTAT_EMERG_SHORT = 4;
+    public static final int TRAINSTAT_THREE_PHASE = 5;
+
+    public static final int TASC_POWER = 0;
+    public static final int TASC_PATTERN_ACTIVE = 1;
+    public static final int TASC_BRAKE = 2;
+    public static final int TASC_OFF = 3;
+    public static final int TASC_ERROR = 4;
+
     public static Socket clientSocket;
     Socket client;
     BufferedReader reader = null;
     PrintWriter writer = null;
     Socket c2s = null;
+
+    int id;
+    int prevId;
 
     float speed = 0f;
     int notch = 0;
@@ -35,11 +69,18 @@ public class NetworkCatcher {
     float move = 0f;
     int moveTo = 1;
     int reverser = 0;
+    int limit = Integer.MAX_VALUE;
+    boolean isTASCEnable = true;
+    boolean isTASCBraking = false;
+
+    boolean isTE = false;
 
     String distanceSetText = "0";
 
     String buttonCommand = null;
     int buttonDo = -1;
+
+    int prevDoor;
 
     Timer blinkTimer;
 
@@ -48,6 +89,23 @@ public class NetworkCatcher {
     JLabel labelMR;
     JLabel labelDistance;
     JLabel labelNotchPos;
+
+    JLabel labelTrainStat;
+    JLabel labelATS;
+    JLabel labelTASC;
+    
+    boolean[] boolTrainStat = {false, false, false, false, false, false};
+    boolean[] boolATS = {false, true, false, false, false, false, false, true};
+    boolean[] boolTASC = {true, false, false, false, false};
+
+    String txtTrainStat = "";
+    String txtATS = "";
+    String txtTASC = "";
+
+    JButton buttonDoorOpenL;
+    JButton buttonDoorOpenR;
+    JButton buttonDoorClose;
+    JButton buttonDoorReOpen;
 
     JButton buttonReverserSetF;
     JButton buttonReverserSetN;
@@ -137,27 +195,30 @@ public class NetworkCatcher {
             JButton buttonTE = new JButton("TE装置");
             buttonTE.setBounds(0, 0, 100, 50);
 
-            JButton buttonDoorOpenL = new JButton("左ドア開");
+            buttonDoorOpenL = new JButton("左ドア開");
             buttonDoorOpenL.setBounds(0, 50, 100, 50);
 
-            JButton buttonDoorOpenR = new JButton("右ドア開");
+            buttonDoorOpenR = new JButton("右ドア開");
             buttonDoorOpenR.setBounds(100, 50, 100, 50);
 
-            JButton buttonDoorClose = new JButton("ドア閉");
-            buttonDoorClose.setBounds(100, 0, 100, 50);
+            buttonDoorClose = new JButton("ドア閉");
+            buttonDoorClose.setBounds(0, 100, 100, 50);
+
+            buttonDoorReOpen = new JButton("再開扉");
+            buttonDoorReOpen.setBounds(100, 100, 100, 50);
 
             JButton buttonAction = new JButton("設定");
-            buttonAction.setBounds(200, 0, 200, 100);
+            buttonAction.setBounds(200, 50, 200, 100);
 
             JButton buttonResetDistance = new JButton("キロ程リセット");
-            buttonResetDistance.setBounds(0, 100, 150, 50);
+            buttonResetDistance.setBounds(0, 150, 150, 50);
 
             buttonReverserSetF = new JButton("前");
-            buttonReverserSetF.setBounds(150, 100, 50, 50);
+            buttonReverserSetF.setBounds(150, 150, 50, 50);
             buttonReverserSetN = new JButton("中");
-            buttonReverserSetN.setBounds(200, 100, 50, 50);
+            buttonReverserSetN.setBounds(200, 150, 50, 50);
             buttonReverserSetB = new JButton("後");
-            buttonReverserSetB.setBounds(250, 100, 50, 50);
+            buttonReverserSetB.setBounds(250, 150, 50, 50);
 
             JFrame distanceReset = new JFrame("キロ程リセット");
             distanceReset.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -195,38 +256,73 @@ public class NetworkCatcher {
             labelSpeed = new JLabel("N/A");
             labelSpeed.setFont(new Font("Arial", Font.PLAIN, 20));
             labelSpeed.setForeground(Color.BLACK);
-            labelSpeed.setBounds(0, 150, 100, 20);
+            labelSpeed.setBounds(0, 200, 100, 20);
 
             labelBC = new JLabel("N/A");
             labelBC.setFont(new Font("Arial", Font.PLAIN, 20));
             labelBC.setForeground(Color.BLACK);
-            labelBC.setBounds(100, 150, 75, 20);
+            labelBC.setBounds(100, 200, 75, 20);
 
             labelMR = new JLabel("N/A");
             labelMR.setFont(new Font("Arial", Font.PLAIN, 20));
             labelMR.setForeground(Color.BLACK);
-            labelMR.setBounds(175, 150, 75, 20);
+            labelMR.setBounds(175, 200, 75, 20);
 
             labelDistance = new JLabel("N/A");
             labelDistance.setFont(new Font("Arial", Font.PLAIN, 20));
             labelDistance.setForeground(Color.BLACK);
-            labelDistance.setBounds(250, 150, 100, 20);
+            labelDistance.setBounds(250, 200, 100, 20);
 
             labelNotchPos = new JLabel("N/A");
             labelNotchPos.setFont(new Font("Arial", Font.PLAIN, 20));
             labelNotchPos.setForeground(Color.BLACK);
-            labelNotchPos.setBounds(350, 150, 50, 20);
+            labelNotchPos.setBounds(350, 200, 50, 20);
 
-            buttonTE.addActionListener(_ -> sendCommand("send", "notch", NOTCH_MAX));
+            labelTrainStat = new JLabel("");
+            labelTrainStat.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
+            labelTrainStat.setForeground(Color.BLACK);
+            labelTrainStat.setBounds(0, 250, 600, 20);
+
+            labelATS = new JLabel("");
+            labelATS.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
+            labelATS.setForeground(Color.BLACK);
+            labelATS.setBounds(0, 300, 600, 20);
+
+            labelTASC = new JLabel("");
+            labelTASC.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
+            labelTASC.setForeground(Color.BLACK);
+            labelTASC.setBounds(0, 350, 600, 20);
+
+            buttonTE.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    sendCommand("send", "notch", NOTCH_EB);
+                    boolTrainStat[TRAINSTAT_DS_BRAKE] = true;
+                    boolTrainStat[TRAINSTAT_EMERG_SHORT] = true;
+                    boolATS[ATS_OPERATING] = true;
+                    isTE = true;
+                }
+            });
+
             buttonDoorOpenL.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (buttonDo == DOOR_LEFT) {
+                    if (buttonDo != -1) {
                         buttonCommand = null;
-                        buttonDo = -1;
-                        blinkTimer.stop();
                         buttonAction.setBackground(Color.WHITE);
                         buttonDoorOpenL.setBackground(Color.WHITE);
+                        buttonDoorOpenR.setBackground(Color.WHITE);
+                        buttonDoorClose.setBackground(Color.WHITE);
+                        buttonDoorReOpen.setBackground(Color.WHITE);
+                        
+                        if (buttonDo != DOOR_LEFT) {
+                            buttonCommand = "door";
+                            buttonDo = DOOR_LEFT;
+                            blinkTimer.start();
+                        } else {
+                            buttonDo = -1;
+                            blinkTimer.stop();
+                        }
                     } else {
                         buttonCommand = "door";
                         buttonDo = DOOR_LEFT;
@@ -237,12 +333,22 @@ public class NetworkCatcher {
             buttonDoorOpenR.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (buttonDo == DOOR_RIGHT) {
+                    if (buttonDo != -1) {
                         buttonCommand = null;
-                        buttonDo = -1;
-                        blinkTimer.stop();
                         buttonAction.setBackground(Color.WHITE);
+                        buttonDoorOpenL.setBackground(Color.WHITE);
                         buttonDoorOpenR.setBackground(Color.WHITE);
+                        buttonDoorClose.setBackground(Color.WHITE);
+                        buttonDoorReOpen.setBackground(Color.WHITE);
+
+                        if (buttonDo != DOOR_RIGHT) {
+                            buttonCommand = "door";
+                            buttonDo = DOOR_RIGHT;
+                            blinkTimer.start();
+                        } else {
+                            buttonDo = -1;
+                            blinkTimer.stop();
+                        }
                     } else {
                         buttonCommand = "door";
                         buttonDo = DOOR_RIGHT;
@@ -253,12 +359,22 @@ public class NetworkCatcher {
             buttonDoorClose.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (buttonDo == DOOR_CLOSE) {
+                    if (buttonDo != -1) {
                         buttonCommand = null;
-                        buttonDo = -1;
-                        blinkTimer.stop();
                         buttonAction.setBackground(Color.WHITE);
+                        buttonDoorOpenL.setBackground(Color.WHITE);
+                        buttonDoorOpenR.setBackground(Color.WHITE);
                         buttonDoorClose.setBackground(Color.WHITE);
+                        buttonDoorReOpen.setBackground(Color.WHITE);
+                        
+                        if (buttonDo != DOOR_CLOSE) {
+                            buttonCommand = "door";
+                            buttonDo = DOOR_CLOSE;
+                            blinkTimer.start();
+                        } else {
+                            buttonDo = -1;
+                            blinkTimer.stop();
+                        }
                     } else {
                         buttonCommand = "door";
                         buttonDo = DOOR_CLOSE;
@@ -266,12 +382,30 @@ public class NetworkCatcher {
                     }
                 }
             });
+            buttonDoorReOpen.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    buttonCommand = null;
+                    buttonDo = -1;
+                    blinkTimer.stop();
+                    buttonAction.setBackground(Color.WHITE);
+                    buttonDoorOpenL.setBackground(Color.WHITE);
+                    buttonDoorOpenR.setBackground(Color.WHITE);
+                    buttonDoorClose.setBackground(Color.WHITE);
+                    buttonDoorReOpen.setBackground(Color.WHITE);
+                    sendCommand("send", "door", prevDoor);
+                }
+            });
+
             buttonResetDistance.addActionListener(_ -> distanceReset.setVisible(true));
             buttonAction.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     switch (buttonCommand) {
                         case "door":
+                            if (buttonDo == 0) {
+                                prevDoor = door;
+                            }
                             sendCommand("send", buttonCommand, buttonDo);
                             break;
                     
@@ -358,6 +492,7 @@ public class NetworkCatcher {
             p.add(buttonDoorOpenL);
             p.add(buttonDoorOpenR);
             p.add(buttonDoorClose);
+            p.add(buttonDoorReOpen);
             p.add(buttonResetDistance);
             p.add(buttonAction);
 
@@ -366,6 +501,11 @@ public class NetworkCatcher {
             p.add(labelMR);
             p.add(labelDistance);
             p.add(labelNotchPos);
+
+            p.add(labelTrainStat);
+            p.add(labelATS);
+            p.add(labelTASC);
+
             p.add(buttonReverserSetF);
             p.add(buttonReverserSetN);
             p.add(buttonReverserSetB);
@@ -412,6 +552,9 @@ public class NetworkCatcher {
                     JSONObject jsonObj = new JSONObject(fetchData);
                     switch (jsonObj.getString("type")) {
                         case "send":
+                            // 受信
+                            prevId = id;
+                            id = jsonObj.getInt("id");
                             speed = jsonObj.getFloat("speed");
                             notch = jsonObj.getInt("notch");
                             door = jsonObj.getInt("door");
@@ -420,14 +563,45 @@ public class NetworkCatcher {
                             move = jsonObj.getFloat("move");
                             moveTo = jsonObj.getInt("moveTo");
                             reverser = jsonObj.getInt("reverser");
+                            limit = jsonObj.getInt("speedLimit");
+                            isTASCEnable = jsonObj.getBoolean("isTASCEnable");
+                            isTASCBraking = jsonObj.getBoolean("isTASCBraking");
 
+                            if (prevId != id) {
+                                boolTrainStat = new boolean[]{false, false, false, false, false, false};
+                                boolATS = new boolean[]{false, true, false, false, false, false, false, true};
+                                boolTASC = new boolean[]{true, false, false, false, false};
+                            }
+
+                            if ((isTE) && (notch != NOTCH_EB)) {
+                                boolTrainStat[TRAINSTAT_DS_BRAKE] = false;
+                                boolTrainStat[TRAINSTAT_EMERG_SHORT] = false;
+                                boolATS[ATS_OPERATING] = false;
+                                isTE = false;
+                            }
+
+                            // GUI更新
                             SwingUtilities.invokeLater(() -> {
                                 labelSpeed.setText(String.format("%dkm/h", (int) speed));
                                 labelBC.setText(String.format("%dkpa", bc));
                                 labelMR.setText(String.format("%dkpa", mr));
                                 labelDistance.setText(String.format("%.1fkm", move / 1000f));
+
+                                if (speed < 5) {
+                                    buttonDoorClose.setEnabled(true);
+                                    buttonDoorOpenL.setEnabled(true);
+                                    buttonDoorOpenR.setEnabled(true);
+                                    buttonDoorReOpen.setEnabled(true);
+                                } else {
+                                    buttonDoorClose.setEnabled(false);
+                                    buttonDoorOpenL.setEnabled(false);
+                                    buttonDoorOpenR.setEnabled(false);
+                                    buttonDoorReOpen.setEnabled(false);
+                                    prevDoor = 0;
+                                }
                                 
-                                Boolean canChangeReverser = false;
+                                // ノッチとレバーサ
+                                boolean canChangeReverser = false;
                                 if (notch == NOTCH_EB) {
                                     labelNotchPos.setText("EB");
                                     canChangeReverser = true;
@@ -475,6 +649,60 @@ public class NetworkCatcher {
                                     buttonReverserSetN.setEnabled(false);
                                     buttonReverserSetB.setEnabled(false);
                                 }
+
+                                // モニタ類
+
+                                boolATS[ATS_P_ACTIVE] = limit != Integer.MAX_VALUE ? true : false;
+                                
+                                boolATS[ATS_P_NEAR_PATTERN] = false;
+                                if ((limit -5) < speed) {
+                                    if( boolATS[ATS_P_ACTIVE] == true)
+                                        boolATS[ATS_P_NEAR_PATTERN] = true;
+                                }
+
+                                boolATS[ATS_P_BRAKE_OPERATING] = false;
+                                if (limit < speed) {
+                                    if( boolATS[ATS_P_ACTIVE] == true)
+                                        boolATS[ATS_P_BRAKE_OPERATING] = true;
+                                }
+                                
+                                boolTASC[TASC_POWER] = isTASCEnable;
+                                
+                                boolTASC[TASC_PATTERN_ACTIVE] = false;
+                                boolTASC[TASC_BRAKE] = false;
+                                if (isTASCBraking) {
+                                    boolTASC[TASC_POWER] = true;
+                                    boolTASC[TASC_PATTERN_ACTIVE] = true;
+                                    boolTASC[TASC_BRAKE] = true;
+                                }
+
+                                txtTrainStat = "";
+                                txtTrainStat += boolTrainStat[TRAINSTAT_PARKING] ? "駐車　" : "";
+                                txtTrainStat += boolTrainStat[TRAINSTAT_CONSTANT_SPEED] ? "定速　" : "";
+                                txtTrainStat += boolTrainStat[TRAINSTAT_DS_BRAKE] ? "直予B　" : "";
+                                txtTrainStat += boolTrainStat[TRAINSTAT_SNOW_BRAKE] ? "耐雪B　" : "";
+                                txtTrainStat += boolTrainStat[TRAINSTAT_EMERG_SHORT] ? "非短　" : "";
+                                txtTrainStat += boolTrainStat[TRAINSTAT_THREE_PHASE] ? "三相　" : "";
+                                labelTrainStat.setText(txtTrainStat);
+
+                                txtATS = "";
+                                txtATS += boolATS[ATS_OPERATING] ? "ATS動作　" : "";
+                                txtATS += boolATS[ATS_POWER] ? "ATS電源　" : "";
+                                txtATS += boolATS[ATS_P_ERROR] ? "故障　" : "";
+                                txtATS += boolATS[ATS_P_ACTIVE] ? "ATS-P　" : "";
+                                txtATS += boolATS[ATS_P_BRAKE_RELEASE] ? "B解放　" : "";
+                                txtATS += boolATS[ATS_P_BRAKE_OPERATING] ? "B動作　" : "";
+                                txtATS += boolATS[ATS_P_NEAR_PATTERN] ? "パタン接近　" : "";
+                                txtATS += boolATS[ATS_P_POWER] ? "P電源" : "";
+                                labelATS.setText(txtATS);
+
+                                txtTASC = "";
+                                txtTASC += boolTASC[TASC_POWER] ? "TASC電源　" : "";
+                                txtTASC += boolTASC[TASC_PATTERN_ACTIVE] ? "パタン　" : "";
+                                txtTASC += boolTASC[TASC_BRAKE] ? "B動作　" : "";
+                                txtTASC += boolTASC[TASC_OFF] ? "切　" : "";
+                                txtTASC += boolTASC[TASC_ERROR] ? "故障　" : "";
+                                labelTASC.setText(txtTASC);
                             });
 
                             System.out.println(String.format("speed:%.2fkm/h notch:%d door:%d bc:%d mr:%d move:%.2f", speed, notch, door, bc, mr, move));
@@ -494,6 +722,9 @@ public class NetworkCatcher {
                                 buttonReverserSetF.setEnabled(false);
                                 buttonReverserSetN.setEnabled(false);
                                 buttonReverserSetB.setEnabled(false);
+                                labelTrainStat.setText("");
+                                labelATS.setText("");
+                                labelTASC.setText("");
                             break;
                         
                         default:

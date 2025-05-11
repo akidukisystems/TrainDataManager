@@ -21,6 +21,11 @@ public class GsonManager {
     public int pantograph;
     public int interiorlight;
 
+    public int speedLimit;
+    public boolean isTASCEnable;
+    public boolean isTASCBraking;
+    public boolean isTASCStopPos;
+
     public float move;
     public int moveTo;
 
@@ -46,6 +51,11 @@ public class GsonManager {
         int pantograph, 
         int interiorlight, 
 
+        int speedLimit,
+        boolean isTASCEnable,
+        boolean isTASCBraking,
+        boolean isTASCStopPos,
+
         float move, 
         int moveTo,
 
@@ -69,6 +79,11 @@ public class GsonManager {
         this.reverser = reverser;
         this.pantograph = pantograph;
         this.interiorlight = interiorlight;
+
+        this.speedLimit = speedLimit;
+        this.isTASCEnable = isTASCEnable;
+        this.isTASCBraking = isTASCBraking;
+        this.isTASCStopPos = isTASCStopPos;
 
         this.move = move;
         this.moveTo = moveTo;
