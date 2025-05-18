@@ -32,39 +32,69 @@ public class TrainLogger {
     private EntityVehicleBase vehicle;
 
     // ID取得
-    public int id;
-    public int id2;
+    private int id;
+    private int id2;
 
     // ステータスを取得
-    public byte stateDoor;
-    public byte stateLight;
-    public byte stateRollsign;
-    public byte stateReverser;
-    public byte statePantogtraph;
-    public byte stateInteriorLight;
+    private byte stateDoor;
+    private byte stateLight;
+    private byte stateRollsign;
+    private byte stateReverser;
+    private byte statePantogtraph;
+    private byte stateInteriorLight;
 
     // 速度とノッチ位置取得
-    public float speed;
-    public int notch;
+    private float speed;
+    private int notch;
 
     // BC MR圧力
-    public int bc;
-    public int mr;
+    private int bc;
+    private int mr;
 
     // 脱線・コンプレッサ
-    public boolean isOnRail;
-    public boolean isComplessorActive;
+    private boolean isOnRail;
+    private boolean isComplessorActive;
 
     // ATSA
     private TrainControllerClient tcc;
-    public int speedLimit;
-    public boolean isTASCEnable;
-    public boolean isTASCBraking;
-    public boolean isTASCStopPos;
+    private int speedLimit;
+    private boolean isTASCEnable;
+    private boolean isTASCBraking;
+    private boolean isTASCStopPos;
 
     // キロ程
-    public float movedDistance;
-    public int moveTo;
+    private float movedDistance;
+    private int moveTo;
+
+    // Getter and Setter
+    public int getBc() {
+        return bc;
+    }
+    public void setBc(int bc) {
+        this.bc = bc;
+    }
+
+    public int getMr() {
+        return mr;
+    }
+    public void setMr(int mr) {
+        this.mr = mr;
+    }
+
+    public float getMovedDistance() {
+        return movedDistance;
+    }
+    public void setMovedDistance(float movedDistance) {
+        this.movedDistance = movedDistance;
+    }
+
+    public int getMoveTo() {
+        return moveTo;
+    }
+    public void setMoveTo(int moveTo) {
+        this.moveTo = moveTo;
+    }
+
 
     private static final Gson gson = new Gson();
     private static final float SCALE_SPEED = 72f;
