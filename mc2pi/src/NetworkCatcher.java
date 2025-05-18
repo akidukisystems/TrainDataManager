@@ -739,7 +739,82 @@ public class NetworkCatcher {
         });
     }
 
+    private void handleArrivingStation() {
+        // 次駅まで300m未満
+        if (beaconGetedPos != 0f) {
+            System.out.println(beaconGetedPos + 300f - move);
+            System.out.println(speed * 3);
 
+            // 次駅接近報知
+            if (!isArrivingStation) {
+                // 今の速度から駅までの予想停車距離を計算し、駅までの距離を上回ったら報知
+                if ((speed * 3) > (beaconGetedPos + 300f - move)) {
+                    isArrivingStation = true;
+                }
+            }
+        }
+
+        // 所定停目付近に停車か、100m以上通過した場合解除
+        if ((0 >= (beaconGetedPos + 300f - move + 100f)) || (!isRunningTrain() && (5f >= (beaconGetedPos + 300f - move)))) {
+            isArrivingStation = false;
+            beaconGetedPos = 0f;
+        }
+    }
+
+    private void handleSafety() {
+        // TE装置解除用
+        if ((isTE) && (notch != NOTCH_EB)) {
+            isTE = false;
+        }
+
+        // EB装置解除用
+        if ((isEB) && (notch != NOTCH_EB)) {
+            boolTrainStatEx[TRAINSTAT_EX_EB] = false;
+            isEB = false;
+            ebTimer.stop();
+            ebActiveTimer.stop();
+        }
+
+        // EB装置
+        if (isRunningTrain()) {
+            if (prevNotch == notch) {
+                if (!ebTimer.isRunning()) ebTimer.start();
+            } else {
+                if (ebActiveTimer.isRunning()) {
+                    boolTrainStatEx[TRAINSTAT_EX_EB] = false;
+                }
+                ebTimer.stop();
+                ebActiveTimer.stop();
+                isEB = false;
+            }
+        } else {
+            if (ebActiveTimer.isRunning()) {
+                boolTrainStatEx[TRAINSTAT_EX_EB] = false;
+            }
+            ebTimer.stop();
+            ebActiveTimer.stop();
+            isEB = false;
+        }
+
+        // 走行中戸開時 
+        if (isRunningTrain() && !isDoorClose) {
+            isRunningDoorOpen = true;
+        } else {
+            isRunningDoorOpen = false;
+        }
+
+        if (boolATS[ATS_P_BRAKE_OPERATING] && (bc < 200)) {
+            if (isATSPBrakeWorking) {
+                ATSPBrakeNWC ++;
+                if (ATSPBrakeNWC > ATSP_BRAKE_NWC_TIME) {
+                    isATSPBrakeWorking = false;
+                }
+            }
+        } else {
+            ATSPBrakeNWC = 0;
+            isATSPBrakeWorking = true;
+        }
+    }
 
     public void running() throws IOException {
         this.clientInit(PORT);
@@ -792,19 +867,6 @@ public class NetworkCatcher {
                                 boolTrainStatEx = new boolean[]{false, false, false};
                             }
 
-                            // TE装置解除用
-                            if ((isTE) && (notch != NOTCH_EB)) {
-                                isTE = false;
-                            }
-
-                            // EB装置解除用
-                            if ((isEB) && (notch != NOTCH_EB)) {
-                                boolTrainStatEx[TRAINSTAT_EX_EB] = false;
-                                isEB = false;
-                                ebTimer.stop();
-                                ebActiveTimer.stop();
-                            }
-
                             // ドア閉めるとき時間差で表示
                             if (door == 0) {
                                 if (!isDoorClose) {
@@ -818,65 +880,8 @@ public class NetworkCatcher {
                                 isDoorClose = false;
                             }
 
-                            // EB装置
-                            if (isRunningTrain()) {
-                                if (prevNotch == notch) {
-                                    if (!ebTimer.isRunning()) ebTimer.start();
-                                } else {
-                                    if (ebActiveTimer.isRunning()) {
-                                        boolTrainStatEx[TRAINSTAT_EX_EB] = false;
-                                    }
-                                    ebTimer.stop();
-                                    ebActiveTimer.stop();
-                                    isEB = false;
-                                }
-                            } else {
-                                if (ebActiveTimer.isRunning()) {
-                                    boolTrainStatEx[TRAINSTAT_EX_EB] = false;
-                                }
-                                ebTimer.stop();
-                                ebActiveTimer.stop();
-                                isEB = false;
-                            }
-
-                            // 走行中戸開時 
-                            if (isRunningTrain() && !isDoorClose) {
-                                isRunningDoorOpen = true;
-                            } else {
-                                isRunningDoorOpen = false;
-                            }
-
-                            if (boolATS[ATS_P_BRAKE_OPERATING] && (bc < 200)) {
-                                if (isATSPBrakeWorking) {
-                                    ATSPBrakeNWC ++;
-                                    if (ATSPBrakeNWC > ATSP_BRAKE_NWC_TIME) {
-                                        isATSPBrakeWorking = false;
-                                    }
-                                }
-                            } else {
-                                ATSPBrakeNWC = 0;
-                                isATSPBrakeWorking = true;
-                            }
-
-                            // 次駅まで300m未満
-                            if (beaconGetedPos != 0f) {
-                                System.out.println(beaconGetedPos + 300f - move);
-                                System.out.println(speed * 3);
-
-                                // 次駅接近報知
-                                if (!isArrivingStation) {
-                                    // 今の速度から駅までの予想停車距離を計算し、駅までの距離を上回ったら報知
-                                    if ((speed * 3) > (beaconGetedPos + 300f - move)) {
-                                        isArrivingStation = true;
-                                    }
-                                }
-                            }
-
-                            // 所定停目付近に停車か、100m以上通過した場合解除
-                            if ((0 >= (beaconGetedPos + 300f - move + 100f)) || (!isRunningTrain() && (5f >= (beaconGetedPos + 300f - move)))) {
-                                isArrivingStation = false;
-                                beaconGetedPos = 0f;
-                            }
+                            handleSafety();
+                            handleArrivingStation();
 
                             // GUI更新
                             if (!refreshTimer.isRunning()) refreshTimer.start();

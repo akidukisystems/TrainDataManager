@@ -1,7 +1,5 @@
 package jp.akidukisystems.traindatamanager.Gson;
 
-import scala.annotation.meta.companionObject;
-
 public class NetworkPacket {
     public String type;
     public String doAny;
