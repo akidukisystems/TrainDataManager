@@ -16,10 +16,10 @@ public class TDMCore {
     public static final String VERSION = "1.0";
     private static final TrainLogger LOGGER_INSTANCE = new TrainLogger();
 
-    // ロガー
+    // 繝ｭ繧ｬ繝ｼ
     private static Logger logger;
 
-    // Modインスタンス
+    // Mod繧､繝ｳ繧ｹ繧ｿ繝ｳ繧ｹ
     @Mod.Instance(MODID)
     public static TDMCore INSTANCE;
 
@@ -35,7 +35,7 @@ public class TDMCore {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        // イベントバス登録
+        // 繧､繝吶Φ繝医ヰ繧ｹ逋ｻ骭ｲ
         MinecraftForge.EVENT_BUS.register(LOGGER_INSTANCE);
     }
 }
