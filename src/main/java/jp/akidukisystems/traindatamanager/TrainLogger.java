@@ -1,26 +1,22 @@
 package jp.akidukisystems.traindatamanager;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 import com.google.gson.Gson;
 
-import jp.ngt.rtm.entity.npc.macro.TrainCommand;
-import jp.ngt.rtm.entity.train.EntityTrainBase;
-import jp.ngt.rtm.entity.train.util.TrainState;
-import jp.ngt.rtm.entity.vehicle.EntityVehicleBase;
 import jp.akidukisystems.traindatamanager.Gson.NetworkPacket;
 import jp.kaiz.atsassistmod.api.TrainControllerClient;
 import jp.kaiz.atsassistmod.api.TrainControllerClientManager;
+import jp.ngt.rtm.entity.train.EntityTrainBase;
+import jp.ngt.rtm.entity.train.util.TrainState;
+import jp.ngt.rtm.entity.vehicle.EntityVehicleBase;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.event.world.WorldEvent;
 
 @SideOnly(Side.CLIENT)
 public class TrainLogger {
@@ -95,29 +91,18 @@ public class TrainLogger {
         this.moveTo = moveTo;
     }
 
-
     private static final Gson gson = new Gson();
-    private static final float SCALE_SPEED = 72f;
-    private static final int SCALE_BC = 3;
-    private static final float SCALE_MR = 0.311f;
-    private static final float SCALE_DISTANCE = 1000f /3600f /2f;
+    private static final float SCALE_SPEED = 72f;                   // 72分の1した値が出る
+    private static final int SCALE_BC = 3;                          // 3分の1した値が出る
+    private static final float SCALE_MR = 0.311f;                   // 0.311倍すると現実的な値になる
+    private static final float SCALE_DISTANCE = 1000f /3600f /2f;   // 1km / 1h / 何故か2倍した値なので /2
+    private static final int TICK_GET_DATA_INTERVAL = 10;           // 10tickごとに列車データ取得
+    private static final int MOVE_DIRECTION_UP = 1;                 // 上り方向
+    private static final int MOVE_DIRECTION_DOWN = 0;               // 下り方向
 
     private boolean isFirst = true;
 
-    enum commands {
-        NOTCH, DOOR, MOVE, MOVETO, DISTANCE, REVERSER
-    }
-
-    @SubscribeEvent
-    public void onLoad(WorldEvent.Load event) {
-        if (networkManager != null) {
-            networkManager.serverClose();
-        }
-
-        networkManager = new NetworkManager();
-        networkManager.serverInit(ConfigManager.networkPort);
-        networkManager.serverWaitingClient();
-
+    private void Initialize(){
         this.id = 0;
         this.id2 = 0;
 
@@ -153,6 +138,110 @@ public class TrainLogger {
         this.moveTo = 1;
     }
 
+    private void getTrainData(EntityPlayer player){
+        // 列車の情報を取得
+        Entity entity = player.getRidingEntity();
+        if (entity instanceof EntityTrainBase && entity instanceof EntityVehicleBase) {
+            this.train = (EntityTrainBase) entity;
+            this.vehicle = (EntityVehicleBase) entity;
+        } else {
+            return; // 不正な乗り物なら何もしない
+        }
+
+        // ID取得
+        this.id = this.train.getEntityId();
+        this.id2 = this.vehicle.getEntityId();
+
+        // ステータスを取得
+        this.stateDoor = this.vehicle.getVehicleState(TrainState.TrainStateType.Door);
+        this.stateLight = this.vehicle.getVehicleState(TrainState.TrainStateType.Light);
+        this.stateRollsign = this.vehicle.getVehicleState(TrainState.TrainStateType.Destination);
+        this.stateReverser = this.vehicle.getVehicleState(TrainState.TrainStateType.Role);
+        this.statePantogtraph = this.vehicle.getVehicleState(TrainState.TrainStateType.Pantograph);
+        this.stateInteriorLight = this.vehicle.getVehicleState(TrainState.TrainStateType.InteriorLight);
+
+        // 速度とノッチ位置取得
+        this.speed = this.train.getSpeed();
+        this.notch = this.train.getNotch();
+
+        // BC MR圧力
+        this.bc = this.train.brakeCount;
+        this.mr = this.train.brakeAirCount;
+
+        // 脱線・コンプレッサ
+        this.isOnRail = this.train.onRail;
+        this.isComplessorActive = this.train.complessorActive;
+
+        // ATSA
+        if ((tcc = TrainControllerClientManager.getTCC(train)) != null) {
+            this.speedLimit = tcc.getATCSpeed();
+            this.isTASCEnable = true;
+            this.isTASCBraking = tcc.isTASC();
+            this.isTASCStopPos = false;
+        }
+
+        // 値を正規化
+        this.speed *= SCALE_SPEED;
+        this.bc *= SCALE_BC;
+        this.mr *= SCALE_MR;
+    }
+
+    private void handleGetData(String str) {
+        NetworkPacket getDataParsed = gson.fromJson(str, NetworkPacket.class);
+
+        NetworkCommands command = NetworkCommands.fromString(getDataParsed.doAny);
+
+        switch (command) {
+            case NOTCH:
+                int notchLevel = getDataParsed.notch;
+                if((-9<notchLevel) && (notchLevel<6)) {
+                    this.train.setNotch(notchLevel);
+                }
+                break;
+        
+            case DOOR:
+                byte doorStatus = (byte) getDataParsed.door;
+                if(doorStatus < 4) {
+                    this.vehicle.setVehicleState(TrainState.TrainStateType.Door, doorStatus);
+                }
+                break;
+        
+            case MOVE:
+                this.movedDistance = getDataParsed.move;
+                break;
+
+            case MOVETO:
+                this.moveTo = getDataParsed.moveTo;
+                break;
+
+            case REVERSER:
+                this.vehicle.setVehicleState(TrainState.TrainStateType.Role, (byte)getDataParsed.reverser);
+                break;
+        
+            case UNKNOWN:
+            default:
+                if (ConfigManager.isLogging) {
+                    System.out.println("Unknown command: " + getDataParsed.doAny);
+                }
+                break;
+        }
+    }
+
+
+
+    @SubscribeEvent
+    public void onLoad(WorldEvent.Load event) {
+        if (networkManager != null) {
+            networkManager.serverClose();
+        }
+
+        networkManager = new NetworkManager();
+        networkManager.serverInit(ConfigManager.networkPort);
+        networkManager.serverWaitingClient();
+
+        Initialize();
+    }
+
     // MARK: INIT
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
@@ -178,103 +267,20 @@ public class TrainLogger {
             // MARK: GET
             // データ取得
             String getData = null;
-
             getData = networkManager.getLatestReceivedString();
 
             // jsonパース
             // データあるのとデータ送信するtickなら初期化
-
             String NBTJson = BlockNBTGetter.getNBTAtPlayerFoot(player);
             if (NBTJson != null) networkManager.serverSendString(NBTJson);
 
+            // 列車情報取得
+            // 取得情報処理
             tickCounter++;
-            if (getData != null || tickCounter >= 10) {
-                // 列車の情報を取得
-                this.train = (EntityTrainBase) player.getRidingEntity();
-                this.vehicle = (EntityVehicleBase) player.getRidingEntity();
+            if (getData != null || tickCounter >= TICK_GET_DATA_INTERVAL) getTrainData(player);
+            if (getData != null) handleGetData(getData);
 
-                // ID取得
-                this.id = this.train.getEntityId();
-                this.id2 = this.vehicle.getEntityId();
-
-                // ステータスを取得
-                this.stateDoor = this.vehicle.getVehicleState(TrainState.TrainStateType.Door);
-                this.stateLight = this.vehicle.getVehicleState(TrainState.TrainStateType.Light);
-                this.stateRollsign = this.vehicle.getVehicleState(TrainState.TrainStateType.Destination);
-                this.stateReverser = this.vehicle.getVehicleState(TrainState.TrainStateType.Role);
-                this.statePantogtraph = this.vehicle.getVehicleState(TrainState.TrainStateType.Pantograph);
-                this.stateInteriorLight = this.vehicle.getVehicleState(TrainState.TrainStateType.InteriorLight);
-
-                // 速度とノッチ位置取得
-                this.speed = this.train.getSpeed();
-                this.notch = this.train.getNotch();
-
-                // BC MR圧力
-                this.bc = this.train.brakeCount;
-                this.mr = this.train.brakeAirCount;
-
-                // 脱線・コンプレッサ
-                this.isOnRail = this.train.onRail;
-                this.isComplessorActive = this.train.complessorActive;
-
-                // ATSA
-                if ((tcc = TrainControllerClientManager.getTCC(train)) != null) {
-                    this.speedLimit = tcc.getATCSpeed();
-                    this.isTASCEnable = true;
-                    this.isTASCBraking = tcc.isTASC();
-                    this.isTASCStopPos = false;
-                }
-
-                // 値を正規化
-                this.speed *= SCALE_SPEED;
-                this.bc *= SCALE_BC;
-                this.mr *= SCALE_MR;
-            }
-
-            if (getData != null) {
-                NetworkPacket getDataParsed = gson.fromJson(getData, NetworkPacket.class);
-
-                NetworkCommands command = NetworkCommands.fromString(getDataParsed.doAny);
-
-                switch (command) {
-                    case NOTCH:
-                        int notchLevel = getDataParsed.notch;
-                        if((-9<notchLevel) && (notchLevel<6)) {
-                            this.train.setNotch(notchLevel);
-                        }
-                        break;
-                
-                    case DOOR:
-                        byte doorStatus = (byte) getDataParsed.door;
-                        if(doorStatus < 4) {
-                            this.vehicle.setVehicleState(TrainState.TrainStateType.Door, doorStatus);
-                        }
-                        break;
-                
-                    case MOVE:
-                        this.movedDistance = getDataParsed.move;
-                        break;
-
-                    case MOVETO:
-                        this.moveTo = getDataParsed.moveTo;
-                        break;
-
-                    case REVERSER:
-                        this.vehicle.setVehicleState(TrainState.TrainStateType.Role, (byte)getDataParsed.reverser);
-                        break;
-                
-                    case UNKNOWN:
-                    default:
-                        if (ConfigManager.isLogging) {
-                            System.out.println("Unknown command: " + getDataParsed.doAny);
-                        }
-                        break;
-                }
-
-                if (ConfigManager.isLogging) System.out.println(String.format("GET"));
-            }
-
-            if (tickCounter < 10) return; // 10tickごと
+            if (tickCounter < TICK_GET_DATA_INTERVAL) return; // 10tickごと
             tickCounter = 0;
 
             // MARK: SEND
@@ -283,9 +289,9 @@ public class TrainLogger {
 
             // 上りで0未満になってしまうならカウントアップ
             float move1sec = (float)this.speed * SCALE_DISTANCE;
-            if ((moveTo == 0) && ((this.movedDistance - move1sec) < 0f )) moveTo = 1;
+            if ((moveTo == MOVE_DIRECTION_DOWN) && ((this.movedDistance - move1sec) < 0f )) moveTo = MOVE_DIRECTION_UP;
 
-            if (moveTo == 0) {
+            if (moveTo == MOVE_DIRECTION_DOWN) {
                 this.movedDistance -= move1sec;
             } else {
                 this.movedDistance += move1sec;
@@ -339,8 +345,10 @@ public class TrainLogger {
     @SubscribeEvent
     public void disconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
         System.out.println("disconnected.");
-        networkManager.serverSendString("{\"type\":\"kill\"}");
+        if (networkManager != null) {
+            networkManager.serverSendString("{\"type\":\"kill\"}");
+            networkManager.serverClose();
+        }
         isFirst = true;
-        networkManager.serverClose();
     }
 }
