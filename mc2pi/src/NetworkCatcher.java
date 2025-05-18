@@ -38,6 +38,7 @@ public class NetworkCatcher {
     public static final int ATS_P_BRAKE_OPERATING = 5;
     public static final int ATS_P_NEAR_PATTERN = 6;
     public static final int ATS_P_POWER = 7;
+    public static final int ATS_P_BRAKE_OPERATING_EB = 8;
 
     public static final int TRAINSTAT_PARKING = 0;
     public static final int TRAINSTAT_CONSTANT_SPEED = 1;
@@ -45,6 +46,7 @@ public class NetworkCatcher {
     public static final int TRAINSTAT_SNOW_BRAKE = 3;
     public static final int TRAINSTAT_EMERG_SHORT = 4;
     public static final int TRAINSTAT_THREE_PHASE = 5;
+    public static final int TRAINSTAT_EB = 6;
 
     public static final int TASC_POWER = 0;
     public static final int TASC_PATTERN_ACTIVE = 1;
@@ -54,6 +56,7 @@ public class NetworkCatcher {
 
     public static final int TRAINSTAT_EX_DOOR_CLOSE = 0;
     public static final int TRAINSTAT_EX_EB = 1;
+    public static final int TRAINSTAT_EX_STA = 2;
 
     public static Socket clientSocket;
     Socket client;
@@ -73,11 +76,13 @@ public class NetworkCatcher {
     int moveTo = 1;
     int reverser = 0;
     int limit = Integer.MAX_VALUE;
+
     boolean isTASCEnable = true;
     boolean isTASCBraking = false;
 
     boolean isTE = false;
     boolean isEB = false;
+    boolean isATSPBrakeWorking = true;
 
     String distanceSetText = "0";
 
@@ -86,6 +91,19 @@ public class NetworkCatcher {
 
     int prevDoor;
     int prevNotch;
+
+    boolean isDoorClose = true;
+    boolean isRunningDoorOpen = false;
+
+    int doorCloseCount = 0;
+    int ATSPBrakeNWC = 0;
+    public static final int DOOR_CLOSE_TIME = 8;
+    public static final int ATSP_BRAKE_NWC_TIME = 10;
+
+    int signal_0;
+    int signal_1;
+    boolean isArrivingStation = false;
+    float beaconGetedPos = 0;
 
     Timer blinkTimer;
     Timer refreshTimer;
@@ -103,10 +121,10 @@ public class NetworkCatcher {
     JLabel labelTASC;
     JLabel labelTrainStatEx;
     
-    boolean[] boolTrainStat = {false, false, false, false, false, false};
-    boolean[] boolATS = {false, true, false, false, false, false, false, true};
+    boolean[] boolTrainStat = {false, false, false, false, false, false, false};
+    boolean[] boolATS = {false, true, false, false, false, false, false, true, false};
     boolean[] boolTASC = {true, false, false, false, false};
-    boolean[] boolTrainStatEx = {false, false};
+    boolean[] boolTrainStatEx = {false, false, false};
 
     String txtTrainStat = "";
     String txtATS = "";
@@ -186,6 +204,10 @@ public class NetworkCatcher {
         obj.put("doAny", doAny);
         obj.put(doAny, value);
         clientSendString(obj.toString());
+    }
+
+    public boolean isRunningTrain() {
+        return (speed > 5);
     }
 
     public void setupUI() {
@@ -309,9 +331,6 @@ public class NetworkCatcher {
         buttonTE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sendCommand("send", "notch", NOTCH_EB);
-                boolTrainStat[TRAINSTAT_DS_BRAKE] = true;
-                boolATS[ATS_OPERATING] = true;
                 isTE = true;
             }
         });
@@ -560,20 +579,21 @@ public class NetworkCatcher {
             labelMR.setText(String.format("%dkpa", mr));
             labelDistance.setText(String.format("%.1fkm", move / 1000f));
 
-            if (speed < 5) {
-                buttonDoorClose.setEnabled(true);
-                buttonDoorOpenL.setEnabled(true);
-                buttonDoorOpenR.setEnabled(true);
-                buttonDoorReOpen.setEnabled(true);
-            } else {
+            // 走行時戸開禁止
+            if (isRunningTrain()) {
                 buttonDoorClose.setEnabled(false);
                 buttonDoorOpenL.setEnabled(false);
                 buttonDoorOpenR.setEnabled(false);
                 buttonDoorReOpen.setEnabled(false);
                 prevDoor = 0;
+            } else {
+                buttonDoorClose.setEnabled(true);
+                buttonDoorOpenL.setEnabled(true);
+                buttonDoorOpenR.setEnabled(true);
+                buttonDoorReOpen.setEnabled(true);
             }
             
-            // ノッチとレバーサ
+            // ノッチ位置表示
             boolean canChangeReverser = false;
             if (notch == NOTCH_EB) {
                 labelNotchPos.setText("EB");
@@ -586,6 +606,7 @@ public class NetworkCatcher {
                 labelNotchPos.setText(String.format("B%d", notch *-1));
             }
 
+            // キロ程演算方向
             if (moveTo == 0) {
                 buttonSetDistanceUp.setEnabled(false);
                 buttonSetDistanceDown.setEnabled(true);
@@ -594,6 +615,8 @@ public class NetworkCatcher {
                 buttonSetDistanceDown.setEnabled(false);
             }
 
+            // レバーサ
+            // ノッチがEB位置じゃないとレバーサいじれないよう変更
             if (canChangeReverser) {
                 switch (reverser) {
                     case 0:
@@ -625,6 +648,7 @@ public class NetworkCatcher {
 
             // モニタ類
 
+            // ATS-P
             boolATS[ATS_P_ACTIVE] = limit != Integer.MAX_VALUE ? true : false;
             
             boolATS[ATS_P_NEAR_PATTERN] = false;
@@ -638,7 +662,30 @@ public class NetworkCatcher {
                 if( boolATS[ATS_P_ACTIVE] == true)
                     boolATS[ATS_P_BRAKE_OPERATING] = true;
             }
+
+            boolATS[ATS_P_BRAKE_OPERATING_EB] = false;
+            if (!isATSPBrakeWorking) boolATS[ATS_P_BRAKE_OPERATING_EB] = true;
+
+            // EB EB EB
+            boolTrainStat[TRAINSTAT_EB] = false;
+            if (isTE) boolTrainStat[TRAINSTAT_EB] = true;
+            if (isRunningDoorOpen) boolTrainStat[TRAINSTAT_EB] = true;
+            if (isEB) boolTrainStat[TRAINSTAT_EB] = true;
+            if (!boolATS[ATS_POWER]) boolTrainStat[TRAINSTAT_EB] = true;
+            if (reverser != 0) boolTrainStat[TRAINSTAT_EB] = true;
+            if (boolATS[ATS_OPERATING]) boolTrainStat[TRAINSTAT_EB] = true;
+            if (boolATS[ATS_P_BRAKE_OPERATING_EB]) boolTrainStat[TRAINSTAT_EB] = true;
+            if (boolATS[ATS_P_ERROR]) boolTrainStat[TRAINSTAT_EB] = true;
+
+            if (boolTrainStat[TRAINSTAT_EB]) sendCommand("send", "notch", NOTCH_EB);
+
+            // 保安ブレーキ
+            boolTrainStat[TRAINSTAT_DS_BRAKE] = false;
+            if (mr < 700) boolTrainStat[TRAINSTAT_DS_BRAKE] = true;
+
+            if (boolTrainStat[TRAINSTAT_DS_BRAKE]) sendCommand("send", "notch", NOTCH_EB);
             
+            // TASC
             boolTASC[TASC_POWER] = isTASCEnable;
             
             boolTASC[TASC_PATTERN_ACTIVE] = false;
@@ -649,42 +696,45 @@ public class NetworkCatcher {
                 boolTASC[TASC_BRAKE] = true;
             }
 
-            boolTrainStatEx[TRAINSTAT_EX_DOOR_CLOSE] = false;
-            if (door == 0) {
-                boolTrainStatEx[TRAINSTAT_EX_DOOR_CLOSE] = true;
-            }
+            // ドア
+            boolTrainStatEx[TRAINSTAT_EX_DOOR_CLOSE] = isDoorClose;
 
-            txtTrainStat = "";
+            boolTrainStatEx[TRAINSTAT_EX_STA] = isArrivingStation;
+
+            txtTrainStat = "状態:";
             txtTrainStat += boolTrainStat[TRAINSTAT_PARKING] ? "駐車　" : "";
             txtTrainStat += boolTrainStat[TRAINSTAT_CONSTANT_SPEED] ? "定速　" : "";
-            txtTrainStat += boolTrainStat[TRAINSTAT_DS_BRAKE] ? "直予B　" : "";
-            txtTrainStat += boolTrainStat[TRAINSTAT_SNOW_BRAKE] ? "耐雪B　" : "";
+            txtTrainStat += boolTrainStat[TRAINSTAT_DS_BRAKE] ? "保B　" : "";
+            txtTrainStat += boolTrainStat[TRAINSTAT_SNOW_BRAKE] ? "雪B　" : "";
             txtTrainStat += boolTrainStat[TRAINSTAT_EMERG_SHORT] ? "非短　" : "";
             txtTrainStat += boolTrainStat[TRAINSTAT_THREE_PHASE] ? "三相　" : "";
+            txtTrainStat += boolTrainStat[TRAINSTAT_EB] ? "非常　" : "";
             labelTrainStat.setText(txtTrainStat);
 
-            txtATS = "";
+            txtATS = "ATS:";
             txtATS += boolATS[ATS_OPERATING] ? "ATS動作　" : "";
             txtATS += boolATS[ATS_POWER] ? "ATS電源　" : "";
             txtATS += boolATS[ATS_P_ERROR] ? "故障　" : "";
             txtATS += boolATS[ATS_P_ACTIVE] ? "ATS-P　" : "";
             txtATS += boolATS[ATS_P_BRAKE_RELEASE] ? "B解放　" : "";
-            txtATS += boolATS[ATS_P_BRAKE_OPERATING] ? "B動作　" : "";
-            txtATS += boolATS[ATS_P_NEAR_PATTERN] ? "パタン接近　" : "";
-            txtATS += boolATS[ATS_P_POWER] ? "P電源" : "";
+            txtATS += boolATS[ATS_P_BRAKE_OPERATING] ? "B　" : "";
+            txtATS += boolATS[ATS_P_NEAR_PATTERN] ? "ﾊﾟﾀﾝ接近　" : "";
+            txtATS += boolATS[ATS_P_POWER] ? "P電源　" : "";
+            txtATS += boolATS[ATS_P_BRAKE_OPERATING_EB] ? "非常　" : "";
             labelATS.setText(txtATS);
 
-            txtTASC = "";
-            txtTASC += boolTASC[TASC_POWER] ? "TASC電源　" : "";
-            txtTASC += boolTASC[TASC_PATTERN_ACTIVE] ? "パタン　" : "";
-            txtTASC += boolTASC[TASC_BRAKE] ? "B動作　" : "";
+            txtTASC = "TASC:";
+            txtTASC += boolTASC[TASC_POWER] ? "電源　" : "";
+            txtTASC += boolTASC[TASC_PATTERN_ACTIVE] ? "ﾊﾟﾀﾝ　" : "";
+            txtTASC += boolTASC[TASC_BRAKE] ? "B　" : "";
             txtTASC += boolTASC[TASC_OFF] ? "切　" : "";
             txtTASC += boolTASC[TASC_ERROR] ? "故障　" : "";
             labelTASC.setText(txtTASC);
 
             txtTrainStatEx = "";
             txtTrainStatEx += boolTrainStatEx[TRAINSTAT_EX_DOOR_CLOSE] ? "戸閉　" : "";
-            txtTrainStatEx += boolTrainStatEx[TRAINSTAT_EX_EB] ? "EB装置" : "";
+            txtTrainStatEx += boolTrainStatEx[TRAINSTAT_EX_EB] ? "EB装置　" : "";
+            txtTrainStatEx += boolTrainStatEx[TRAINSTAT_EX_STA] ? "次駅接近　" : "";
             labelTrainStatEx.setText(txtTrainStatEx);
         });
     }
@@ -697,6 +747,7 @@ public class NetworkCatcher {
 
         System.out.println("client starting on port " + PORT + "...");
 
+        // EB装置関連
         ebTimer = new Timer(60000, _ -> {
             boolTrainStatEx[TRAINSTAT_EX_EB] = true;
             ebActiveTimer.start();
@@ -705,9 +756,7 @@ public class NetworkCatcher {
 
         ebActiveTimer = new Timer(5000, _ -> {
             boolTrainStatEx[TRAINSTAT_EX_EB] = true;
-            boolATS[ATS_OPERATING] = true;
             isEB = true;
-            sendCommand("send", "notch", NOTCH_EB);
             ebTimer.stop();
             ebActiveTimer.stop();
         });
@@ -737,27 +786,40 @@ public class NetworkCatcher {
                             isTASCBraking = jsonObj.getBoolean("isTASCBraking");
 
                             if (prevId != id) {
-                                boolTrainStat = new boolean[]{false, false, false, false, false, false};
-                                boolATS = new boolean[]{false, true, false, false, false, false, false, true};
+                                boolTrainStat = new boolean[]{false, false, false, false, false, false, false};
+                                boolATS = new boolean[]{false, true, false, false, false, false, false, true, false};
                                 boolTASC = new boolean[]{true, false, false, false, false};
-                                boolTrainStatEx = new boolean[]{false, false};
+                                boolTrainStatEx = new boolean[]{false, false, false};
                             }
 
+                            // TE装置解除用
                             if ((isTE) && (notch != NOTCH_EB)) {
-                                boolTrainStat[TRAINSTAT_DS_BRAKE] = false;
-                                boolATS[ATS_OPERATING] = false;
                                 isTE = false;
                             }
 
+                            // EB装置解除用
                             if ((isEB) && (notch != NOTCH_EB)) {
                                 boolTrainStatEx[TRAINSTAT_EX_EB] = false;
-                                boolATS[ATS_OPERATING] = false;
                                 isEB = false;
                                 ebTimer.stop();
                                 ebActiveTimer.stop();
                             }
 
-                            if (speed > 5) {
+                            // ドア閉めるとき時間差で表示
+                            if (door == 0) {
+                                if (!isDoorClose) {
+                                    doorCloseCount ++;
+                                    if (doorCloseCount > DOOR_CLOSE_TIME) {
+                                        isDoorClose = true;
+                                    }
+                                }
+                            } else {
+                                doorCloseCount = 0;
+                                isDoorClose = false;
+                            }
+
+                            // EB装置
+                            if (isRunningTrain()) {
                                 if (prevNotch == notch) {
                                     if (!ebTimer.isRunning()) ebTimer.start();
                                 } else {
@@ -777,8 +839,47 @@ public class NetworkCatcher {
                                 isEB = false;
                             }
 
+                            // 走行中戸開時 
+                            if (isRunningTrain() && !isDoorClose) {
+                                isRunningDoorOpen = true;
+                            } else {
+                                isRunningDoorOpen = false;
+                            }
+
+                            if (boolATS[ATS_P_BRAKE_OPERATING] && (bc < 200)) {
+                                if (isATSPBrakeWorking) {
+                                    ATSPBrakeNWC ++;
+                                    if (ATSPBrakeNWC > ATSP_BRAKE_NWC_TIME) {
+                                        isATSPBrakeWorking = false;
+                                    }
+                                }
+                            } else {
+                                ATSPBrakeNWC = 0;
+                                isATSPBrakeWorking = true;
+                            }
+
+                            // 次駅まで300m未満
+                            if (beaconGetedPos != 0f) {
+                                System.out.println(beaconGetedPos + 300f - move);
+                                System.out.println(speed * 3);
+
+                                // 次駅接近報知
+                                if (!isArrivingStation) {
+                                    // 今の速度から駅までの予想停車距離を計算し、駅までの距離を上回ったら報知
+                                    if ((speed * 3) > (beaconGetedPos + 300f - move)) {
+                                        isArrivingStation = true;
+                                    }
+                                }
+                            }
+
+                            // 所定停目付近に停車か、100m以上通過した場合解除
+                            if ((0 >= (beaconGetedPos + 300f - move + 100f)) || (!isRunningTrain() && (5f >= (beaconGetedPos + 300f - move)))) {
+                                isArrivingStation = false;
+                                beaconGetedPos = 0f;
+                            }
+
                             // GUI更新
-                            refreshTimer.start();
+                            if (!refreshTimer.isRunning()) refreshTimer.start();
 
                             System.out.println(String.format("speed:%.2fkm/h notch:%d door:%d bc:%d mr:%d move:%.2f", speed, notch, door, bc, mr, move));
                             break;
@@ -789,6 +890,7 @@ public class NetworkCatcher {
                             break;
 
                         case "notRidingTrain":
+                            // 列車に載ってない
                             labelSpeed.setText("N/A");
                             labelBC.setText("N/A");
                             labelMR.setText("N/A");
@@ -800,7 +902,37 @@ public class NetworkCatcher {
                             labelTrainStat.setText("");
                             labelATS.setText("");
                             labelTASC.setText("");
-                            refreshTimer.stop();
+                            labelTrainStatEx.setText("");
+                            if (refreshTimer.isRunning()) refreshTimer.stop();
+                            break;
+
+                        case "beacon":
+                            signal_0 = jsonObj.getInt("signal_0");
+                            signal_1 = jsonObj.getInt("signal_1");
+
+                            switch (signal_0) {
+                                case 1:
+                                    // TIMS駅情報更新
+                                    break;
+
+                                case 2: 
+                                    // 次駅接近報知
+                                    // signal_1 = 1...セット
+                                    // signal_1 = 2...リセット
+                                    if (signal_1 == 1) beaconGetedPos = move;
+                                    if (signal_1 == 2) {
+                                        beaconGetedPos = 0f;
+                                        isArrivingStation = false;
+                                    }
+                                    break;
+                            
+                                default:
+                                    break;
+                            }
+                            break;
+
+                        case "start":
+                            System.out.println(fetchData);
                             break;
                         
                         default:

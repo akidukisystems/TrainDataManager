@@ -10,6 +10,7 @@ import jp.ngt.rtm.entity.npc.macro.TrainCommand;
 import jp.ngt.rtm.entity.train.EntityTrainBase;
 import jp.ngt.rtm.entity.train.util.TrainState;
 import jp.ngt.rtm.entity.vehicle.EntityVehicleBase;
+import jp.akidukisystems.traindatamanager.Gson.NetworkPacket;
 import jp.kaiz.atsassistmod.api.TrainControllerClient;
 import jp.kaiz.atsassistmod.api.TrainControllerClientManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.world.WorldEvent;
 
 @SideOnly(Side.CLIENT)
@@ -68,7 +70,7 @@ public class TrainLogger {
     private static final float SCALE_SPEED = 72f;
     private static final int SCALE_BC = 3;
     private static final float SCALE_MR = 0.311f;
-    private static final float SCALE_DISTANCE = 1000f /3600f /4f;
+    private static final float SCALE_DISTANCE = 1000f /3600f /2f;
 
     private boolean isFirst = true;
 
@@ -124,22 +126,25 @@ public class TrainLogger {
     // MARK: INIT
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        EntityPlayer player = event.player;
+
         if (event.phase != TickEvent.Phase.END) return;
-        if (event.player != Minecraft.getMinecraft().player) return;
+        if (player != Minecraft.getMinecraft().player) return;
 
         // Client側じゃないなら帰る
-        if (!event.player.world.isRemote) return;
+        if (!player.world.isRemote) return;
 
         // 通信できてないなら帰る
         if (networkManager == null) return;
 
         if (isFirst) {
             networkManager.serverStartRead();
+            networkManager.serverSendString("{\"type\":\"start\",\"version\":\""+ TDMCore.VERSION +"\"}");
             isFirst = false;
         }
 
         // お前列車に乗ってんの？
-        if (event.player.isRiding() && event.player.getRidingEntity() instanceof EntityTrainBase) {
+        if (player.isRiding() && player.getRidingEntity() instanceof EntityTrainBase) {
             // MARK: GET
             // データ取得
             String getData = null;
@@ -149,11 +154,14 @@ public class TrainLogger {
             // jsonパース
             // データあるのとデータ送信するtickなら初期化
 
+            String NBTJson = BlockNBTGetter.getNBTAtPlayerFoot(player);
+            if (NBTJson != null) networkManager.serverSendString(NBTJson);
+
             tickCounter++;
             if (getData != null || tickCounter >= 10) {
                 // 列車の情報を取得
-                this.train = (EntityTrainBase) event.player.getRidingEntity();
-                this.vehicle = (EntityVehicleBase) event.player.getRidingEntity();
+                this.train = (EntityTrainBase) player.getRidingEntity();
+                this.vehicle = (EntityVehicleBase) player.getRidingEntity();
 
                 // ID取得
                 this.id = this.train.getEntityId();
@@ -194,7 +202,7 @@ public class TrainLogger {
             }
 
             if (getData != null) {
-                GsonManager getDataParsed = gson.fromJson(getData, GsonManager.class);
+                NetworkPacket getDataParsed = gson.fromJson(getData, NetworkPacket.class);
 
                 NetworkCommands command = NetworkCommands.fromString(getDataParsed.doAny);
 
@@ -255,7 +263,7 @@ public class TrainLogger {
             
             
             // 出力 jsonにするよ～
-            GsonManager gsonManager = new GsonManager(
+            NetworkPacket gsonManager = new NetworkPacket(
                 "send", 
                 "none", 
 

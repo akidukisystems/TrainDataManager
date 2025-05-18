@@ -1,8 +1,8 @@
-package jp.akidukisystems.traindatamanager;
+package jp.akidukisystems.traindatamanager.Gson;
 
 import scala.annotation.meta.companionObject;
 
-public class GsonManager {
+public class NetworkPacket {
     public String type;
     public String doAny;
 
@@ -32,7 +32,7 @@ public class GsonManager {
     public boolean isOnRail;
     public boolean isComplessorActive;
 
-    public GsonManager(
+    public NetworkPacket(
         String type, 
         String doAny, 
 
