@@ -189,7 +189,7 @@ public class TrainLogger {
     private void handleGetData(String str) {
         NetworkPacket getDataParsed = gson.fromJson(str, NetworkPacket.class);
 
-        NetworkCommands command = NetworkCommands.fromString(getDataParsed.doAny);
+        NetworkCommands command = NetworkCommands.fromString(getDataParsed.message);
 
         switch (command) {
             case NOTCH:
@@ -221,7 +221,7 @@ public class TrainLogger {
             case UNKNOWN:
             default:
                 if (ConfigManager.isLogging) {
-                    System.out.println("Unknown command: " + getDataParsed.doAny);
+                    System.out.println("Unknown command: " + getDataParsed.message);
                 }
                 break;
         }
@@ -254,7 +254,7 @@ public class TrainLogger {
         if (!player.world.isRemote) return;
 
         // 通信できてないなら帰る
-        if (networkManager == null) return;
+        if (networkManager.s2c == null) return;
 
         if (isFirst) {
             networkManager.serverStartRead();

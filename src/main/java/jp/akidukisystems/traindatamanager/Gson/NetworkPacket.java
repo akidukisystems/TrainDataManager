@@ -2,7 +2,7 @@ package jp.akidukisystems.traindatamanager.Gson;
 
 public class NetworkPacket {
     public String type;
-    public String doAny;
+    public String message;
 
     public int id;
     public int id2;
@@ -32,7 +32,7 @@ public class NetworkPacket {
 
     public NetworkPacket(
         String type, 
-        String doAny, 
+        String message, 
 
         int id, 
         int id2, 
@@ -61,7 +61,7 @@ public class NetworkPacket {
         boolean isComplessorActive
     ) {
         this.type = type;
-        this.doAny = doAny;
+        this.message = message;
 
         this.id = id;
         this.id2 = id2;

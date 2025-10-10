@@ -9,7 +9,8 @@ import java.net.UnknownHostException;
 
 import org.json.JSONObject;
 
-public class NetworkManager {
+public class NetworkManager 
+{
 
     public static Socket clientSocket;
     Socket client;
@@ -17,61 +18,84 @@ public class NetworkManager {
     PrintWriter writer = null;
     Socket c2s = null;
 
-    public void clientInit(int port) {
-        while (true) {
-            try {
+    public void clientInit(int port) 
+    {
+        while (true) 
+        {
+            try 
+            {
                 this.client = new Socket("localhost", port);
-            } catch (UnknownHostException e) {
+            } 
+            catch (UnknownHostException e) 
+            {
                 // e.printStackTrace();
-            } catch (IOException e) {
+            } 
+            catch (IOException e) 
+            {
                 // e.printStackTrace();
             }
             if(this.client != null) break;
 
-            try {
+            try 
+            {
                 Thread.sleep(10);
-            } catch (InterruptedException e) {
+            } 
+            catch (InterruptedException e) 
+            {
                 e.printStackTrace();
             }
         }
-        try {
+        try 
+        {
             this.writer = new PrintWriter(this.client.getOutputStream(), true);
             this.reader = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
         }
     }
 
-    public String clientReciveString() {
-        try {
+    public String clientReciveString() 
+    {
+        try 
+        {
             return this.reader.readLine();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
             return null;
         }
     }
 
-    public void clientSendString(String data) {
+    public void clientSendString(String data) 
+    {
         this.writer.println(data);
     }
 
-    public void clientClose() {
+    public void clientClose() 
+    {
         System.out.println("exit");
-        try {
+        try 
+        {
             if (this.writer != null) this.writer.close();
             if (this.reader != null) this.reader.close();
             if (this.c2s != null) this.c2s.close();
             if (this.client != null) this.client.close();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
         }
     }
 
-    public void sendCommand(String type, String doAny, Object value) {
+    public void sendCommand(String type, String message, Object value) 
+    {
         JSONObject obj = new JSONObject();
         obj.put("type", type);
-        obj.put("doAny", doAny);
-        obj.put(doAny, value);
+        obj.put("message", message);
+        obj.put(message, value);
         clientSendString(obj.toString());
     }
     

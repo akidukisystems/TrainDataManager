@@ -16,7 +16,8 @@ import javax.swing.Timer;
 
 import org.json.JSONObject;
 
-public class TDCCore {
+public class TDCCore 
+{
 
     private static final int PORT = 34565;
     public static final int DOOR_CLOSE = 0;
@@ -69,7 +70,8 @@ public class TDCCore {
     private static TrainNumber tn;
     private static TrainControl tc;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException 
+    {
         TDCCore clientObject = new TDCCore();
         tn = new TrainNumber();
         networkManager = new NetworkManager();
@@ -82,7 +84,8 @@ public class TDCCore {
 
     
 
-    public void setupUI() {
+    public void setupUI() 
+    {
         // フレーム（ウィンドウ）を作成
         JPanel p = new JPanel();
         p.setLayout(null);
@@ -145,13 +148,18 @@ public class TDCCore {
             distanceSetUPButton.addActionListener(_ -> networkManager.sendCommand("send", "moveTo", 0));
             dictanceSetDOWNButton.addActionListener(_ -> networkManager.sendCommand("send", "moveTo", 1));
 
-            setDistanceButton.addActionListener(new ActionListener() {
+            setDistanceButton.addActionListener(new ActionListener() 
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
+                public void actionPerformed(ActionEvent e) 
+                {
+                    try 
+                    {
                         float newDistance = Float.parseFloat(distanceSetText);
                        networkManager.sendCommand("send", "move", newDistance *1000f);
-                    } catch (NumberFormatException ef) {
+                    }
+                    catch (NumberFormatException ef) 
+                    {
                         System.out.println(ef);
                     }
                     distanceSetText = "0";
@@ -169,22 +177,29 @@ public class TDCCore {
             epButton.setBounds(140, 75, 200, 150);
             epButton.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
 
-            epButtonTimer = new Timer(200, new ActionListener() {
+            epButtonTimer = new Timer(200, new ActionListener() 
+            {
                 private boolean on = true;
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e) 
+                {
                     r.setBackground(on ? Color.RED : Color.WHITE);
                     on = !on;
                 } 
             });
 
-            epButton.addActionListener(new ActionListener() {
+            epButton.addActionListener(new ActionListener() 
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (!tc.isRaisingEP()) {
+                public void actionPerformed(ActionEvent e) 
+                {
+                    if (!tc.isRaisingEP()) 
+                    {
                         epButtonTimer.start();
                         epButton.setText("復位");
-                    } else {
+                    } 
+                    else 
+                    {
                         epButtonTimer.stop();
                         r.setBackground(Color.WHITE);
                         epButton.setText("発報");
@@ -237,9 +252,11 @@ public class TDCCore {
             setTrainNum8Button.addActionListener(_ -> tn.number += "8");
             setTrainNum9Button.addActionListener(_ -> tn.number += "9");
 
-            setTrainNumButton.addActionListener(new ActionListener() {
+            setTrainNumButton.addActionListener(new ActionListener() 
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e) 
+                {
                     tn.alphabet = textTrainStr.getText();
                     tn.half = tn.number + tn.alphabet;
                     trainNumSetFrame.setVisible(false);
@@ -336,17 +353,22 @@ public class TDCCore {
             trainNumberLabel.setForeground(Color.BLACK);
             trainNumberLabel.setBounds(0, 450, 400, 20);
 
-            teButton.addActionListener(new ActionListener() {
+            teButton.addActionListener(new ActionListener() 
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e) 
+                {
                     tc.setTE(true);
                 }
             });
 
-            doorOpenLButton.addActionListener(new ActionListener() {
+            doorOpenLButton.addActionListener(new ActionListener() 
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (buttonDo != -1) {
+                public void actionPerformed(ActionEvent e) 
+                {
+                    if (buttonDo != -1) 
+                    {
                         buttonCommand = null;
                         ActionButton.setBackground(Color.WHITE);
                         doorOpenLButton.setBackground(Color.WHITE);
@@ -354,16 +376,21 @@ public class TDCCore {
                         doorCloseButton.setBackground(Color.WHITE);
                         doorReOpenButton.setBackground(Color.WHITE);
                         
-                        if (buttonDo != DOOR_LEFT) {
+                        if (buttonDo != DOOR_LEFT) 
+                        {
                             buttonCommand = "door";
                             buttonDo = DOOR_LEFT;
                             blinkTimer.start();
                             doorOpenLButton.setBackground(Color.YELLOW);
-                        } else {
+                        } 
+                        else
+                        {
                             buttonDo = -1;
                             blinkTimer.stop();
                         }
-                    } else {
+                    }
+                    else 
+                    {
                         buttonCommand = "door";
                         buttonDo = DOOR_LEFT;
                         blinkTimer.start();
@@ -371,10 +398,13 @@ public class TDCCore {
                     }
                 }
             });
-            doorOpenRButton.addActionListener(new ActionListener() {
+            doorOpenRButton.addActionListener(new ActionListener() 
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (buttonDo != -1) {
+                public void actionPerformed(ActionEvent e)
+                {
+                    if (buttonDo != -1)
+                    {
                         buttonCommand = null;
                         ActionButton.setBackground(Color.WHITE);
                         doorOpenLButton.setBackground(Color.WHITE);
@@ -382,16 +412,21 @@ public class TDCCore {
                         doorCloseButton.setBackground(Color.WHITE);
                         doorReOpenButton.setBackground(Color.WHITE);
 
-                        if (buttonDo != DOOR_RIGHT) {
+                        if (buttonDo != DOOR_RIGHT)
+                        {
                             buttonCommand = "door";
                             buttonDo = DOOR_RIGHT;
                             blinkTimer.start();
                             doorOpenRButton.setBackground(Color.YELLOW);
-                        } else {
+                        }
+                        else
+                        {
                             buttonDo = -1;
                             blinkTimer.stop();
                         }
-                    } else {
+                    }
+                    else
+                    {
                         buttonCommand = "door";
                         buttonDo = DOOR_RIGHT;
                         blinkTimer.start();
@@ -399,10 +434,13 @@ public class TDCCore {
                     }
                 }
             });
-            doorCloseButton.addActionListener(new ActionListener() {
+            doorCloseButton.addActionListener(new ActionListener()
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (buttonDo != -1) {
+                public void actionPerformed(ActionEvent e)
+                {
+                    if (buttonDo != -1)
+                    {
                         buttonCommand = null;
                         ActionButton.setBackground(Color.WHITE);
                         doorOpenLButton.setBackground(Color.WHITE);
@@ -410,16 +448,21 @@ public class TDCCore {
                         doorCloseButton.setBackground(Color.WHITE);
                         doorReOpenButton.setBackground(Color.WHITE);
                         
-                        if (buttonDo != DOOR_CLOSE) {
+                        if (buttonDo != DOOR_CLOSE)
+                        {
                             buttonCommand = "door";
                             buttonDo = DOOR_CLOSE;
                             blinkTimer.start();
                             doorCloseButton.setBackground(Color.YELLOW);
-                        } else {
+                        }
+                        else
+                        {
                             buttonDo = -1;
                             blinkTimer.stop();
                         }
-                    } else {
+                    }
+                    else
+                    {
                         buttonCommand = "door";
                         buttonDo = DOOR_CLOSE;
                         blinkTimer.start();
@@ -427,9 +470,11 @@ public class TDCCore {
                     }
                 }
             });
-            doorReOpenButton.addActionListener(new ActionListener() {
+            doorReOpenButton.addActionListener(new ActionListener()
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e)
+                {
                     buttonCommand = null;
                     buttonDo = -1;
                     blinkTimer.stop();
@@ -443,9 +488,11 @@ public class TDCCore {
             });
 
             showResetDistanceWindowButon.addActionListener(_ -> distanceResetFrame.setVisible(true));
-            showSetTrainNumWindowButton.addActionListener(new ActionListener() {
+            showSetTrainNumWindowButton.addActionListener(new ActionListener()
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e)
+                {
                     trainNumSetFrame.setVisible(true);
                     tn.alphabet = "";
                     tn.number = "";
@@ -454,12 +501,16 @@ public class TDCCore {
                 }
             });
 
-            ActionButton.addActionListener(new ActionListener() {
+            ActionButton.addActionListener(new ActionListener()
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    switch (buttonCommand) {
+                public void actionPerformed(ActionEvent e)
+                {
+                    switch (buttonCommand)
+                    {
                         case "door":
-                            if (buttonDo == 0) {
+                            if (buttonDo == 0)
+                            {
                                 tc.setPrevDoor(tc.getDoor());
                             }
                            networkManager.sendCommand("send", buttonCommand, buttonDo);
@@ -479,9 +530,11 @@ public class TDCCore {
                 }
             });
 
-            allResetButon.addActionListener(new ActionListener() {
+            allResetButon.addActionListener(new ActionListener()
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e)
+                {
                     reset();
                 }
             });
@@ -490,12 +543,15 @@ public class TDCCore {
             reverserSetNButton.addActionListener(_ ->networkManager.sendCommand("send", "reverser", 1));
             reverserSetBButton.addActionListener(_ ->networkManager.sendCommand("send", "reverser", 2));
 
-            blinkTimer = new Timer(500, new ActionListener() {
+            blinkTimer = new Timer(500, new ActionListener()
+            {
                 private boolean on = true;
 
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    switch (buttonCommand) {
+                public void actionPerformed(ActionEvent e)
+                {
+                    switch (buttonCommand)
+                    {
                         case "door":
                             ActionButton.setBackground(on ? Color.YELLOW : Color.WHITE);
                             break;
@@ -588,20 +644,24 @@ public class TDCCore {
         epFrame.setVisible(true);
         trainNumSetFrame.setVisible(false);
 
-        refreshTimer = new Timer(250, _ -> {
+        refreshTimer = new Timer(250, _ -> 
+        {
             speedLabel.setText(String.format("%dkm/h", (int) tc.getSpeed()));
             bcLabel.setText(String.format("%dkpa", tc.getBc()));
             mrLabel.setText(String.format("%dkpa", tc.getMr()));
             distanceLabel.setText(String.format("%.1fkm", tc.getMove() / 1000f));
 
             // 走行時戸開禁止
-            if (tc.isRunningTrain()) {
+            if (tc.isRunningTrain())
+            {
                 doorCloseButton.setEnabled(false);
                 doorOpenLButton.setEnabled(false);
                 doorOpenRButton.setEnabled(false);
                 doorReOpenButton.setEnabled(false);
                 tc.setPrevDoor(-1);
-            } else {
+            }
+            else
+            {
                 doorCloseButton.setEnabled(true);
                 doorOpenLButton.setEnabled(true);
                 doorOpenRButton.setEnabled(true);
@@ -610,30 +670,42 @@ public class TDCCore {
             
             // ノッチ位置表示
             boolean canChangeReverser = false;
-            if (tc.getNotch() == TrainControl.NOTCH_EB) {
+            if (tc.getNotch() == TrainControl.NOTCH_EB)
+            {
                 notchPosLabel.setText("EB");
                 canChangeReverser = true;
-            } else if (tc.getNotch() == TrainControl.NOTCH_N) {
+            }
+            else if (tc.getNotch() == TrainControl.NOTCH_N)
+            {
                 notchPosLabel.setText("N");
-            } else if (tc.getNotch() > TrainControl.NOTCH_N) {
+            }
+            else if (tc.getNotch() > TrainControl.NOTCH_N)
+            {
                 notchPosLabel.setText(String.format("P%d", tc.getNotch()));
-            } else {
+            }
+            else
+            {
                 notchPosLabel.setText(String.format("B%d", tc.getNotch() *-1));
             }
 
             // キロ程演算方向
-            if (tc.getMoveTo() == 0) {
+            if (tc.getMoveTo() == 0)
+            {
                 distanceSetUPButton.setEnabled(false);
                 dictanceSetDOWNButton.setEnabled(true);
-            } else {
+            }
+            else
+            {
                 distanceSetUPButton.setEnabled(true);
                 dictanceSetDOWNButton.setEnabled(false);
             }
 
             // レバーサ
             // ノッチがEB位置じゃないとレバーサいじれないよう変更
-            if (canChangeReverser) {
-                switch (tc.getReverser()) {
+            if (canChangeReverser)
+            {
+                switch (tc.getReverser())
+                {
                     case 0:
                         reverserSetFButton.setEnabled(false);
                         reverserSetNButton.setEnabled(true);
@@ -655,7 +727,9 @@ public class TDCCore {
                     default:
                         break;
                 }
-            } else {
+            }
+            else
+            {
                 reverserSetFButton.setEnabled(false);
                 reverserSetNButton.setEnabled(false);
                 reverserSetBButton.setEnabled(false);
@@ -731,7 +805,8 @@ public class TDCCore {
         tn.full = null;
     }
 
-    public void running() throws IOException {
+    public void running() throws IOException
+    {
         SwingUtilities.invokeLater(this::setupUI);
 
         System.out.println("client starting on port " + PORT + "...");
@@ -739,17 +814,20 @@ public class TDCCore {
         tc.refreshTimer();
         reset();
 
-        new Thread(() -> {
-            while(true) {
+        new Thread(() ->
+        {
+            while(true)
+            {
                 String fetchData = networkManager.clientReciveString();
 
-                if(fetchData != null) {
+                if(fetchData != null)
+                {
                     System.out.println(fetchData);
                     JSONObject jsonObj = new JSONObject(fetchData);
-                    switch (jsonObj.getString("type")) {
+                    switch (jsonObj.getString("type"))
+                    {
                         case "send":
                             // 受信
-                            tc.setPrevId(tc.getId());
                             tc.setPrevNotch(tc.getNotch());
                             tc.setId(jsonObj.getInt("id"));
                             tc.setSpeed(jsonObj.getFloat("speed"));
@@ -764,7 +842,6 @@ public class TDCCore {
                             tc.setTASCEnable(jsonObj.getBoolean("isTASCEnable"));
                             tc.setTASCBraking(jsonObj.getBoolean("isTASCBraking"));
 
-                            // tc.refreshTrainId();
                             tc.doorOpen_Close();
                             tc.handleTEunlock();
                             tc.handleEBunlock();
@@ -805,7 +882,8 @@ public class TDCCore {
                             signal_0 = jsonObj.getInt("signal_0");
                             signal_1 = jsonObj.getInt("signal_1");
 
-                            switch (signal_0) {
+                            switch (signal_0)
+                            {
                                 case 1:
                                     // TIMS駅情報更新
                                     break;
@@ -831,7 +909,9 @@ public class TDCCore {
                         default:
                             break;
                     }
-                } else {
+                }
+                else
+                {
                     networkManager.clientInit(PORT);
                 }
             }

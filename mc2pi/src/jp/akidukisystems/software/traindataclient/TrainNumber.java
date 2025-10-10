@@ -1,6 +1,7 @@
 package jp.akidukisystems.software.traindataclient;
 
-public class TrainNumber {
+public class TrainNumber
+{
     // TIMS画面に大きく表示される完全な内容の列車番号
     // 臨9001M　回1001M
     String full;

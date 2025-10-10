@@ -1,0 +1,28 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "TDCCore",
+            "request": "launch",
+            "mainClass": "TDCCore",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "TDCCore",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.traindataclient.TDCCore",
+            "projectName": "mc2pi_1378da23"
+        }
+    ]
+}

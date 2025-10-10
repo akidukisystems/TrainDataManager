@@ -2,7 +2,8 @@ package jp.akidukisystems.software.traindataclient;
 
 import javax.swing.Timer;
 
-public class TrainControl {
+public class TrainControl
+{
 
     public static final int ATS_OPERATING = 0;
     public static final int ATS_POWER = 1;
@@ -43,164 +44,200 @@ public class TrainControl {
     Timer ebActiveTimer;
     
 
-    int id;
-    public int getId() {
+    private int id;
+    public int getId()
+    {
         return id;
     }
-    public void setId(int id) {
+    public void setId(int id)
+    {
         this.id = id;
     }
 
-    int prevId;
+    private int prevId;
 
-    public int getPrevId() {
+    public int getPrevId()
+    {
         return prevId;
     }
-    public void setPrevId(int prevId) {
+    public void setPrevId(int prevId)
+    {
         this.prevId = prevId;
     }
 
-    float speed = 0f;
-    public float getSpeed() {
+    private float speed = 0f;
+    public float getSpeed()
+    {
         return speed;
     }
-    public void setSpeed(float speed) {
+    public void setSpeed(float speed)
+    {
         this.speed = speed;
     }
 
-    int notch = 0;
-    public int getNotch() {
+    private int notch = 0;
+    public int getNotch()
+    {
         return notch;
     }
-    public void setNotch(int notch) {
+    public void setNotch(int notch)
+    {
         this.notch = notch;
     }
 
-    int door = 0;
-    public int getDoor() {
+    private int door = 0;
+    public int getDoor()
+    {
         return door;
     }
-    public void setDoor(int door) {
+    public void setDoor(int door)
+    {
         this.door = door;
     }
 
-    int bc = 0;
-    public int getBc() {
+    private int bc = 0;
+    public int getBc()
+    {
         return bc;
     }
-    public void setBc(int bc) {
+    public void setBc(int bc)
+    {
         this.bc = bc;
     }
 
-    int mr = 0;
-    public int getMr() {
+    private int mr = 0;
+    public int getMr()
+    {
         return mr;
     }
-    public void setMr(int mr) {
+    public void setMr(int mr)
+    {
         this.mr = mr;
     }
 
-    float move = 0f;
-    public float getMove() {
+    private float move = 0f;
+    public float getMove()
+    {
         return move;
     }
-    public void setMove(float move) {
+    public void setMove(float move)
+    {
         this.move = move;
     }
 
-    int moveTo = 1;
-    public int getMoveTo() {
+    private int moveTo = 1;
+    public int getMoveTo()
+    {
         return moveTo;
     }
-    public void setMoveTo(int moveTo) {
+    public void setMoveTo(int moveTo)
+    {
         this.moveTo = moveTo;
     }
 
-    int reverser = 0;
-    public int getReverser() {
+    private int reverser = 0;
+    public int getReverser()
+    {
         return reverser;
     }
-    public void setReverser(int reverser) {
+    public void setReverser(int reverser)
+    {
         this.reverser = reverser;
     }
 
-    int limit = Integer.MAX_VALUE;
-
-    public int getLimit() {
+    private int limit = Integer.MAX_VALUE;
+    public int getLimit()
+    {
         return limit;
     }
-    public void setLimit(int limit) {
+    public void setLimit(int limit) 
+    {
         this.limit = limit;
     }
 
-    boolean isTASCEnable = true;
-    public boolean isTASCEnable() {
+    private boolean isTASCEnable = true;
+    public boolean isTASCEnable()
+    {
         return isTASCEnable;
     }
-    public void setTASCEnable(boolean isTASCEnable) {
+    public void setTASCEnable(boolean isTASCEnable)
+    {
         this.isTASCEnable = isTASCEnable;
     }
 
-    boolean isTASCBraking = false;
-    public boolean isTASCBraking() {
+    private boolean isTASCBraking = false;
+    public boolean isTASCBraking()
+    {
         return isTASCBraking;
     }
-    public void setTASCBraking(boolean isTASCBraking) {
+    public void setTASCBraking(boolean isTASCBraking)
+    {
         this.isTASCBraking = isTASCBraking;
     }
 
-    boolean isTE = false;
-    public boolean isTE() {
+    private boolean isTE = false;
+    public boolean isTE()
+    {
         return isTE;
     }
-    public void setTE(boolean isTE) {
+    public void setTE(boolean isTE)
+    {
         this.isTE = isTE;
     }
 
-    boolean isEBStop = false;
-    public boolean isEBStop() {
+    private boolean isEBStop = false;
+    public boolean isEBStop()
+    {
         return isEBStop;
     }
-    public void setEB(boolean isEBStop) {
+    public void setEB(boolean isEBStop)
+    {
         this.isEBStop = isEBStop;
     }
 
-    boolean isATSPBrakeWorking = true;
-    public boolean isATSPBrakeWorking() {
+    private boolean isATSPBrakeWorking = true;
+    public boolean isATSPBrakeWorking()
+    {
         return isATSPBrakeWorking;
     }
-    public void setATSPBrakeWorking(boolean isATSPBrakeWorking) {
+    public void setATSPBrakeWorking(boolean isATSPBrakeWorking)
+    {
         this.isATSPBrakeWorking = isATSPBrakeWorking;
     }
 
-    boolean isArrivingStation = false;
-    float beaconGetedPos = 0;
-    boolean isRaisingEP = false;
+    private boolean isArrivingStation = false;
+    private float beaconGetedPos = 0;
+    private boolean isRaisingEP = false;
 
-    public boolean isRaisingEP() {
+    public boolean isRaisingEP()
+    {
         return isRaisingEP;
     }
-    public void setRaisingEP(boolean isRaisingEP) {
+    public void setRaisingEP(boolean isRaisingEP)
+    {
         this.isRaisingEP = isRaisingEP;
     }
 
 
 
-    boolean boolTrainStat[];
-
+    private boolean boolTrainStat[];
     public void boolTrainStatInit(int size)
     {
         boolTrainStat = new boolean[size];
     }
-    public boolean getboolTrainStat(int index) {
-        if (index < 0 || index >= boolTrainStat.length) {
+    public boolean getboolTrainStat(int index)
+    {
+        if (index < 0 || index >= boolTrainStat.length)
+        {
             throw new IndexOutOfBoundsException("Invalid index");
         }
         return boolTrainStat[index];
     }
 
-    public void setboolTrainStat(int index, boolean value) {
-        if (index < 0 || index >= boolTrainStat.length) {
+    public void setboolTrainStat(int index, boolean value)
+    {
+        if (index < 0 || index >= boolTrainStat.length)
+        {
             throw new IndexOutOfBoundsException("Invalid index");
         }
         boolTrainStat[index] = value;
@@ -213,60 +250,72 @@ public class TrainControl {
     String txtTASC = "";
     String txtTrainStatEx = "";
 
-    boolean isDoorClose = true;
-    boolean isRunningDoorOpen = false;
+    private boolean isDoorClose = true;
+    private boolean isRunningDoorOpen = false;
 
-    int prevDoor = -1;
-    public int getPrevDoor() {
+    private int prevDoor = -1;
+    public int getPrevDoor()
+    {
         return prevDoor;
     }
-    public void setPrevDoor(int prevDoor) {
+    public void setPrevDoor(int prevDoor)
+    {
         this.prevDoor = prevDoor;
     }
 
-    int prevNotch = 0;
-    public int getPrevNotch() {
+    private int prevNotch = 0;
+    public int getPrevNotch()
+    {
         return prevNotch;
     }
-    public void setPrevNotch(int prevNotch) {
+    public void setPrevNotch(int prevNotch) 
+    {
         this.prevNotch = prevNotch;
     }
 
-    int doorCloseCount = 0;
-    int ATSPBrakeNWC = 0;
+    private int doorCloseCount = 0;
+    private int ATSPBrakeNWC = 0;
 
 
 
-    public boolean isRunningTrain() {
+    public boolean isRunningTrain()
+    {
         return (speed > 5f);
     }
 
-    public void handleArrivingStation() {
+    public void handleArrivingStation()
+    {
         // 次駅まで300m未満
-        if (beaconGetedPos != 0f) {
+        if (beaconGetedPos != 0f)
+        {
             System.out.println(beaconGetedPos + 300f - move);
             System.out.println(speed * 3);
 
             // 次駅接近報知
-            if (!isArrivingStation) {
+            if (!isArrivingStation)
+            {
                 // 今の速度から駅までの予想停車距離を計算し、駅までの距離を上回ったら報知
-                if ((speed * 3) > (beaconGetedPos + 300f - move)) {
+                if ((speed * 3) > (beaconGetedPos + 300f - move))
+                {
                     isArrivingStation = true;
                 }
             }
         }
 
         // 所定停目付近に停車か、100m以上通過した場合解除
-        if ((0 >= (beaconGetedPos + 300f - move + 100f)) || (!isRunningTrain() && (5f >= (beaconGetedPos + 300f - move)))) {
+        if ((0 >= (beaconGetedPos + 300f - move + 100f)) || (!isRunningTrain() && (5f >= (beaconGetedPos + 300f - move))))
+        {
             isArrivingStation = false;
             beaconGetedPos = 0f;
         }
     }
 
+    // 列車接近報知機の地上子設定
     public void setArraivingStation(int signal_1)
     {
         if (signal_1 == 1) beaconGetedPos = move;
-        if (signal_1 == 2) {
+        if (signal_1 == 2)
+        {
             beaconGetedPos = 0f;
             isArrivingStation = false;
         }
@@ -284,7 +333,8 @@ public class TrainControl {
     public void handleEBunlock()
     {
         // EB装置解除用
-        if ((isEBStop) && (notch != NOTCH_EB) && !isRunningTrain()) {
+        if ((isEBStop) && (notch != NOTCH_EB) && !isRunningTrain())
+        {
             boolTrainStat[TRAINSTAT_EX_EB] = false;
             isEBStop = false;
             ebTimer.stop();
@@ -295,19 +345,27 @@ public class TrainControl {
     public void handleEB()
     {
         // EB装置
-        if (isRunningTrain()) {
-            if (prevNotch == notch) {
+        if (isRunningTrain())
+        {
+            if (prevNotch == notch)
+            {
                 if (!ebTimer.isRunning()) ebTimer.start();
-            } else {
-                if (ebActiveTimer.isRunning()) {
+            }
+            else
+            {
+                if (ebActiveTimer.isRunning())
+                {
                     boolTrainStat[TRAINSTAT_EX_EB] = false;
                 }
                 ebTimer.stop();
                 ebActiveTimer.stop();
                 isEBStop = false;
             }
-        } else {
-            if (ebActiveTimer.isRunning()) {
+        }
+        else
+        {
+            if (ebActiveTimer.isRunning())
+            {
                 boolTrainStat[TRAINSTAT_EX_EB] = false;
             }
             ebTimer.stop();
@@ -319,43 +377,48 @@ public class TrainControl {
     public void handleRunningOpen()
     {
         // 走行中戸開時 
-        if (isRunningTrain() && !isDoorClose) {
+        if (isRunningTrain() && !isDoorClose)
+        {
             isRunningDoorOpen = true;
-        } else {
+        }
+        else
+        {
             isRunningDoorOpen = false;
         }
     }
 
+    // ATS異常時に列車とめる
     public void handleATSNW()
     {
-        if (boolTrainStat[ATS_P_BRAKE_OPERATING] && (bc < 200)) {
-            if (isATSPBrakeWorking) {
+        if (boolTrainStat[ATS_P_BRAKE_OPERATING] && (bc < 200))
+        {
+            if (isATSPBrakeWorking)
+            {
                 ATSPBrakeNWC ++;
-                if (ATSPBrakeNWC > ATSP_BRAKE_NWC_TIME) {
+                if (ATSPBrakeNWC > ATSP_BRAKE_NWC_TIME)
+                {
                     isATSPBrakeWorking = false;
                 }
             }
         }
     }
 
-    public void refreshTrainId()
-    {
-        if (prevId != id) {
-            resetTrain();
-        }
-    }
-
     public void doorOpen_Close()
     {
             // ドア閉めるとき時間差で表示
-        if (door == 0) {
-            if (!isDoorClose) {
+        if (door == 0)
+        {
+            if (!isDoorClose)
+            {
                 doorCloseCount ++;
-                if (doorCloseCount > DOOR_CLOSE_TIME) {
+                if (doorCloseCount > DOOR_CLOSE_TIME)
+                {
                     isDoorClose = true;
                 }
             }
-        } else {
+        }
+        else
+        {
             doorCloseCount = 0;
             isDoorClose = false;
         }
@@ -367,13 +430,15 @@ public class TrainControl {
             boolTrainStat[ATS_P_ACTIVE] = limit != Integer.MAX_VALUE ? true : false;
             
             boolTrainStat[ATS_P_NEAR_PATTERN] = false;
-            if ((limit -5) < speed) {
+            if ((limit -5) < speed)
+            {
                 if( boolTrainStat[ATS_P_ACTIVE] == true)
                     boolTrainStat[ATS_P_NEAR_PATTERN] = true;
             }
 
             boolTrainStat[ATS_P_BRAKE_OPERATING] = false;
-            if (limit < speed) {
+            if (limit < speed)
+            {
                 if( boolTrainStat[ATS_P_ACTIVE] == true)
                     boolTrainStat[ATS_P_BRAKE_OPERATING] = true;
             }
@@ -404,7 +469,8 @@ public class TrainControl {
             
             boolTrainStat[TASC_PATTERN_ACTIVE] = false;
             boolTrainStat[TASC_BRAKE] = false;
-            if (isTASCBraking) {
+            if (isTASCBraking)
+            {
                 boolTrainStat[TASC_POWER] = true;
                 boolTrainStat[TASC_PATTERN_ACTIVE] = true;
                 boolTrainStat[TASC_BRAKE] = true;
@@ -463,13 +529,15 @@ public class TrainControl {
     public void refreshTimer()
     {
         // EB装置関連
-        ebTimer = new Timer(60000, _ -> {
+        ebTimer = new Timer(60000, _ ->
+        {
             setboolTrainStat(TrainControl.TRAINSTAT_EX_EB, true);
             ebActiveTimer.start();
             ebTimer.stop();
         });
 
-        ebActiveTimer = new Timer(5000, _ -> {
+        ebActiveTimer = new Timer(5000, _ ->
+        {
             setboolTrainStat(TrainControl.TRAINSTAT_EX_EB, true);
             isEBStop = true;
             ebTimer.stop();
