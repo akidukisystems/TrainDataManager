@@ -26,6 +26,8 @@ public class NetworkPacket {
 
     public float move;
     public int moveTo;
+    
+    public int formation;
 
     public boolean isOnRail;
     public boolean isComplessorActive;
@@ -57,6 +59,8 @@ public class NetworkPacket {
         float move, 
         int moveTo,
 
+        int formation,
+
         boolean isOnRail, 
         boolean isComplessorActive
     ) {
@@ -85,6 +89,8 @@ public class NetworkPacket {
 
         this.move = move;
         this.moveTo = moveTo;
+
+        this.formation = formation;
 
         this.isOnRail = isOnRail;
         this.isComplessorActive = isComplessorActive;

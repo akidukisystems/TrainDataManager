@@ -243,7 +243,13 @@ public class TrainControl
         boolTrainStat[index] = value;
     }
 
-    
+    private int cars = 0;
+    public int getCars() {
+        return cars;
+    }
+    public void setCars(int cars) {
+        this.cars = cars;
+    }
 
     String txtTrainStat = "";
     String txtATS = "";

@@ -53,6 +53,8 @@ public class TDCCore
 
     JLabel trainNumberLabel;
 
+    JLabel formationLabel;
+
     JButton doorOpenLButton;
     JButton doorOpenRButton;
     JButton doorCloseButton;
@@ -351,7 +353,15 @@ public class TDCCore
             trainNumberLabel = new JLabel("");
             trainNumberLabel.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
             trainNumberLabel.setForeground(Color.BLACK);
-            trainNumberLabel.setBounds(0, 450, 400, 20);
+            trainNumberLabel.setBounds(0, 450, 200, 20);
+
+            formationLabel = new JLabel("");
+            formationLabel.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
+            formationLabel.setForeground(Color.BLACK);
+            formationLabel.setBounds(200, 450, 200, 20);
+
+
+            
 
             teButton.addActionListener(new ActionListener() 
             {
@@ -587,6 +597,8 @@ public class TDCCore
         p.add(infoTrainExLabel);
         p.add(trainNumberLabel);
 
+        p.add(formationLabel);
+
         p.add(reverserSetFButton);
         p.add(reverserSetNButton);
         p.add(reverserSetBButton);
@@ -650,6 +662,7 @@ public class TDCCore
             bcLabel.setText(String.format("%dkpa", tc.getBc()));
             mrLabel.setText(String.format("%dkpa", tc.getMr()));
             distanceLabel.setText(String.format("%.1fkm", tc.getMove() / 1000f));
+            formationLabel.setText(String.format("%d両編成", tc.getCars()));
 
             // 走行時戸開禁止
             if (tc.isRunningTrain())
@@ -841,6 +854,7 @@ public class TDCCore
                             tc.setLimit(jsonObj.getInt("speedLimit"));
                             tc.setTASCEnable(jsonObj.getBoolean("isTASCEnable"));
                             tc.setTASCBraking(jsonObj.getBoolean("isTASCBraking"));
+                            tc.setCars(jsonObj.getInt("formation"));
 
                             tc.doorOpen_Close();
                             tc.handleTEunlock();

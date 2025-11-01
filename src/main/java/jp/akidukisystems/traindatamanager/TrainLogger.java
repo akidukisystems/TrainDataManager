@@ -6,6 +6,8 @@ import jp.akidukisystems.traindatamanager.Gson.NetworkPacket;
 import jp.kaiz.atsassistmod.api.TrainControllerClient;
 import jp.kaiz.atsassistmod.api.TrainControllerClientManager;
 import jp.ngt.rtm.entity.train.EntityTrainBase;
+import jp.ngt.rtm.entity.train.util.Formation;
+import jp.ngt.rtm.entity.train.util.FormationEntry;
 import jp.ngt.rtm.entity.train.util.TrainState;
 import jp.ngt.rtm.entity.vehicle.EntityVehicleBase;
 import net.minecraft.client.Minecraft;
@@ -25,7 +27,7 @@ public class TrainLogger {
     private NetworkManager networkManager = null;
 
     private EntityTrainBase train;
-    private EntityVehicleBase vehicle;
+    private EntityVehicleBase<?> vehicle;
 
     // ID取得
     private int id;
@@ -50,6 +52,8 @@ public class TrainLogger {
     // 脱線・コンプレッサ
     private boolean isOnRail;
     private boolean isComplessorActive;
+
+    private int formation;
 
     // ATSA
     private TrainControllerClient tcc;
@@ -89,6 +93,20 @@ public class TrainLogger {
     }
     public void setMoveTo(int moveTo) {
         this.moveTo = moveTo;
+    }
+
+    public static int getCarsCount(EntityTrainBase train) {
+        if (train == null) return 0;
+        Formation f = train.getFormation();
+        if (f == null || f.entries == null) return 0;
+
+        int n = 0;
+        for (FormationEntry e : f.entries) {
+            if (e != null && e.train != null && !e.train.isDead) {
+                n++;
+            }
+        }
+        return n;
     }
 
     private static final Gson gson = new Gson();
@@ -136,6 +154,8 @@ public class TrainLogger {
         // moveTo = 0...上り（カウントダウン）　1...下り（カウントアップ）
         this.movedDistance = 0f;
         this.moveTo = 1;
+
+        this.formation = 0;
     }
 
     private void getTrainData(EntityPlayer player){
@@ -143,7 +163,7 @@ public class TrainLogger {
         Entity entity = player.getRidingEntity();
         if (entity instanceof EntityTrainBase && entity instanceof EntityVehicleBase) {
             this.train = (EntityTrainBase) entity;
-            this.vehicle = (EntityVehicleBase) entity;
+            this.vehicle = (EntityVehicleBase<?>) entity;
         } else {
             return; // 不正な乗り物なら何もしない
         }
@@ -171,6 +191,8 @@ public class TrainLogger {
         // 脱線・コンプレッサ
         this.isOnRail = this.train.onRail;
         this.isComplessorActive = this.train.complessorActive;
+
+        this.formation = getCarsCount(train);
 
         // ATSA
         if ((tcc = TrainControllerClientManager.getTCC(train)) != null) {
@@ -325,6 +347,7 @@ public class TrainLogger {
 
                 this.movedDistance, 
                 this.moveTo,
+                this.formation,
 
                 this.isOnRail, 
                 this.isComplessorActive
