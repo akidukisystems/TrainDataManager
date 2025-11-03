@@ -432,7 +432,22 @@ public class TrainControl
 
     public void refreshTrainStat()
     {
+
+        if(getReverser() == 0)
+        {
+            boolTrainStat[ATS_POWER] = true;
+            boolTrainStat[ATS_P_POWER] = true;
+        }
+        else
+        {
+            boolTrainStat[ATS_POWER] = false;
+            boolTrainStat[ATS_P_POWER] = false;
+            boolTrainStat[TASC_POWER] = false;
+        }
+
         // ATS-P
+        if (boolTrainStat[ATS_POWER] && boolTrainStat[ATS_P_POWER])
+        {
             boolTrainStat[ATS_P_ACTIVE] = limit != Integer.MAX_VALUE ? true : false;
             
             boolTrainStat[ATS_P_NEAR_PATTERN] = false;
@@ -451,41 +466,49 @@ public class TrainControl
 
             boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = false;
             if (!isATSPBrakeWorking) boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = true;
+        }
+        else
+        {
+            boolTrainStat[ATS_P_ACTIVE] = false;
+            boolTrainStat[ATS_P_NEAR_PATTERN] = false;
+            boolTrainStat[ATS_P_BRAKE_OPERATING] = false;
+            boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = false;
+        }
 
-            // EB EB EB
-            boolTrainStat[TRAINSTAT_EB] = false;
-            if (isTE) boolTrainStat[TRAINSTAT_EB] = true;
-            if (isRunningDoorOpen) boolTrainStat[TRAINSTAT_EB] = true;
-            if (isEBStop) boolTrainStat[TRAINSTAT_EB] = true;
-            if (!boolTrainStat[ATS_POWER]) boolTrainStat[TRAINSTAT_EB] = true;
-            if (reverser != 0) boolTrainStat[TRAINSTAT_EB] = true;
-            if (boolTrainStat[ATS_OPERATING]) boolTrainStat[TRAINSTAT_EB] = true;
-            if (boolTrainStat[ATS_P_BRAKE_OPERATING_EB]) boolTrainStat[TRAINSTAT_EB] = true;
-            if (boolTrainStat[ATS_P_ERROR]) boolTrainStat[TRAINSTAT_EB] = true;
+        // EB EB EB
+        boolTrainStat[TRAINSTAT_EB] = false;
+        if (isTE) boolTrainStat[TRAINSTAT_EB] = true;
+        if (isRunningDoorOpen) boolTrainStat[TRAINSTAT_EB] = true;
+        if (isEBStop) boolTrainStat[TRAINSTAT_EB] = true;
+        if (!boolTrainStat[ATS_POWER]) boolTrainStat[TRAINSTAT_EB] = true;
+        if (reverser != 0) boolTrainStat[TRAINSTAT_EB] = true;
+        if (boolTrainStat[ATS_OPERATING]) boolTrainStat[TRAINSTAT_EB] = true;
+        if (boolTrainStat[ATS_P_BRAKE_OPERATING_EB]) boolTrainStat[TRAINSTAT_EB] = true;
+        if (boolTrainStat[ATS_P_ERROR]) boolTrainStat[TRAINSTAT_EB] = true;
 
-           
-            // 保安ブレーキ
-            boolTrainStat[TRAINSTAT_DS_BRAKE] = false;
-            if (mr < 700) boolTrainStat[TRAINSTAT_DS_BRAKE] = true;
+        
+        // 保安ブレーキ
+        boolTrainStat[TRAINSTAT_DS_BRAKE] = false;
+        if (mr < 700) boolTrainStat[TRAINSTAT_DS_BRAKE] = true;
 
-            
-            
-            // TASC
-            boolTrainStat[TASC_POWER] = isTASCEnable;
-            
-            boolTrainStat[TASC_PATTERN_ACTIVE] = false;
-            boolTrainStat[TASC_BRAKE] = false;
-            if (isTASCBraking)
-            {
-                boolTrainStat[TASC_POWER] = true;
-                boolTrainStat[TASC_PATTERN_ACTIVE] = true;
-                boolTrainStat[TASC_BRAKE] = true;
-            }
+        
+        
+        // TASC
+        boolTrainStat[TASC_POWER] = isTASCEnable;
+        
+        boolTrainStat[TASC_PATTERN_ACTIVE] = false;
+        boolTrainStat[TASC_BRAKE] = false;
+        if (isTASCBraking && (getReverser() == 0))
+        {
+            boolTrainStat[TASC_POWER] = true;
+            boolTrainStat[TASC_PATTERN_ACTIVE] = true;
+            boolTrainStat[TASC_BRAKE] = true;
+        }
 
-            // ドア
-            boolTrainStat[TRAINSTAT_EX_DOOR_CLOSE] = isDoorClose;
+        // ドア
+        boolTrainStat[TRAINSTAT_EX_DOOR_CLOSE] = isDoorClose;
 
-            boolTrainStat[TRAINSTAT_EX_STA] = isArrivingStation;
+        boolTrainStat[TRAINSTAT_EX_STA] = isArrivingStation;
     }
 
     public void resetTrain()
@@ -527,9 +550,9 @@ public class TrainControl
         txtTASC = "";
         txtTrainStatEx = "";
 
-        boolTrainStat[ATS_POWER] = true;
-        boolTrainStat[ATS_P_POWER] = true;
-        boolTrainStat[TASC_POWER] = true;
+        boolTrainStat[ATS_POWER] = false;
+        boolTrainStat[ATS_P_POWER] = false;
+        boolTrainStat[TASC_POWER] = false;
     }
 
     public void refreshTimer()

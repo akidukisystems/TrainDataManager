@@ -16,6 +16,8 @@ import javax.swing.Timer;
 
 import org.json.JSONObject;
 
+import jp.akidukisystems.software.traindataclient.Controller.MasConReader;
+
 public class TDCCore 
 {
 
@@ -71,10 +73,12 @@ public class TDCCore
 
     private static TrainNumber tn;
     private static TrainControl tc;
+    private static MasConReader reader;
 
     public static void main(String[] args) throws IOException 
     {
         TDCCore clientObject = new TDCCore();
+        reader = new MasConReader();
         tn = new TrainNumber();
         networkManager = new NetworkManager();
         networkManager.clientInit(PORT);
@@ -656,6 +660,8 @@ public class TDCCore
         epFrame.setVisible(true);
         trainNumSetFrame.setVisible(false);
 
+
+
         refreshTimer = new Timer(250, _ -> 
         {
             speedLabel.setText(String.format("%dkm/h", (int) tc.getSpeed()));
@@ -747,6 +753,9 @@ public class TDCCore
                 reverserSetNButton.setEnabled(false);
                 reverserSetBButton.setEnabled(false);
             }
+
+            // マスコン
+            if(reader.isRunning()) networkManager.sendCommand("send", "notch", MasConReader.mapYtoNotch(reader.getValue("y")));
 
             // モニタ類
 
@@ -867,6 +876,8 @@ public class TDCCore
                             // GUI更新
                             if (!refreshTimer.isRunning()) refreshTimer.start();
 
+                            if(!reader.isRunning()) reader.start();
+
                             //System.out.println(String.format("speed:%.2fkm/h notch:%d door:%d bc:%d mr:%d move:%.2f", speed, notch, door, bc, mr, move));
                             break;
 
@@ -890,6 +901,7 @@ public class TDCCore
                             infoTascLabel.setText("");
                             infoTrainExLabel.setText("");
                             if (refreshTimer.isRunning()) refreshTimer.stop();
+                            if(reader.isRunning()) reader.stop();
                             break;
 
                         case "beacon":
