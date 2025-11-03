@@ -40,6 +40,7 @@ public class TrainLogger {
     private byte stateReverser;
     private byte statePantogtraph;
     private byte stateInteriorLight;
+    private byte stateDestination;
 
     // 速度とノッチ位置取得
     private float speed;
@@ -131,6 +132,7 @@ public class TrainLogger {
         this.stateReverser = 0;
         this.statePantogtraph = 0;
         this.stateInteriorLight = 0;
+        this.stateDestination = 0;
 
         // 速度とノッチ位置取得
         this.speed = 0f;
@@ -179,6 +181,7 @@ public class TrainLogger {
         this.stateReverser = this.vehicle.getVehicleState(TrainState.TrainStateType.Role);
         this.statePantogtraph = this.vehicle.getVehicleState(TrainState.TrainStateType.Pantograph);
         this.stateInteriorLight = this.vehicle.getVehicleState(TrainState.TrainStateType.InteriorLight);
+        this.stateDestination = this.vehicle.getVehicleState(TrainState.TrainStateType.Destination);
 
         // 速度とノッチ位置取得
         this.speed = this.train.getSpeed();
@@ -339,6 +342,7 @@ public class TrainLogger {
                 this.stateReverser, 
                 this.statePantogtraph, 
                 this.stateInteriorLight, 
+                this.stateDestination,
 
                 this.speedLimit,
                 this.isTASCEnable,

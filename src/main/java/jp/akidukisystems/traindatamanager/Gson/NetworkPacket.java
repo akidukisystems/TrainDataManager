@@ -18,6 +18,7 @@ public class NetworkPacket {
     public int reverser;
     public int pantograph;
     public int interiorlight;
+    public int stateDestination;
 
     public int speedLimit;
     public boolean isTASCEnable;
@@ -50,6 +51,7 @@ public class NetworkPacket {
         int reverser, 
         int pantograph, 
         int interiorlight, 
+        int stateDestination,
 
         int speedLimit,
         boolean isTASCEnable,
@@ -81,6 +83,7 @@ public class NetworkPacket {
         this.reverser = reverser;
         this.pantograph = pantograph;
         this.interiorlight = interiorlight;
+        this.stateDestination = stateDestination;
 
         this.speedLimit = speedLimit;
         this.isTASCEnable = isTASCEnable;
