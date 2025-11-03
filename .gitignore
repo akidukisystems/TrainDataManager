@@ -28,3 +28,4 @@ library
 libs
 mc2pi/lib/
 *.old
+mc2pi/*.txt
