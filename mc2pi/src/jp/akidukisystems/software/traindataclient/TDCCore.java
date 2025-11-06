@@ -1,4 +1,4 @@
-package jp.akidukisystems.software.traindataclient;
+package jp.akidukisystems.software.TrainDataClient;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TesterCore",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.debug.MasconTester.TesterCore",
+            "projectName": "mc2pi_8acefe3b"
+        },
+        {
+            "type": "java",
             "name": "MBCore",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.masconbridge.MBCore",

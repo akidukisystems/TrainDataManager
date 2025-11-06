@@ -1,4 +1,4 @@
-package jp.akidukisystems.software.traindataclient;
+package jp.akidukisystems.software.TrainDataClient;
 
 public class TrainNumber
 {

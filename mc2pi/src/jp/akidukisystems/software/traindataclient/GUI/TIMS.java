@@ -1,4 +1,4 @@
-package jp.akidukisystems.software.traindataclient.GUI;
+package jp.akidukisystems.software.TrainDataClient.GUI;
 
 public class TIMS {
     

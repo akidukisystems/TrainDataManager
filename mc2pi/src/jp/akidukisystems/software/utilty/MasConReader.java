@@ -1,4 +1,4 @@
-package jp.akidukisystems.software.masconbridge.Controller;
+package jp.akidukisystems.software.utilty;
 
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
