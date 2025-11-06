@@ -27,13 +27,13 @@ public class NetworkManager
     ExecutorService executor = Executors.newSingleThreadExecutor();
     AtomicReference<String> sharedData = new AtomicReference<>(null);
 
-    public void clientInit(int port) 
+    public void clientInit(String adrs, int port) 
     {
         while (true) 
         {
             try 
             {
-                this.client = new Socket("localhost", port);
+                this.client = new Socket(adrs, port);
                 this.client.setTcpNoDelay(true);
             } 
             catch (UnknownHostException e) 

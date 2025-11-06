@@ -81,7 +81,7 @@ public class TDCCore
         
         tn = new TrainNumber();
         networkManager = new NetworkManager();
-        networkManager.clientInit(PORT);
+        networkManager.clientInit("10.163.57.213", PORT);
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
 
@@ -931,10 +931,6 @@ public class TDCCore
                         default:
                             break;
                     }
-                }
-                else
-                {
-                    networkManager.clientInit(PORT);
                 }
             }
         }).start();

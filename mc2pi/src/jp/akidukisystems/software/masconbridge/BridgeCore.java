@@ -17,7 +17,7 @@ public class BridgeCore {
         reader = new MasConReader();
         
         gameNetworkManager = new NetworkManager();
-        gameNetworkManager.clientInit(GAME_PORT);  
+        gameNetworkManager.clientInit("localhost",GAME_PORT);  
 
         piNetworkManager = new NetworkManager();
         piNetworkManager.serverInit(PI_PORT);  
