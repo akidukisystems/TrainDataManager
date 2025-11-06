@@ -70,6 +70,11 @@ public class NetworkManager
     {
         try 
         {
+            if(this.reader == null)
+            {
+                return null;
+            }
+
             return this.reader.readLine();
         } 
         catch (IOException e) 
@@ -136,6 +141,11 @@ public class NetworkManager
     }
 
     public String getLatestReceivedString()  {
+        if(this.reader == null)
+        {
+            return null;
+        }
+        
         String data = sharedData.get();
         sharedData.set(null);
         return data;

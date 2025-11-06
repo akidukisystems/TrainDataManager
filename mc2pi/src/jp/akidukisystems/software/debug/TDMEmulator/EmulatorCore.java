@@ -37,7 +37,17 @@ public class EmulatorCore {
                 {
                     System.out.println(fetchData);
                     JSONObject jsonObj = new JSONObject(fetchData);
-                    notch = jsonObj.getInt("notch");
+
+                    switch (jsonObj.getString("type"))
+                    {
+                        case "kill":
+                            networkManager.clientClose();
+                            break;
+                            
+                        default:
+                            notch = jsonObj.getInt("notch");
+                            break;
+                    }
                 }
                 else
                 {
