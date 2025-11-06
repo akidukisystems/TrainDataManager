@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 public class NetworkManager 
 {
-
     public static Socket clientSocket;
     Socket client;
     BufferedReader reader = null;

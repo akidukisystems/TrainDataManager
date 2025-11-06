@@ -16,12 +16,9 @@ import javax.swing.Timer;
 
 import org.json.JSONObject;
 
-import jp.akidukisystems.software.traindataclient.Controller.MasConReader;
-
 public class TDCCore 
 {
-
-    private static final int PORT = 34565;
+    private static final int PORT = 34575;
     public static final int DOOR_CLOSE = 0;
     public static final int DOOR_RIGHT = 1;
     public static final int DOOR_LEFT = 2;
@@ -73,12 +70,11 @@ public class TDCCore
 
     private static TrainNumber tn;
     private static TrainControl tc;
-    private static MasConReader reader;
 
     public static void main(String[] args) throws IOException 
     {
         TDCCore clientObject = new TDCCore();
-        reader = new MasConReader();
+        
         tn = new TrainNumber();
         networkManager = new NetworkManager();
         networkManager.clientInit(PORT);
@@ -140,19 +136,19 @@ public class TDCCore
             dictanceSetDOWNButton = new JButton("下り");
             dictanceSetDOWNButton.setBounds(100, 100, 100, 50);
 
-            setDistance0Button.addActionListener(_ -> distanceSetText += "0");
-            setDistance1Button.addActionListener(_ -> distanceSetText += "1");
-            setDistance2Button.addActionListener(_ -> distanceSetText += "2");
-            setDistance3Button.addActionListener(_ -> distanceSetText += "3");
-            setDistance4Button.addActionListener(_ -> distanceSetText += "4");
-            setDistance5Button.addActionListener(_ -> distanceSetText += "5");
-            setDistance6Button.addActionListener(_ -> distanceSetText += "6");
-            setDistance7Button.addActionListener(_ -> distanceSetText += "7");
-            setDistance8Button.addActionListener(_ -> distanceSetText += "8");
-            setDistance9Button.addActionListener(_ -> distanceSetText += "9");
-            setDistancePeriodButton.addActionListener(_ -> distanceSetText += ".");
-            distanceSetUPButton.addActionListener(_ -> networkManager.sendCommand("send", "moveTo", 0));
-            dictanceSetDOWNButton.addActionListener(_ -> networkManager.sendCommand("send", "moveTo", 1));
+            setDistance0Button.addActionListener(keyword -> distanceSetText += "0");
+            setDistance1Button.addActionListener(keyword -> distanceSetText += "1");
+            setDistance2Button.addActionListener(keyword -> distanceSetText += "2");
+            setDistance3Button.addActionListener(keyword -> distanceSetText += "3");
+            setDistance4Button.addActionListener(keyword -> distanceSetText += "4");
+            setDistance5Button.addActionListener(keyword -> distanceSetText += "5");
+            setDistance6Button.addActionListener(keyword -> distanceSetText += "6");
+            setDistance7Button.addActionListener(keyword -> distanceSetText += "7");
+            setDistance8Button.addActionListener(keyword -> distanceSetText += "8");
+            setDistance9Button.addActionListener(keyword -> distanceSetText += "9");
+            setDistancePeriodButton.addActionListener(keyword -> distanceSetText += ".");
+            distanceSetUPButton.addActionListener(keyword -> networkManager.sendCommand("send", "moveTo", 0));
+            dictanceSetDOWNButton.addActionListener(keyword -> networkManager.sendCommand("send", "moveTo", 1));
 
             setDistanceButton.addActionListener(new ActionListener() 
             {
@@ -247,16 +243,16 @@ public class TDCCore
             JButton setTrainNumButton = new JButton("設定");
             setTrainNumButton.setBounds(300, 50, 100, 50);
 
-            setTrainNum0Button.addActionListener(_ -> tn.number += "0");
-            setTrainNum1Button.addActionListener(_ -> tn.number += "1");
-            setTrainNum2Button.addActionListener(_ -> tn.number += "2");
-            setTrainNum3Button.addActionListener(_ -> tn.number += "3");
-            setTrainNum4Button.addActionListener(_ -> tn.number += "4");
-            setTrainNum5Button.addActionListener(_ -> tn.number += "5");
-            setTrainNum6Button.addActionListener(_ -> tn.number += "6");
-            setTrainNum7Button.addActionListener(_ -> tn.number += "7");
-            setTrainNum8Button.addActionListener(_ -> tn.number += "8");
-            setTrainNum9Button.addActionListener(_ -> tn.number += "9");
+            setTrainNum0Button.addActionListener(keyword -> tn.number += "0");
+            setTrainNum1Button.addActionListener(keyword -> tn.number += "1");
+            setTrainNum2Button.addActionListener(keyword -> tn.number += "2");
+            setTrainNum3Button.addActionListener(keyword -> tn.number += "3");
+            setTrainNum4Button.addActionListener(keyword -> tn.number += "4");
+            setTrainNum5Button.addActionListener(keyword -> tn.number += "5");
+            setTrainNum6Button.addActionListener(keyword -> tn.number += "6");
+            setTrainNum7Button.addActionListener(keyword -> tn.number += "7");
+            setTrainNum8Button.addActionListener(keyword -> tn.number += "8");
+            setTrainNum9Button.addActionListener(keyword -> tn.number += "9");
 
             setTrainNumButton.addActionListener(new ActionListener() 
             {
@@ -501,7 +497,7 @@ public class TDCCore
                 }
             });
 
-            showResetDistanceWindowButon.addActionListener(_ -> distanceResetFrame.setVisible(true));
+            showResetDistanceWindowButon.addActionListener(keyword -> distanceResetFrame.setVisible(true));
             showSetTrainNumWindowButton.addActionListener(new ActionListener()
             {
                 @Override
@@ -553,9 +549,9 @@ public class TDCCore
                 }
             });
 
-            reverserSetFButton.addActionListener(_ ->networkManager.sendCommand("send", "reverser", 0));
-            reverserSetNButton.addActionListener(_ ->networkManager.sendCommand("send", "reverser", 1));
-            reverserSetBButton.addActionListener(_ ->networkManager.sendCommand("send", "reverser", 2));
+            reverserSetFButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 0));
+            reverserSetNButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 1));
+            reverserSetBButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 2));
 
             blinkTimer = new Timer(500, new ActionListener()
             {
@@ -662,7 +658,7 @@ public class TDCCore
 
 
 
-        refreshTimer = new Timer(250, _ -> 
+        refreshTimer = new Timer(250, keyword -> 
         {
             speedLabel.setText(String.format("%dkm/h", (int) tc.getSpeed()));
             bcLabel.setText(String.format("%dkpa", tc.getBc()));
@@ -754,8 +750,6 @@ public class TDCCore
                 reverserSetBButton.setEnabled(false);
             }
 
-            // マスコン
-            if(reader.isRunning()) networkManager.sendCommand("send", "notch", MasConReader.mapYtoNotch(reader.getValue("y")));
 
             // モニタ類
 
@@ -872,11 +866,10 @@ public class TDCCore
                             tc.handleRunningOpen();
                             tc.handleATSNW();
                             tc.handleArrivingStation();
-
                             // GUI更新
                             if (!refreshTimer.isRunning()) refreshTimer.start();
 
-                            if(!reader.isRunning()) reader.start();
+                            
 
                             //System.out.println(String.format("speed:%.2fkm/h notch:%d door:%d bc:%d mr:%d move:%.2f", speed, notch, door, bc, mr, move));
                             break;
@@ -901,7 +894,6 @@ public class TDCCore
                             infoTascLabel.setText("");
                             infoTrainExLabel.setText("");
                             if (refreshTimer.isRunning()) refreshTimer.stop();
-                            if(reader.isRunning()) reader.stop();
                             break;
 
                         case "beacon":

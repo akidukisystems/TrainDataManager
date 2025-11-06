@@ -558,14 +558,14 @@ public class TrainControl
     public void refreshTimer()
     {
         // EB装置関連
-        ebTimer = new Timer(60000, _ ->
+        ebTimer = new Timer(60000, keyword ->
         {
             setboolTrainStat(TrainControl.TRAINSTAT_EX_EB, true);
             ebActiveTimer.start();
             ebTimer.stop();
         });
 
-        ebActiveTimer = new Timer(5000, _ ->
+        ebActiveTimer = new Timer(5000, keyword ->
         {
             setboolTrainStat(TrainControl.TRAINSTAT_EX_EB, true);
             isEBStop = true;
