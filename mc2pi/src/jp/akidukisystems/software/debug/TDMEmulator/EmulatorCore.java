@@ -21,6 +21,7 @@ public class EmulatorCore {
         {
             boolean isFirst = true;
             int notch = -8;
+            int bc = 0;
             
             while(true)
             {
@@ -42,10 +43,20 @@ public class EmulatorCore {
                     {
                         case "kill":
                             networkManager.clientClose();
+                            System.exit(0);
                             break;
-                            
+
                         default:
                             notch = jsonObj.getInt("notch");
+
+                            if(notch < 0)
+                            {
+                                bc = notch * -59;
+                            }
+                            else
+                            {
+                                bc = 0;
+                            }
                             break;
                     }
                 }
@@ -58,7 +69,7 @@ public class EmulatorCore {
                     }
                 }
 
-                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\"0.0\",\"notch\":"+ notch +",\"bc\":440,\"mr\":880,\"door\":0,\"reverser\":0,\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":0,\"moveTo\":0,\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":false}");
+                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\"0.0\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":880,\"door\":0,\"reverser\":0,\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":0,\"moveTo\":0,\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":false}");
             }
         }).start();
     }
