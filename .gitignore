@@ -29,3 +29,5 @@ libs
 mc2pi/lib/
 *.old
 mc2pi/*.txt
+mc2pi/.vscode/*.json
+.vscode/*.json

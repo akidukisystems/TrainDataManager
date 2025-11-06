@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "DutyCardViewer",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.utilty.DutyCardViewer",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
             "name": "TDCCore",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
