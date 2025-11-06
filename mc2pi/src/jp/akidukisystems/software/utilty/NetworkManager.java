@@ -1,4 +1,4 @@
-package jp.akidukisystems.software.masconbridge;
+package jp.akidukisystems.software.utilty;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 public class NetworkManager 
 {
-
     public static Socket clientSocket;
     Socket client;
     BufferedReader reader = null;

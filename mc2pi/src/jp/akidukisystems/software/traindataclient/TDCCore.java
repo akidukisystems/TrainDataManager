@@ -16,6 +16,8 @@ import javax.swing.Timer;
 
 import org.json.JSONObject;
 
+import jp.akidukisystems.software.utilty.NetworkManager;
+
 public class TDCCore 
 {
     private static final int PORT = 34575;

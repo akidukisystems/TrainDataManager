@@ -1,6 +1,7 @@
 package jp.akidukisystems.software.masconbridge;
 
 import jp.akidukisystems.software.masconbridge.Controller.MasConReader;
+import jp.akidukisystems.software.utilty.NetworkManager;
 
 public class MBCore {
 
