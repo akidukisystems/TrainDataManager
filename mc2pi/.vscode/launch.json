@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TDCCore",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
+            "projectName": "mc2pi_8acefe3b"
+        },
+        {
+            "type": "java",
+            "name": "BridgeCore",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",
+            "projectName": "mc2pi_8acefe3b"
+        },
+        {
+            "type": "java",
+            "name": "EmulatorCore",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
+            "projectName": "mc2pi_8acefe3b"
+        },
+        {
+            "type": "java",
             "name": "TesterCore",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.debug.MasconTester.TesterCore",

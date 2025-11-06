@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -825,12 +827,16 @@ public class TDCCore
 
     public void running() throws IOException
     {
-        SwingUtilities.invokeLater(this::setupUI);
-
         System.out.println("client starting on port " + PORT + "...");
 
         tc.refreshTimer();
         reset();
+
+        try {
+            SwingUtilities.invokeAndWait(this::setupUI);
+        } catch (InvocationTargetException | InterruptedException e) {
+            e.printStackTrace();
+        }
 
         new Thread(() ->
         {
@@ -870,10 +876,6 @@ public class TDCCore
                             tc.handleArrivingStation();
                             // GUI更新
                             if (!refreshTimer.isRunning()) refreshTimer.start();
-
-                            
-
-                            //System.out.println(String.format("speed:%.2fkm/h notch:%d door:%d bc:%d mr:%d move:%.2f", speed, notch, door, bc, mr, move));
                             break;
 
                         case "kill":

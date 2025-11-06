@@ -18,8 +18,18 @@ public class BridgeCore {
         
         gameNetworkManager = new NetworkManager();
         gameNetworkManager.clientInit(GAME_PORT);  
+
         piNetworkManager = new NetworkManager();
-        piNetworkManager.clientInit(PI_PORT);      
+        piNetworkManager.serverInit(PI_PORT);  
+        piNetworkManager.serverWaitingClient();    
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> 
+        {
+            if (piNetworkManager != null) {
+                piNetworkManager.sendString("{\"type\":\"kill\"}");
+                piNetworkManager.serverClose();
+            }
+        }));
 
         clientObject.running(); 
     }
@@ -29,25 +39,47 @@ public class BridgeCore {
         new Thread(() ->
         {
             if(!reader.isRunning()) reader.start();
+
+            boolean isFirst = true;
             
             while(true)
             {
+
+                if (isFirst) {
+                    piNetworkManager.serverStartRead();
+                    piNetworkManager.sendString("{\"type\":\"start\",\"version\":null}");
+                    isFirst = false;
+                }
+
                 // データのブリッジ処理
                 String fetchGameData = gameNetworkManager.clientReciveString();
-                String fetchPiData = piNetworkManager.clientReciveString();
+                
+                String fetchPiData = null;
+                fetchPiData = piNetworkManager.getLatestReceivedString();
 
                 if(fetchGameData != null)
                 {
-                    piNetworkManager.clientSendString(fetchGameData);;
+                    piNetworkManager.sendString(fetchGameData);
+                    System.out.println(fetchGameData);
                 }
 
                 if(fetchPiData != null)
                 {
-                    gameNetworkManager.clientSendString(fetchPiData);;
+                    gameNetworkManager.sendString(fetchPiData);
+                    System.out.println(fetchPiData);
+                }
+
+                if((fetchGameData == null ) && (fetchPiData == null))
+                {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if(reader.isRunning()) gameNetworkManager.sendCommand("send", "notch", MasConReader.mapYtoNotch(reader.getValue("y")));
             }
-        }).start();;
+        }).start();
     }
 }
