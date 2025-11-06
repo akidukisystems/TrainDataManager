@@ -17,7 +17,7 @@ public class NetworkManager
 {
     public static Socket clientSocket;
     Socket client;
-    BufferedReader reader = null;
+    public BufferedReader reader = null;
     PrintWriter writer = null;
     Socket c2s = null;
 

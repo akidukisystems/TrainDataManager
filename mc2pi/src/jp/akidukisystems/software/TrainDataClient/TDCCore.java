@@ -85,6 +85,14 @@ public class TDCCore
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> 
+        {
+            if (networkManager != null) {
+                networkManager.sendString("{\"type\":\"kill\"}");
+                networkManager.clientClose();
+            }
+        }));
+
         clientObject.running();
     }
 

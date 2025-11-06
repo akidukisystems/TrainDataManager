@@ -1,5 +1,7 @@
 package jp.akidukisystems.software.MasconBridge;
 
+import org.json.JSONObject;
+
 import jp.akidukisystems.software.utilty.MasConReader;
 import jp.akidukisystems.software.utilty.NetworkManager;
 
@@ -60,13 +62,36 @@ public class BridgeCore {
                 if(fetchGameData != null)
                 {
                     piNetworkManager.sendString(fetchGameData);
+
+                    JSONObject jsonObj = new JSONObject(fetchGameData);
+                    switch (jsonObj.getString("type"))
+                    {
+                        case "kill":
+                            gameNetworkManager.clientClose();
+                            break;
+                    }
+                    
                     System.out.println(fetchGameData);
                 }
 
                 if(fetchPiData != null)
                 {
                     gameNetworkManager.sendString(fetchPiData);
+
+                    JSONObject jsonObj = new JSONObject(fetchPiData);
+                    switch (jsonObj.getString("type"))
+                    {
+                        case "kill":
+                            piNetworkManager.serverClose();
+                            break;
+                    }
+
                     System.out.println(fetchPiData);
+                }
+
+                if((gameNetworkManager.reader == null) && (piNetworkManager.reader == null))
+                {
+                    System.exit(0);
                 }
 
                 if((fetchGameData == null ) && (fetchPiData == null))
