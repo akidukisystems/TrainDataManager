@@ -21,7 +21,7 @@ public class BridgeCore {
         reader = new MasConReader();
         
         gameNetworkManager = new NetworkManager();
-        gameNetworkManager.clientInit("localhost",GAME_PORT);  
+        gameNetworkManager.clientInit("localhost", GAME_PORT);  
 
         piNetworkManager = new NetworkManager();
         piNetworkManager.serverInit(PI_PORT);  
@@ -29,9 +29,12 @@ public class BridgeCore {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> 
         {
+            if (gameNetworkManager != null) {
+                gameNetworkManager.sendString("{\"type\":\"kill\"}");
+            }
+
             if (piNetworkManager != null) {
                 piNetworkManager.sendString("{\"type\":\"kill\"}");
-                piNetworkManager.serverClose();
             }
         }));
 
@@ -52,12 +55,23 @@ public class BridgeCore {
             }
             System.out.println("exit");
         }).start();
-
+        
         new Thread(() ->
         {
             if(!reader.isRunning()) reader.start();
 
             boolean isFirst = true;
+
+            piNetworkManager.startHeartbeat(
+                3000,  // intervalMs
+                7000,  // timeoutMs
+                () -> {
+                    System.err.println("Peer dead. Exiting...");
+                    try { piNetworkManager.clientClose(); } catch (Exception ignored) {}
+                    try { piNetworkManager.serverClose(); } catch (Exception ignored) {}
+                    System.exit(0);
+                }
+            );
             
             while(true)
             {
@@ -83,10 +97,16 @@ public class BridgeCore {
                     {
                         case "kill":
                             gameNetworkManager.clientClose();
+                            System.exit(0);
                             break;
                     }
                     
                     System.out.println(fetchGameData);
+                }
+                else
+                {
+                    gameNetworkManager = new NetworkManager();
+                    gameNetworkManager.clientInit("localhost", GAME_PORT);
                 }
 
                 if(fetchPiData != null)
@@ -98,15 +118,11 @@ public class BridgeCore {
                     {
                         case "kill":
                             piNetworkManager.serverClose();
+                            System.exit(0);
                             break;
                     }
 
                     System.out.println(fetchPiData);
-                }
-
-                if((gameNetworkManager.reader == null) && (piNetworkManager.reader == null))
-                {
-                    System.exit(0);
                 }
 
                 if((fetchGameData == null ) && (fetchPiData == null))

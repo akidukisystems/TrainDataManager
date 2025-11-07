@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "EmulatorCore",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "BridgeCore",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "TDCCore",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
             "name": "DutyCardViewer",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.utilty.DutyCardViewer",

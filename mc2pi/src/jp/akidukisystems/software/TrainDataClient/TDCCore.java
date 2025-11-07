@@ -846,11 +846,24 @@ public class TDCCore
             e.printStackTrace();
         }
 
+        networkManager.startHeartbeat(
+            3000,  // intervalMs
+            7000,  // timeoutMs
+            () -> {
+                System.err.println("Peer dead. Exiting...");
+                try { networkManager.clientClose(); } catch (Exception ignored) {}
+                try { networkManager.serverClose(); } catch (Exception ignored) {}
+                System.exit(0);
+            }
+        );
+
         new Thread(() ->
         {
+            String fetchData = null;
+
             while(true)
             {
-                String fetchData = networkManager.clientReciveString();
+                fetchData = networkManager.clientReciveString();
 
                 if(fetchData != null)
                 {

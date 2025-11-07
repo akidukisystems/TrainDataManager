@@ -27,6 +27,11 @@ public class NetworkManager
     ExecutorService executor = Executors.newSingleThreadExecutor();
     AtomicReference<String> sharedData = new AtomicReference<>(null);
 
+    private volatile HeartbeatLink hb;
+
+    public Socket getActiveSocket() { return (client != null ? client : s2c); }
+    public PrintWriter getWriter() { return writer; }
+
     public void clientInit(String adrs, int port) 
     {
         while (true) 
@@ -66,22 +71,20 @@ public class NetworkManager
         }
     }
 
-    public String clientReciveString() 
-    {
-        try 
-        {
-            if(this.reader == null)
-            {
-                return null;
+    public String clientReciveString() {
+        try {
+            String line;
+            while ((line = this.reader.readLine()) != null) {
+                HeartbeatLink local = hb;
+                if (local != null && local.consume(line)) {
+                    continue; // HB は飲み込む
+                }
+                return line;
             }
-
-            return this.reader.readLine();
-        } 
-        catch (IOException e) 
-        {
+        } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 
     public void clientClose() 
@@ -115,6 +118,7 @@ public class NetworkManager
             server.setSoTimeout(60000);
             s2c = server.accept();
             System.out.println("Connected s2c");
+
             reader = new BufferedReader(new InputStreamReader(s2c.getInputStream()));
             writer = new PrintWriter(s2c.getOutputStream(), true);
         } catch (Exception e) {
@@ -127,11 +131,14 @@ public class NetworkManager
             while (true) {
                 try {
                     String data = reader.readLine();
-                    if (data != null) {
-                        sharedData.set(data);
-                    } else {
-                        break;
+                    if (data == null) break;
+
+                    HeartbeatLink local = hb;
+                    if (local != null && local.consume(data)) {
+                        continue; // 飲み込んだので上位に流さない
                     }
+
+                    sharedData.set(data);
                 } catch (IOException e) {
                     e.printStackTrace();
                     break;
@@ -140,12 +147,7 @@ public class NetworkManager
         });
     }
 
-    public String getLatestReceivedString()  {
-        if(this.reader == null)
-        {
-            return null;
-        }
-        
+    public String getLatestReceivedString()  {   
         String data = sharedData.get();
         sharedData.set(null);
         return data;
@@ -178,6 +180,16 @@ public class NetworkManager
         obj.put("message", message);
         obj.put(message, value);
         sendString(obj.toString());
+    }
+
+    public void startHeartbeat(long intervalMs, long timeoutMs, Runnable onPeerDead) {
+        try {
+            Socket sock = getActiveSocket();
+            if (sock == null || writer == null) return;
+            hb = HeartbeatLink.attach(sock, writer, intervalMs, timeoutMs, onPeerDead);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
 }
