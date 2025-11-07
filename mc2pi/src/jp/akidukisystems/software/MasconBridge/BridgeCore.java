@@ -1,5 +1,7 @@
 package jp.akidukisystems.software.MasconBridge;
 
+import java.util.Scanner;
+
 import org.json.JSONObject;
 
 import jp.akidukisystems.software.utilty.MasConReader;
@@ -38,6 +40,19 @@ public class BridgeCore {
 
     public void running()
     {
+        new Thread(() -> {
+            try (Scanner sc = new Scanner(System.in)) {
+                while (true) {
+                    String line = sc.nextLine();
+                    if (line.equalsIgnoreCase("exit")) break;
+                    gameNetworkManager.sendCommand("send", "notch", Integer.parseInt(line));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("exit");
+        }).start();
+
         new Thread(() ->
         {
             if(!reader.isRunning()) reader.start();

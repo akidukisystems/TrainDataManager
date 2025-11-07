@@ -1,4 +1,7 @@
 package jp.akidukisystems.software.debug.TDMEmulator;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.json.JSONObject;
 
 import jp.akidukisystems.software.utilty.NetworkManager;
@@ -7,6 +10,14 @@ public class EmulatorCore {
     
     private static NetworkManager networkManager = null; 
     private static final int PORT = 34565;
+    int bc = 0;
+    int targetBc = 0;
+    int mr = 880;
+    int notch = -8;
+    float speed = 0f;
+    boolean isComplessorActive = false;
+    int door = 0;
+
     public static void main(String[] args) {
         EmulatorCore object = new EmulatorCore();
         networkManager = new NetworkManager();
@@ -20,8 +31,46 @@ public class EmulatorCore {
         new Thread(() ->
         {
             boolean isFirst = true;
-            int notch = -8;
-            int bc = 0;
+
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    int beforeBC = bc;
+
+                    if(bc > targetBc)
+                        bc -= 17;
+
+                    if(bc < targetBc)
+                        bc += 17;
+
+                    if(beforeBC < bc)
+                        mr -= 1;
+
+                    if(mr < 800)
+                        isComplessorActive = true;
+
+                    if(isComplessorActive)
+                        mr += 1;
+
+                    if(isComplessorActive && (mr > 880))
+                        isComplessorActive = false;
+
+
+
+                    if(notch > 0)
+                    {
+                        speed += 0.07f * notch;
+                    }
+
+                    if(bc > 0)
+                    {
+                        speed -= 0.0012f * bc;
+                        if(speed < 0f)
+                            speed = 0f;
+                    }
+                }
+            }, 0, 80);
             
             while(true)
             {
@@ -47,16 +96,30 @@ public class EmulatorCore {
                             break;
 
                         default:
-                            notch = jsonObj.getInt("notch");
 
-                            if(notch < 0)
-                            {
-                                bc = notch * -59;
+                            switch (jsonObj.getString("message")) {
+                                case "notch":
+                                    notch = jsonObj.getInt("notch");
+
+                                    if(notch < 0)
+                                    {
+                                        targetBc = notch * -59;
+                                    }
+                                    else
+                                    {
+                                        targetBc = 0;
+                                    }
+
+                                    break;
+
+                                case "door":
+                                    door = jsonObj.getInt("door");
+                                    break;
+
+                                default:
+                                    break;
                             }
-                            else
-                            {
-                                bc = 0;
-                            }
+                            
                             break;
                     }
                 }
@@ -69,7 +132,7 @@ public class EmulatorCore {
                     }
                 }
 
-                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\"0.0\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":880,\"door\":0,\"reverser\":0,\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":0,\"moveTo\":0,\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":false}");
+                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ mr +",\"door\":"+ door +",\"reverser\":0,\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":0,\"moveTo\":0,\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
             }
         }).start();
     }

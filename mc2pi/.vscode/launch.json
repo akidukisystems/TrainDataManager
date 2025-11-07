@@ -9,6 +9,13 @@
             "name": "DutyCardViewer",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.utilty.DutyCardViewer",
+            "projectName": "mc2pi_8acefe3b"
+        },
+        {
+            "type": "java",
+            "name": "DutyCardViewer",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.utilty.DutyCardViewer",
             "projectName": "mc2pi_1378da23"
         },
         {
