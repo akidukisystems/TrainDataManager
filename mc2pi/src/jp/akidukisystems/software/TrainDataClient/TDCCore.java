@@ -28,6 +28,12 @@ public class TDCCore
     public static final int DOOR_LEFT = 2;
     public static final int DOOR_BOTH = 3;
 
+    private static final Color COLOR_DEFAULT = Color.WHITE;
+    private static final Color COLOR_ACTIVE = Color.YELLOW;
+    private static final Color COLOR_ALERT = Color.RED;
+
+    private static final String NA = "N/A";
+
     private static NetworkManager networkManager = null;    
 
     String distanceSetText = "0";
@@ -72,6 +78,8 @@ public class TDCCore
 
     JButton epButton;
 
+    JButton ActionButton;
+
     private static TrainNumber tn;
     private static TrainControl tc;
 
@@ -96,7 +104,67 @@ public class TDCCore
         clientObject.running();
     }
 
-    
+    // EDTいじいじするのでEdtでよい　Editではない
+
+    private static void onEdt(Runnable r) {
+        if (SwingUtilities.isEventDispatchThread()) r.run();
+        else SwingUtilities.invokeLater(r);
+    }
+
+    private void resetBlinkState() {
+        blinkTimer.stop();
+        resetDoorButtonColors();
+        buttonCommand = null;
+        buttonDo = -1;
+    }
+
+    private void resetDoorButtonColors() {
+        ActionButton.setBackground(COLOR_DEFAULT);
+        doorOpenLButton.setBackground(COLOR_DEFAULT);
+        doorOpenRButton.setBackground(COLOR_DEFAULT);
+        doorCloseButton.setBackground(COLOR_DEFAULT);
+        doorReOpenButton.setBackground(COLOR_DEFAULT);
+    }
+
+    private void toggleBlink(JButton source, String command, int value) {
+        if (command.equals(buttonCommand) && buttonDo == value) {
+            resetBlinkState();
+        } else {
+            // 新しいボタンを押したとき
+            buttonCommand = command;
+            buttonDo = value;
+            blinkTimer.start();
+            resetDoorButtonColors();
+            source.setBackground(COLOR_ACTIVE);
+        }
+    }
+
+    private void createNumberButtons(JPanel parent, int startX, int startY, int size, ActionListener listener) {
+        for (int i = 0; i <= 9; i++) {
+            JButton btn = new JButton(String.valueOf(i));
+            int row = (i < 5) ? 0 : 1;
+            int col = (i < 5) ? i : i - 5;
+            btn.setBounds(startX + col * size, startY + row * size, size, size);
+            btn.addActionListener(listener);
+            parent.add(btn);
+        }
+    }
+
+    private JLabel createLabel(String text, int x, int y, int w, int h) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("ＭＳ ゴシック", Font.PLAIN, 20));
+        label.setForeground(Color.BLACK);
+        label.setBounds(x, y, w, h);
+        return label;
+    }
+
+    private JFrame createFrame(String title, int w, int h, JPanel content) {
+        JFrame frame = new JFrame(title);
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        frame.setSize(w, h);
+        frame.getContentPane().add(content, BorderLayout.CENTER);
+        return frame;
+    }
 
     public void setupUI() 
     {
@@ -115,30 +183,10 @@ public class TDCCore
 
         // kilo
 
-            JFrame distanceResetFrame = new JFrame("キロ程リセット");
-            distanceResetFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-            distanceResetFrame.setSize(640, 480);
+            JFrame distanceResetFrame = createFrame("キロ程リセット", 640, 480, q);
 
-            JButton setDistance0Button = new JButton("0");
-            setDistance0Button.setBounds(0, 0, 50, 50);
-            JButton setDistance1Button = new JButton("1");
-            setDistance1Button.setBounds(50, 0, 50, 50);
-            JButton setDistance2Button = new JButton("2");
-            setDistance2Button.setBounds(100, 0, 50, 50);
-            JButton setDistance3Button = new JButton("3");
-            setDistance3Button.setBounds(150, 0, 50, 50);
-            JButton setDistance4Button = new JButton("4");
-            setDistance4Button.setBounds(200, 0, 50, 50);
-            JButton setDistance5Button = new JButton("5");
-            setDistance5Button.setBounds(0, 50, 50, 50);
-            JButton setDistance6Button = new JButton("6");
-            setDistance6Button.setBounds(50, 50, 50, 50);
-            JButton setDistance7Button = new JButton("7");
-            setDistance7Button.setBounds(100, 50, 50, 50);
-            JButton setDistance8Button = new JButton("8");
-            setDistance8Button.setBounds(150, 50, 50, 50);
-            JButton setDistance9Button = new JButton("9");
-            setDistance9Button.setBounds(200, 50, 50, 50);
+            createNumberButtons(q, 0, 0, 50, e -> distanceSetText += ((JButton)e.getSource()).getText());
+            
             JButton setDistancePeriodButton = new JButton(".");
             setDistancePeriodButton.setBounds(250, 50, 50, 50);
             JButton setDistanceButton = new JButton("設定");
@@ -148,16 +196,6 @@ public class TDCCore
             dictanceSetDOWNButton = new JButton("下り");
             dictanceSetDOWNButton.setBounds(100, 100, 100, 50);
 
-            setDistance0Button.addActionListener(keyword -> distanceSetText += "0");
-            setDistance1Button.addActionListener(keyword -> distanceSetText += "1");
-            setDistance2Button.addActionListener(keyword -> distanceSetText += "2");
-            setDistance3Button.addActionListener(keyword -> distanceSetText += "3");
-            setDistance4Button.addActionListener(keyword -> distanceSetText += "4");
-            setDistance5Button.addActionListener(keyword -> distanceSetText += "5");
-            setDistance6Button.addActionListener(keyword -> distanceSetText += "6");
-            setDistance7Button.addActionListener(keyword -> distanceSetText += "7");
-            setDistance8Button.addActionListener(keyword -> distanceSetText += "8");
-            setDistance9Button.addActionListener(keyword -> distanceSetText += "9");
             setDistancePeriodButton.addActionListener(keyword -> distanceSetText += ".");
             distanceSetUPButton.addActionListener(keyword -> networkManager.sendCommand("send", "moveTo", 0));
             dictanceSetDOWNButton.addActionListener(keyword -> networkManager.sendCommand("send", "moveTo", 1));
@@ -183,9 +221,7 @@ public class TDCCore
 
         // bg
 
-            JFrame epFrame = new JFrame("防護無線");
-            epFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-            epFrame.setSize(480, 300);
+            JFrame epFrame = createFrame("防護無線", 480, 300, r);
 
             epButton = new JButton("発報");
             epButton.setBounds(140, 75, 200, 150);
@@ -197,7 +233,7 @@ public class TDCCore
                 @Override
                 public void actionPerformed(ActionEvent e) 
                 {
-                    r.setBackground(on ? Color.RED : Color.WHITE);
+                    r.setBackground(on ? COLOR_ALERT : COLOR_DEFAULT);
                     on = !on;
                 } 
             });
@@ -215,7 +251,7 @@ public class TDCCore
                     else 
                     {
                         epButtonTimer.stop();
-                        r.setBackground(Color.WHITE);
+                        r.setBackground(COLOR_DEFAULT);
                         epButton.setText("発報");
                     }
                     tc.setRaisingEP(!tc.isRaisingEP());
@@ -224,47 +260,15 @@ public class TDCCore
 
         // trainnum
 
-            JFrame trainNumSetFrame = new JFrame("列車番号");
-            trainNumSetFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-            trainNumSetFrame.setSize(640, 480);
+            JFrame trainNumSetFrame = createFrame("列車番号", 640, 480, s);
 
-            JButton setTrainNum0Button = new JButton("0");
-            setTrainNum0Button.setBounds(0, 0, 50, 50);
-            JButton setTrainNum1Button = new JButton("1");
-            setTrainNum1Button.setBounds(50, 0, 50, 50);
-            JButton setTrainNum2Button = new JButton("2");
-            setTrainNum2Button.setBounds(100, 0, 50, 50);
-            JButton setTrainNum3Button = new JButton("3");
-            setTrainNum3Button.setBounds(150, 0, 50, 50);
-            JButton setTrainNum4Button = new JButton("4");
-            setTrainNum4Button.setBounds(200, 0, 50, 50);
-            JButton setTrainNum5Button = new JButton("5");
-            setTrainNum5Button.setBounds(0, 50, 50, 50);
-            JButton setTrainNum6Button = new JButton("6");
-            setTrainNum6Button.setBounds(50, 50, 50, 50);
-            JButton setTrainNum7Button = new JButton("7");
-            setTrainNum7Button.setBounds(100, 50, 50, 50);
-            JButton setTrainNum8Button = new JButton("8");
-            setTrainNum8Button.setBounds(150, 50, 50, 50);
-            JButton setTrainNum9Button = new JButton("9");
-            setTrainNum9Button.setBounds(200, 50, 50, 50);
+            createNumberButtons(s, 0, 0, 50, e -> tn.number += ((JButton)e.getSource()).getText());
 
             JTextField textTrainStr = new JTextField("");
             textTrainStr.setBounds(250, 50, 100, 50);
 
             JButton setTrainNumButton = new JButton("設定");
             setTrainNumButton.setBounds(300, 50, 100, 50);
-
-            setTrainNum0Button.addActionListener(keyword -> tn.number += "0");
-            setTrainNum1Button.addActionListener(keyword -> tn.number += "1");
-            setTrainNum2Button.addActionListener(keyword -> tn.number += "2");
-            setTrainNum3Button.addActionListener(keyword -> tn.number += "3");
-            setTrainNum4Button.addActionListener(keyword -> tn.number += "4");
-            setTrainNum5Button.addActionListener(keyword -> tn.number += "5");
-            setTrainNum6Button.addActionListener(keyword -> tn.number += "6");
-            setTrainNum7Button.addActionListener(keyword -> tn.number += "7");
-            setTrainNum8Button.addActionListener(keyword -> tn.number += "8");
-            setTrainNum9Button.addActionListener(keyword -> tn.number += "9");
 
             setTrainNumButton.addActionListener(new ActionListener() 
             {
@@ -298,7 +302,7 @@ public class TDCCore
             doorReOpenButton = new JButton("再開扉");
             doorReOpenButton.setBounds(100, 100, 100, 50);
 
-            JButton ActionButton = new JButton("設定");
+            ActionButton = new JButton("設定");
             ActionButton.setBounds(200, 50, 200, 100);
 
             JButton showResetDistanceWindowButon = new JButton("キロ程リセット");
@@ -317,63 +321,17 @@ public class TDCCore
             reverserSetBButton = new JButton("後");
             reverserSetBButton.setBounds(400, 150, 50, 50);
 
-            speedLabel = new JLabel("N/A");
-            speedLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-            speedLabel.setForeground(Color.BLACK);
-            speedLabel.setBounds(0, 200, 100, 20);
-
-            bcLabel = new JLabel("N/A");
-            bcLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-            bcLabel.setForeground(Color.BLACK);
-            bcLabel.setBounds(100, 200, 75, 20);
-
-            mrLabel = new JLabel("N/A");
-            mrLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-            mrLabel.setForeground(Color.BLACK);
-            mrLabel.setBounds(175, 200, 75, 20);
-
-            distanceLabel = new JLabel("N/A");
-            distanceLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-            distanceLabel.setForeground(Color.BLACK);
-            distanceLabel.setBounds(250, 200, 100, 20);
-
-            notchPosLabel = new JLabel("N/A");
-            notchPosLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-            notchPosLabel.setForeground(Color.BLACK);
-            notchPosLabel.setBounds(350, 200, 50, 20);
-
-            infoTrainLabel = new JLabel("");
-            infoTrainLabel.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
-            infoTrainLabel.setForeground(Color.BLACK);
-            infoTrainLabel.setBounds(0, 250, 600, 20);
-
-            infoAtsLabel = new JLabel("");
-            infoAtsLabel.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
-            infoAtsLabel.setForeground(Color.BLACK);
-            infoAtsLabel.setBounds(0, 300, 600, 20);
-
-            infoTascLabel = new JLabel("");
-            infoTascLabel.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
-            infoTascLabel.setForeground(Color.BLACK);
-            infoTascLabel.setBounds(0, 350, 600, 20);
-
-            infoTrainExLabel = new JLabel("");
-            infoTrainExLabel.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
-            infoTrainExLabel.setForeground(Color.BLACK);
-            infoTrainExLabel.setBounds(0, 400, 600, 20);
-
-            trainNumberLabel = new JLabel("");
-            trainNumberLabel.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
-            trainNumberLabel.setForeground(Color.BLACK);
-            trainNumberLabel.setBounds(0, 450, 200, 20);
-
-            formationLabel = new JLabel("");
-            formationLabel.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
-            formationLabel.setForeground(Color.BLACK);
-            formationLabel.setBounds(200, 450, 200, 20);
-
-
-            
+            speedLabel = createLabel(NA, 0, 200, 100, 20);
+            bcLabel = createLabel(NA, 100, 200, 75, 20);
+            mrLabel = createLabel(NA, 175, 200, 75, 20);
+            distanceLabel = createLabel(NA, 250, 200, 100, 20);
+            notchPosLabel = createLabel(NA, 350, 200, 50, 20);
+            infoTrainLabel = createLabel("", 0, 250, 600, 20);
+            infoAtsLabel = createLabel("", 0, 300, 600, 20);
+            infoTascLabel = createLabel("", 0, 350, 600, 20);
+            infoTrainExLabel = createLabel("", 0, 400, 600, 20);
+            trainNumberLabel = createLabel("", 0, 450, 200, 20);
+            formationLabel = createLabel("", 200, 450, 200, 20);
 
             teButton.addActionListener(new ActionListener() 
             {
@@ -384,129 +342,14 @@ public class TDCCore
                 }
             });
 
-            doorOpenLButton.addActionListener(new ActionListener() 
-            {
-                @Override
-                public void actionPerformed(ActionEvent e) 
-                {
-                    if (buttonDo != -1) 
-                    {
-                        buttonCommand = null;
-                        ActionButton.setBackground(Color.WHITE);
-                        doorOpenLButton.setBackground(Color.WHITE);
-                        doorOpenRButton.setBackground(Color.WHITE);
-                        doorCloseButton.setBackground(Color.WHITE);
-                        doorReOpenButton.setBackground(Color.WHITE);
-                        
-                        if (buttonDo != DOOR_LEFT) 
-                        {
-                            buttonCommand = "door";
-                            buttonDo = DOOR_LEFT;
-                            blinkTimer.start();
-                            doorOpenLButton.setBackground(Color.YELLOW);
-                        } 
-                        else
-                        {
-                            buttonDo = -1;
-                            blinkTimer.stop();
-                        }
-                    }
-                    else 
-                    {
-                        buttonCommand = "door";
-                        buttonDo = DOOR_LEFT;
-                        blinkTimer.start();
-                        doorOpenLButton.setBackground(Color.YELLOW);
-                    }
-                }
-            });
-            doorOpenRButton.addActionListener(new ActionListener() 
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    if (buttonDo != -1)
-                    {
-                        buttonCommand = null;
-                        ActionButton.setBackground(Color.WHITE);
-                        doorOpenLButton.setBackground(Color.WHITE);
-                        doorOpenRButton.setBackground(Color.WHITE);
-                        doorCloseButton.setBackground(Color.WHITE);
-                        doorReOpenButton.setBackground(Color.WHITE);
+            doorOpenLButton.addActionListener(e -> toggleBlink(doorOpenLButton, "door", DOOR_LEFT));
+            doorOpenRButton.addActionListener(e -> toggleBlink(doorOpenRButton, "door", DOOR_RIGHT));
+            doorCloseButton.addActionListener(e -> toggleBlink(doorCloseButton, "door", DOOR_CLOSE));
 
-                        if (buttonDo != DOOR_RIGHT)
-                        {
-                            buttonCommand = "door";
-                            buttonDo = DOOR_RIGHT;
-                            blinkTimer.start();
-                            doorOpenRButton.setBackground(Color.YELLOW);
-                        }
-                        else
-                        {
-                            buttonDo = -1;
-                            blinkTimer.stop();
-                        }
-                    }
-                    else
-                    {
-                        buttonCommand = "door";
-                        buttonDo = DOOR_RIGHT;
-                        blinkTimer.start();
-                        doorOpenRButton.setBackground(Color.YELLOW);
-                    }
-                }
-            });
-            doorCloseButton.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    if (buttonDo != -1)
-                    {
-                        buttonCommand = null;
-                        ActionButton.setBackground(Color.WHITE);
-                        doorOpenLButton.setBackground(Color.WHITE);
-                        doorOpenRButton.setBackground(Color.WHITE);
-                        doorCloseButton.setBackground(Color.WHITE);
-                        doorReOpenButton.setBackground(Color.WHITE);
-                        
-                        if (buttonDo != DOOR_CLOSE)
-                        {
-                            buttonCommand = "door";
-                            buttonDo = DOOR_CLOSE;
-                            blinkTimer.start();
-                            doorCloseButton.setBackground(Color.YELLOW);
-                        }
-                        else
-                        {
-                            buttonDo = -1;
-                            blinkTimer.stop();
-                        }
-                    }
-                    else
-                    {
-                        buttonCommand = "door";
-                        buttonDo = DOOR_CLOSE;
-                        blinkTimer.start();
-                        doorCloseButton.setBackground(Color.YELLOW);
-                    }
-                }
-            });
-            doorReOpenButton.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    buttonCommand = null;
-                    buttonDo = -1;
-                    blinkTimer.stop();
-                    ActionButton.setBackground(Color.WHITE);
-                    doorOpenLButton.setBackground(Color.WHITE);
-                    doorOpenRButton.setBackground(Color.WHITE);
-                    doorCloseButton.setBackground(Color.WHITE);
-                    doorReOpenButton.setBackground(Color.WHITE);
-                    if (tc.getPrevDoor() != -1 )networkManager.sendCommand("send", "door", tc.getPrevDoor());
-                }
+            doorReOpenButton.addActionListener(e -> {
+                resetBlinkState();
+                if (tc.getPrevDoor() != -1)
+                    networkManager.sendCommand("send", "door", tc.getPrevDoor());
             });
 
             showResetDistanceWindowButon.addActionListener(keyword -> distanceResetFrame.setVisible(true));
@@ -528,27 +371,13 @@ public class TDCCore
                 @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    switch (buttonCommand)
-                    {
-                        case "door":
-                            if (buttonDo == 0)
-                            {
-                                tc.setPrevDoor(tc.getDoor());
-                            }
-                           networkManager.sendCommand("send", buttonCommand, buttonDo);
-                            break;
-                    
-                        default:
-                            break;
+                    if (buttonCommand != null) {
+                        if ("door".equals(buttonCommand)) {
+                            if (buttonDo == 0) tc.setPrevDoor(tc.getDoor());
+                            networkManager.sendCommand("send", buttonCommand, buttonDo);
+                        }
+                        resetBlinkState();
                     }
-
-                    buttonCommand = null;
-                    buttonDo = -1;
-                    blinkTimer.stop();
-                    ActionButton.setBackground(Color.WHITE);
-                    doorOpenLButton.setBackground(Color.WHITE);
-                    doorOpenRButton.setBackground(Color.WHITE);
-                    doorCloseButton.setBackground(Color.WHITE);
                 }
             });
 
@@ -575,7 +404,7 @@ public class TDCCore
                     switch (buttonCommand)
                     {
                         case "door":
-                            ActionButton.setBackground(on ? Color.YELLOW : Color.WHITE);
+                            ActionButton.setBackground(on ? COLOR_ACTIVE : COLOR_DEFAULT);
                             break;
                     
                         default:
@@ -615,16 +444,6 @@ public class TDCCore
         p.add(reverserSetNButton);
         p.add(reverserSetBButton);
 
-        q.add(setDistance0Button);
-        q.add(setDistance1Button);
-        q.add(setDistance2Button);
-        q.add(setDistance3Button);
-        q.add(setDistance4Button);
-        q.add(setDistance5Button);
-        q.add(setDistance6Button);
-        q.add(setDistance7Button);
-        q.add(setDistance8Button);
-        q.add(setDistance9Button);
         q.add(setDistancePeriodButton);
         q.add(setDistanceButton);
         q.add(distanceSetUPButton);
@@ -633,22 +452,12 @@ public class TDCCore
         r.add(epButton);
 
         s.add(setTrainNumButton);
-        s.add(setTrainNum0Button);
-        s.add(setTrainNum1Button);
-        s.add(setTrainNum2Button);
-        s.add(setTrainNum3Button);
-        s.add(setTrainNum4Button);
-        s.add(setTrainNum5Button);
-        s.add(setTrainNum6Button);
-        s.add(setTrainNum7Button);
-        s.add(setTrainNum8Button);
-        s.add(setTrainNum9Button);
         s.add(textTrainStr);
 
-        ActionButton.setBackground(Color.WHITE);
-        doorOpenLButton.setBackground(Color.WHITE);
-        doorOpenRButton.setBackground(Color.WHITE);
-        doorCloseButton.setBackground(Color.WHITE);
+        ActionButton.setBackground(COLOR_DEFAULT);
+        doorOpenLButton.setBackground(COLOR_DEFAULT);
+        doorOpenRButton.setBackground(COLOR_DEFAULT);
+        doorCloseButton.setBackground(COLOR_DEFAULT);
 
         frame.getContentPane().add(p, BorderLayout.CENTER);
         distanceResetFrame.getContentPane().add(q, BorderLayout.CENTER);
@@ -660,7 +469,7 @@ public class TDCCore
         reverserSetNButton.setEnabled(false);
         reverserSetBButton.setEnabled(false);
 
-        epButton.setBackground(Color.WHITE);
+        epButton.setBackground(COLOR_DEFAULT);
 
         // 表示
         frame.setVisible(true);
@@ -668,155 +477,142 @@ public class TDCCore
         epFrame.setVisible(true);
         trainNumSetFrame.setVisible(false);
 
-
-
         refreshTimer = new Timer(250, keyword -> 
         {
-            speedLabel.setText(String.format("%dkm/h", (int) tc.getSpeed()));
-            bcLabel.setText(String.format("%dkpa", tc.getBc()));
-            mrLabel.setText(String.format("%dkpa", tc.getMr()));
-            distanceLabel.setText(String.format("%.1fkm", tc.getMove() / 1000f));
-            formationLabel.setText(String.format("%d両編成", tc.getCars()));
-
-            // 走行時戸開禁止
-            if (tc.isRunningTrain())
-            {
-                doorCloseButton.setEnabled(false);
-                doorOpenLButton.setEnabled(false);
-                doorOpenRButton.setEnabled(false);
-                doorReOpenButton.setEnabled(false);
-                tc.setPrevDoor(-1);
-            }
-            else
-            {
-                doorCloseButton.setEnabled(true);
-                doorOpenLButton.setEnabled(true);
-                doorOpenRButton.setEnabled(true);
-                doorReOpenButton.setEnabled(true);
-            }
-            
-            // ノッチ位置表示
-            boolean canChangeReverser = false;
-            if (tc.getNotch() == TrainControl.NOTCH_EB)
-            {
-                notchPosLabel.setText("EB");
-                canChangeReverser = true;
-            }
-            else if (tc.getNotch() == TrainControl.NOTCH_N)
-            {
-                notchPosLabel.setText("N");
-            }
-            else if (tc.getNotch() > TrainControl.NOTCH_N)
-            {
-                notchPosLabel.setText(String.format("P%d", tc.getNotch()));
-            }
-            else
-            {
-                notchPosLabel.setText(String.format("B%d", tc.getNotch() *-1));
-            }
-
-            // キロ程演算方向
-            if (tc.getMoveTo() == 0)
-            {
-                distanceSetUPButton.setEnabled(false);
-                dictanceSetDOWNButton.setEnabled(true);
-            }
-            else
-            {
-                distanceSetUPButton.setEnabled(true);
-                dictanceSetDOWNButton.setEnabled(false);
-            }
-
-            // レバーサ
-            // ノッチがEB位置じゃないとレバーサいじれないよう変更
-            if (canChangeReverser)
-            {
-                switch (tc.getReverser())
-                {
-                    case 0:
-                        reverserSetFButton.setEnabled(false);
-                        reverserSetNButton.setEnabled(true);
-                        reverserSetBButton.setEnabled(true);
-                        break;
-
-                    case 1:
-                        reverserSetFButton.setEnabled(true);
-                        reverserSetNButton.setEnabled(false);
-                        reverserSetBButton.setEnabled(true);
-                        break;
-
-                    case 2:
-                        reverserSetFButton.setEnabled(true);
-                        reverserSetNButton.setEnabled(true);
-                        reverserSetBButton.setEnabled(false);
-                        break;
-                
-                    default:
-                        break;
-                }
-            }
-            else
-            {
-                reverserSetFButton.setEnabled(false);
-                reverserSetNButton.setEnabled(false);
-                reverserSetBButton.setEnabled(false);
-            }
-
-
-            // モニタ類
-
-            // ATS-P
-            tc.refreshTrainStat();
-
-            if (tc.getboolTrainStat(TrainControl.TRAINSTAT_EB)) networkManager.sendCommand("send", "notch", TrainControl.NOTCH_EB);
-            if (tc.getboolTrainStat(TrainControl.TRAINSTAT_DS_BRAKE)) networkManager.sendCommand("send", "notch", TrainControl.NOTCH_EB);
-
-
-            tc.txtTrainStat = "状態:";
-            tc.txtTrainStat += tc.getboolTrainStat(TrainControl.TRAINSTAT_PARKING) ? "駐車　" : "";
-            tc.txtTrainStat += tc.getboolTrainStat(TrainControl.TRAINSTAT_CONSTANT_SPEED) ? "定速　" : "";
-            tc.txtTrainStat += tc.getboolTrainStat(TrainControl.TRAINSTAT_DS_BRAKE) ? "保B　" : "";
-            tc.txtTrainStat += tc.getboolTrainStat(TrainControl.TRAINSTAT_SNOW_BRAKE) ? "雪B　" : "";
-            tc.txtTrainStat += tc.getboolTrainStat(TrainControl.TRAINSTAT_EMERG_SHORT) ? "非短　" : "";
-            tc.txtTrainStat += tc.getboolTrainStat(TrainControl.TRAINSTAT_THREE_PHASE) ? "三相　" : "";
-            tc.txtTrainStat += tc.getboolTrainStat(TrainControl.TRAINSTAT_EB) ? "非常　" : "";
-            infoTrainLabel.setText(tc.txtTrainStat);
-
-            tc.txtATS = "ATS:";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_OPERATING) ? "ATS動作　" : "";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_POWER) ? "ATS電源　" : "";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_P_ERROR) ? "故障　" : "";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_P_ACTIVE) ? "ATS-P　" : "";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_P_BRAKE_RELEASE) ? "B解放　" : "";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING) ? "B　" : "";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_P_NEAR_PATTERN) ? "ﾊﾟﾀﾝ接近　" : "";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_P_POWER) ? "P電源　" : "";
-            tc.txtATS += tc.getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING_EB) ? "非常　" : "";
-            infoAtsLabel.setText(tc.txtATS);
-
-            tc.txtTASC = "TASC:";
-            tc.txtTASC += tc.getboolTrainStat(TrainControl.TASC_POWER) ? "電源　" : "";
-            tc.txtTASC += tc.getboolTrainStat(TrainControl.TASC_PATTERN_ACTIVE) ? "ﾊﾟﾀﾝ　" : "";
-            tc.txtTASC += tc.getboolTrainStat(TrainControl.TASC_BRAKE) ? "B　" : "";
-            tc.txtTASC += tc.getboolTrainStat(TrainControl.TASC_OFF) ? "切　" : "";
-            tc.txtTASC += tc.getboolTrainStat(TrainControl.TASC_ERROR) ? "故障　" : "";
-            infoTascLabel.setText(tc.txtTASC);
-
-            tc.txtTrainStatEx = "";
-            tc.txtTrainStatEx += tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_DOOR_CLOSE) ? "戸閉　" : "";
-            tc.txtTrainStatEx += tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_EB) ? "EB装置　" : "";
-            tc.txtTrainStatEx += tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_STA) ? "次駅接近　" : "";
-            infoTrainExLabel.setText(tc.txtTrainStatEx);
-
-            if (tn.half != null)
-            {
-                trainNumberLabel.setText("列車番号: "+ tn.half);
-            }
-            else
-            {
-                trainNumberLabel.setText("列車番号を設定してください");
-            }
+            updateTrainState();
+            updateProtectService();
+            updateDisplay();
         });
+    }
+
+    private void updateDisplay()
+    {
+        speedLabel.setText(String.format("%dkm/h", (int) tc.getSpeed()));
+        bcLabel.setText(String.format("%dkpa", tc.getBc()));
+        mrLabel.setText(String.format("%dkpa", tc.getMr()));
+        distanceLabel.setText(String.format("%.1fkm", tc.getMove() / 1000f));
+        formationLabel.setText(String.format("%d両編成", tc.getCars()));
+
+        StringBuilder trainStat = new StringBuilder("状態:");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_PARKING)) trainStat.append("駐車　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_CONSTANT_SPEED)) trainStat.append("定速　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_DS_BRAKE)) trainStat.append("保B　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_SNOW_BRAKE)) trainStat.append("雪B　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EMERG_SHORT)) trainStat.append("非短　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_THREE_PHASE)) trainStat.append("三相　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EB)) trainStat.append("非常　");
+        infoTrainLabel.setText(trainStat.toString());
+
+        StringBuilder trainATS = new StringBuilder("ATS:");
+        if(tc.getboolTrainStat(TrainControl.ATS_OPERATING)) trainATS.append("ATS動作　");
+        if(tc.getboolTrainStat(TrainControl.ATS_POWER)) trainATS.append("ATS電源　");
+        if(tc.getboolTrainStat(TrainControl.ATS_P_ERROR)) trainATS.append("故障　");
+        if(tc.getboolTrainStat(TrainControl.ATS_P_ACTIVE)) trainATS.append("ATS-P　");
+        if(tc.getboolTrainStat(TrainControl.ATS_P_BRAKE_RELEASE)) trainATS.append("B解放　");
+        if(tc.getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING)) trainATS.append("B　");
+        if(tc.getboolTrainStat(TrainControl.ATS_P_NEAR_PATTERN)) trainATS.append("ﾊﾟﾀﾝ接近　");
+        if(tc.getboolTrainStat(TrainControl.ATS_P_POWER)) trainATS.append("P電源　");
+        if(tc.getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING_EB)) trainATS.append("非常　");
+        infoAtsLabel.setText(trainATS.toString());
+
+        StringBuilder trainTASC = new StringBuilder("TASC:");
+        if(tc.getboolTrainStat(TrainControl.TASC_POWER)) trainTASC.append("電源　");
+        if(tc.getboolTrainStat(TrainControl.TASC_PATTERN_ACTIVE)) trainTASC.append("ﾊﾟﾀﾝ　");
+        if(tc.getboolTrainStat(TrainControl.TASC_BRAKE)) trainTASC.append("B　");
+        if(tc.getboolTrainStat(TrainControl.TASC_OFF)) trainTASC.append("切　");
+        if(tc.getboolTrainStat(TrainControl.TASC_ERROR)) trainTASC.append("故障　");
+        infoTascLabel.setText(trainTASC.toString());
+
+        StringBuilder trainStatEX = new StringBuilder("");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_DOOR_CLOSE)) trainStatEX.append("戸閉　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_EB)) trainStatEX.append("EB装置　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_STA)) trainStatEX.append("次駅接近　");
+        infoTrainExLabel.setText(trainStatEX.toString());
+
+        if (tn.half != null)
+        {
+            trainNumberLabel.setText("列車番号: "+ tn.half);
+        }
+        else
+        {
+            trainNumberLabel.setText("列車番号を設定してください");
+        }
+    }
+
+    private void updateProtectService()
+    {
+        // ATS-P
+        tc.refreshTrainStat();
+
+        if (tc.getboolTrainStat(TrainControl.TRAINSTAT_EB)) networkManager.sendCommand("send", "notch", TrainControl.NOTCH_EB);
+        if (tc.getboolTrainStat(TrainControl.TRAINSTAT_DS_BRAKE)) networkManager.sendCommand("send", "notch", TrainControl.NOTCH_EB);
+    }
+
+    private void updateTrainState()
+    {
+        // 走行時戸開禁止
+        if (tc.isRunningTrain())
+        {
+            doorCloseButton.setEnabled(false);
+            doorOpenLButton.setEnabled(false);
+            doorOpenRButton.setEnabled(false);
+            doorReOpenButton.setEnabled(false);
+            tc.setPrevDoor(-1);
+        }
+        else
+        {
+            doorCloseButton.setEnabled(true);
+            doorOpenLButton.setEnabled(true);
+            doorOpenRButton.setEnabled(true);
+            doorReOpenButton.setEnabled(true);
+        }
+        
+        // ノッチ位置表示
+        boolean canChangeReverser = false;
+        if (tc.getNotch() == TrainControl.NOTCH_EB)
+        {
+            notchPosLabel.setText("EB");
+            canChangeReverser = true;
+        }
+        else if (tc.getNotch() == TrainControl.NOTCH_N)
+        {
+            notchPosLabel.setText("N");
+        }
+        else if (tc.getNotch() > TrainControl.NOTCH_N)
+        {
+            notchPosLabel.setText(String.format("P%d", tc.getNotch()));
+        }
+        else
+        {
+            notchPosLabel.setText(String.format("B%d", tc.getNotch() *-1));
+        }
+
+        // キロ程演算方向
+        if (tc.getMoveTo() == 0)
+        {
+            distanceSetUPButton.setEnabled(false);
+            dictanceSetDOWNButton.setEnabled(true);
+        }
+        else
+        {
+            distanceSetUPButton.setEnabled(true);
+            dictanceSetDOWNButton.setEnabled(false);
+        }
+
+        // レバーサ
+        // ノッチがEB位置じゃないとレバーサいじれないよう変更
+        if (canChangeReverser)
+        {
+            JButton[] reverserButtons = {reverserSetFButton, reverserSetNButton, reverserSetBButton};
+            int reversers = tc.getReverser();
+            for (int i = 0; i < 3; i++) reverserButtons[i].setEnabled(canChangeReverser && i != reversers);
+        }
+        else
+        {
+            reverserSetFButton.setEnabled(false);
+            reverserSetNButton.setEnabled(false);
+            reverserSetBButton.setEnabled(false);
+        }
     }
 
     public void reset()
@@ -827,10 +623,7 @@ public class TDCCore
         buttonDo = -1;
         signal_0 = 0;
         signal_1 = 0;
-        tn.alphabet = null;
-        tn.number = null;
-        tn.half = null;
-        tn.full = null;
+        tn.reset();
     }
 
     public void running() throws IOException
@@ -868,89 +661,107 @@ public class TDCCore
                 if(fetchData != null)
                 {
                     System.out.println(fetchData);
-                    JSONObject jsonObj = new JSONObject(fetchData);
-                    switch (jsonObj.getString("type"))
+
+                    try
                     {
-                        case "send":
-                            // 受信
-                            tc.setPrevNotch(tc.getNotch());
-                            tc.setId(jsonObj.getInt("id"));
-                            tc.setSpeed(jsonObj.getFloat("speed"));
-                            tc.setNotch(jsonObj.getInt("notch"));
-                            tc.setDoor(jsonObj.getInt("door"));
-                            tc.setBc(jsonObj.getInt("bc"));
-                            tc.setMr(jsonObj.getInt("mr"));
-                            tc.setMove(jsonObj.getFloat("move"));
-                            tc.setMoveTo(jsonObj.getInt("moveTo"));
-                            tc.setReverser(jsonObj.getInt("reverser"));
-                            tc.setLimit(jsonObj.getInt("speedLimit"));
-                            tc.setTASCEnable(jsonObj.getBoolean("isTASCEnable"));
-                            tc.setTASCBraking(jsonObj.getBoolean("isTASCBraking"));
-                            tc.setCars(jsonObj.getInt("formation"));
+                        JSONObject jsonObj = new JSONObject(fetchData);
+                        switch (jsonObj.getString("type"))
+                        {
+                            case "send":
+                                // 受信
+                                tc.setPrevNotch(tc.getNotch());
+                                tc.setId(jsonObj.getInt("id"));
+                                tc.setSpeed(jsonObj.getFloat("speed"));
+                                tc.setNotch(jsonObj.getInt("notch"));
+                                tc.setDoor(jsonObj.getInt("door"));
+                                tc.setBc(jsonObj.getInt("bc"));
+                                tc.setMr(jsonObj.getInt("mr"));
+                                tc.setMove(jsonObj.getFloat("move"));
+                                tc.setMoveTo(jsonObj.getInt("moveTo"));
+                                tc.setReverser(jsonObj.getInt("reverser"));
+                                tc.setLimit(jsonObj.getInt("speedLimit"));
+                                tc.setTASCEnable(jsonObj.getBoolean("isTASCEnable"));
+                                tc.setTASCBraking(jsonObj.getBoolean("isTASCBraking"));
+                                tc.setCars(jsonObj.getInt("formation"));
 
-                            tc.doorOpen_Close();
-                            tc.handleTEunlock();
-                            tc.handleEBunlock();
-                            tc.handleEB();
-                            tc.handleRunningOpen();
-                            tc.handleATSNW();
-                            tc.handleArrivingStation();
-                            // GUI更新
-                            if (!refreshTimer.isRunning()) refreshTimer.start();
-                            break;
+                                tc.doorOpen_Close();
+                                tc.handleTEunlock();
+                                tc.handleEBunlock();
+                                tc.handleEB();
+                                tc.handleRunningOpen();
+                                tc.handleATSNW();
+                                tc.handleArrivingStation();
+                                // GUI更新
+                                onEdt(() -> {
+                                    if (!refreshTimer.isRunning()) {
+                                        refreshTimer.start();
+                                    }
+                                });
 
-                        case "kill":
-                            networkManager.clientClose();
-                            System.exit(0);
-                            break;
+                                break;
 
-                        case "notRidingTrain":
-                            // 列車に載ってない
-                            speedLabel.setText("N/A");
-                            bcLabel.setText("N/A");
-                            mrLabel.setText("N/A");
-                            distanceLabel.setText("N/A");
-                            notchPosLabel.setText("N/A");
-                            reverserSetFButton.setEnabled(false);
-                            reverserSetNButton.setEnabled(false);
-                            reverserSetBButton.setEnabled(false);
-                            infoTrainLabel.setText("");
-                            infoAtsLabel.setText("");
-                            infoTascLabel.setText("");
-                            infoTrainExLabel.setText("");
-                            if (refreshTimer.isRunning()) refreshTimer.stop();
-                            break;
+                            case "kill":
+                                networkManager.clientClose();
+                                System.exit(0);
+                                break;
 
-                        case "beacon":
-                            signal_0 = jsonObj.getInt("signal_0");
-                            signal_1 = jsonObj.getInt("signal_1");
+                            case "notRidingTrain":
+                                // 列車に載ってない
+                                onEdt(() -> 
+                                {
+                                    speedLabel.setText(NA);
+                                    bcLabel.setText(NA);
+                                    mrLabel.setText(NA);
+                                    distanceLabel.setText(NA);
+                                    notchPosLabel.setText(NA);
+                                    reverserSetFButton.setEnabled(false);
+                                    reverserSetNButton.setEnabled(false);
+                                    reverserSetBButton.setEnabled(false);
+                                    infoTrainLabel.setText("");
+                                    infoAtsLabel.setText("");
+                                    infoTascLabel.setText("");
+                                    infoTrainExLabel.setText("");
+                                });
 
-                            switch (signal_0)
-                            {
-                                case 1:
-                                    // TIMS駅情報更新
-                                    break;
+                                if (refreshTimer.isRunning()) refreshTimer.stop();
 
-                                case 2: 
-                                    // 次駅接近報知
-                                    // signal_1 = 1...セット
-                                    // signal_1 = 2...リセット
-                                    tc.setArraivingStation(signal_1);
-                                    break;
+                                break;
 
-                                case 3:
-                                    break;
+                            case "beacon":
+                                signal_0 = jsonObj.getInt("signal_0");
+                                signal_1 = jsonObj.getInt("signal_1");
+
+                                switch (signal_0)
+                                {
+                                    case 1:
+                                        // TIMS駅情報更新
+                                        break;
+
+                                    case 2: 
+                                        // 次駅接近報知
+                                        // signal_1 = 1...セット
+                                        // signal_1 = 2...リセット
+                                        tc.setArraivingStation(signal_1);
+                                        break;
+
+                                    case 3:
+                                        break;
+                                
+                                    default:
+                                        break;
+                                }
+                                break;
+
+                            case "start":
+                                break;
                             
-                                default:
-                                    break;
-                            }
-                            break;
-
-                        case "start":
-                            break;
-                        
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        System.err.println("JSON parse error: " + e.getMessage());
                     }
                 }
             }

@@ -17,4 +17,8 @@ public class TrainNumber
     // 末尾アルファベットのみ
     // A,B,C,D,E,F,G,H,K,M,S,T,Y
     String alphabet;
+
+    public void reset() {
+        alphabet = number = half = full = null;
+    }
 }
