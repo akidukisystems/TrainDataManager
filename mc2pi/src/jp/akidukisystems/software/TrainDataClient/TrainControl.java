@@ -36,6 +36,7 @@ public class TrainControl
     public static final int NOTCH_EB = -8;
     public static final int NOTCH_MAX = -7;
     public static final int NOTCH_N = 0;
+    public static final int NOTCH_NONE = -32768;
 
     public static final int DOOR_CLOSE_TIME = 8;
     public static final int ATSP_BRAKE_NWC_TIME = 10;
@@ -244,10 +245,12 @@ public class TrainControl
     }
 
     private int cars = 0;
-    public int getCars() {
+    public int getCars()
+    {
         return cars;
     }
-    public void setCars(int cars) {
+    public void setCars(int cars)
+    {
         this.cars = cars;
     }
 
@@ -398,7 +401,7 @@ public class TrainControl
     // ATS異常時に列車とめる
     public void handleATSNW()
     {
-        if (boolTrainStat[ATS_P_BRAKE_OPERATING] && (bc < 200))
+        if (boolTrainStat[ATS_P_BRAKE_OPERATING] && (bc < 50))
         {
             if (isATSPBrakeWorking)
             {

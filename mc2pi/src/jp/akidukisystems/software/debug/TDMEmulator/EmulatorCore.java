@@ -20,7 +20,8 @@ public class EmulatorCore {
     int door = 0;
     int reverser = 1;
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         EmulatorCore object = new EmulatorCore();
         networkManager = new NetworkManager();
 
@@ -47,9 +48,11 @@ public class EmulatorCore {
             boolean isFirst = true;
 
             Timer timer = new Timer();
-            timer.scheduleAtFixedRate(new TimerTask() {
+            timer.scheduleAtFixedRate(new TimerTask()
+            {
                 @Override
-                public void run() {
+                public void run()
+                {
                     int beforeBC = bc;
 
                     if(bc > targetBc)
@@ -105,18 +108,13 @@ public class EmulatorCore {
                     switch (jsonObj.getString("type"))
                     {
                         case "kill":
-                            try {
-                                networkManager.clientClose();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
+                            networkManager.clientClose();
                             System.exit(0);
                             break;
 
                         default:
-
-                            switch (jsonObj.getString("message")) {
+                            switch (jsonObj.getString("message"))
+                            {
                                 case "notch":
                                     notch = jsonObj.getInt("notch");
 
@@ -149,7 +147,7 @@ public class EmulatorCore {
                 else
                 {
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

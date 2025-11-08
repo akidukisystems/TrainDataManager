@@ -6,9 +6,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.json.JSONObject;
@@ -19,45 +20,81 @@ public class NetworkManager
     Socket client;
     public BufferedReader reader = null;
     PrintWriter writer = null;
-    Socket c2s = null;
 
     ServerSocket server;
     Socket s2c = null;
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
     AtomicReference<String> sharedData = new AtomicReference<>(null);
+    private final BlockingQueue<String> receiveQueue = new LinkedBlockingQueue<>();
 
     private volatile HeartbeatLink hb;
 
-    public Socket getActiveSocket() { return (client != null ? client : s2c); }
     public PrintWriter getWriter() { return writer; }
 
-    public void clientInit(String adrs, int port) throws UnknownHostException, IOException 
+    public boolean clientInit(String adrs, int port, int connectTimeoutMs, int maxRetry)
     {
-        while (true) 
+        for (int i = 0; i < maxRetry; i++)
         {
-            this.client = new Socket(adrs, port);
-            this.client.setTcpNoDelay(true);
-
-            if(this.client != null) break;
-
+            Socket sock = new Socket();
             try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                sock.connect(new java.net.InetSocketAddress(adrs, port), connectTimeoutMs);
+
+                this.client = sock;
+                this.writer = new PrintWriter(this.client.getOutputStream(), true);
+                this.reader = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
+
+                sock.setKeepAlive(true);
+                sock.setSoTimeout(0);
+                return true; // 接続できた
+            } catch (IOException e) {
+                try { sock.close(); } catch (IOException ignore) {}
+                // 少し待ってリトライ
+                try { Thread.sleep(200); } catch (InterruptedException ignore) {}
             }
         }
-
-        this.writer = new PrintWriter(this.client.getOutputStream(), true);
-        this.reader = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
+        // 失敗時は全クリア
+        this.client = null;
+        this.writer = null;
+        this.reader = null;
+        return false;
     }
 
-    public String clientReciveString() throws IOException
+    public boolean isAliveClient()
+    {
+        Socket s = this.client;
+        return s != null
+            && s.isConnected()
+            && !s.isClosed()
+            && !s.isInputShutdown()
+            && !s.isOutputShutdown();
+    }
+
+    public boolean isAliveServer()
+    {
+        Socket s = this.s2c;
+        return s != null
+            && s.isConnected()
+            && !s.isClosed()
+            && !s.isInputShutdown()
+            && !s.isOutputShutdown();
+    }
+
+    public Socket getActiveSocket()
+    {
+        if (isAliveClient()) return client;
+        if (isAliveServer()) return s2c;
+        return null;
+    }
+
+    public String clientReceiveString() throws IOException
     {
         String line;
-        while ((line = this.reader.readLine()) != null) {
+        while ((line = this.reader.readLine()) != null)
+        {
             HeartbeatLink local = hb;
-            if (local != null && local.consume(line)) {
+            if (local != null && local.consume(line))
+            {
                 continue; // HB は飲み込む
             }
             return line;
@@ -65,17 +102,17 @@ public class NetworkManager
         return null;
     }
 
-    public void clientClose() throws IOException 
+    public void clientClose()
     {
         System.out.println("exit");
+        try { if (this.writer != null) this.writer.close(); } catch (Exception ignore) {}
+        try { if (this.reader != null) this.reader.close(); } catch (Exception ignore) {}
+        try { if (this.client != null) this.client.close(); } catch (Exception ignore) {}
 
-        if (this.writer != null) this.writer.close();
-        if (this.reader != null) this.reader.close();
-        if (this.c2s != null) this.c2s.close();
-        if (this.client != null) this.client.close();
+        this.writer = null;
+        this.reader = null;
+        this.client= null;
     }
-
-
 
     public void serverInit(int port) throws IOException
     {
@@ -88,6 +125,9 @@ public class NetworkManager
         s2c = server.accept();
         System.out.println("Connected s2c");
 
+        s2c.setKeepAlive(true);
+        s2c.setSoTimeout(0);
+
         reader = new BufferedReader(new InputStreamReader(s2c.getInputStream()));
         writer = new PrintWriter(s2c.getOutputStream(), true);
     }
@@ -99,7 +139,6 @@ public class NetworkManager
             while (true)
             {
                 String data = null;
-
                 try {
                     data = reader.readLine();
                 } catch (IOException e) {
@@ -107,42 +146,43 @@ public class NetworkManager
                 }
 
                 if (data == null) break;
-
                 HeartbeatLink local = hb;
                 if (local != null && local.consume(data))
-                {
-                    continue; // 飲み込んだので上位に流さない
-                }
+                    continue;
 
-                sharedData.set(data);
+                receiveQueue.offer(data);
             }
         });
     }
 
-    public String getLatestReceivedString()
-    {   
-        String data = sharedData.get();
-        sharedData.set(null);
-        return data;
+   public String getLatestReceivedString()
+    {
+        return receiveQueue.poll(); 
     }
 
-    public void serverClose() throws IOException
+    public void serverClose()
     {
-        if (writer != null) writer.close();
-        if (reader != null) reader.close();
-        if (s2c != null) s2c.close();
-        if (server != null) server.close();
-        
+        try { if (writer != null) writer.close(); } catch (Exception ignore) {}
+        try { if (reader != null) reader.close(); } catch (Exception ignore) {}
+        try { if (s2c != null) s2c.close(); }     catch (Exception ignore) {}
+        try { if (server != null) server.close(); } catch (Exception ignore) {}
+        writer = null;
+        reader = null;
+        s2c    = null;
+        server = null;
         sharedData.set(null);
         executor.shutdown();
     }
 
-
-
-    public void sendString(String data) 
+    public synchronized boolean sendString(String data)
     {
+        if (!isAliveClient() && !isAliveServer()) return false;
+        if (this.writer == null) return false;
         this.writer.println(data);
+        this.writer.flush();
+        return !this.writer.checkError();
     }
+
 
     public void sendCommand(String type, String message, Object value) 
     {
@@ -156,12 +196,18 @@ public class NetworkManager
     public void startHeartbeat(long intervalMs, long timeoutMs, Runnable onPeerDead)
     {
         try {
+            if (hb != null) return; // 既に開始済みならスキップ
             Socket sock = getActiveSocket();
             if (sock == null || writer == null) return;
-            hb = HeartbeatLink.attach(sock, writer, intervalMs, timeoutMs, onPeerDead);
+            hb = HeartbeatLink.attach(sock, writer, intervalMs, timeoutMs, () ->
+            {
+                try { clientClose(); } catch (Exception ignore) {}
+                try { serverClose(); } catch (Exception ignore) {}
+                if (onPeerDead != null) onPeerDead.run();
+                hb = null;
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
 }

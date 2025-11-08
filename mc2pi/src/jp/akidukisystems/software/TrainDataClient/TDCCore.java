@@ -2,13 +2,19 @@ package jp.akidukisystems.software.TrainDataClient;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,9 +35,17 @@ public class TDCCore
     public static final int DOOR_LEFT = 2;
     public static final int DOOR_BOTH = 3;
 
+    // 色
     private static final Color COLOR_DEFAULT = Color.WHITE;
     private static final Color COLOR_ACTIVE = Color.YELLOW;
     private static final Color COLOR_ALERT = Color.RED;
+
+    // ボタンサイズ定義
+    private static final Dimension BUTTON_NORMAL = new Dimension(96, 48);
+    private static final Dimension BUTTON_LARGE = new Dimension(128, 48);
+    private static final Dimension BUTTON_MIDLARGE = new Dimension(96, 64);
+    private static final Dimension BUTTON_SMALL = new Dimension(48, 48);
+    private static final Dimension BUTTON_BIG = new Dimension(128, 64);
 
     private static final String NA = "N/A";
 
@@ -67,7 +81,8 @@ public class TDCCore
 
     JButton doorOpenLButton;
     JButton doorOpenRButton;
-    JButton doorCloseButton;
+    JButton doorCloseButtonL;
+    JButton doorCloseButtonR;
     JButton doorReOpenButton;
 
     JButton reverserSetFButton;
@@ -90,28 +105,17 @@ public class TDCCore
         
         tn = new TrainNumber();
         networkManager = new NetworkManager();
-
-        try {
-            networkManager.clientInit("localhost", PORT);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        networkManager.clientInit("localhost", PORT, 60000, 32768);
 
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> 
         {
-            if (networkManager != null) {
+            if (networkManager != null)
+            {
                 networkManager.sendString("{\"type\":\"kill\"}");
-
-                try {
-                    networkManager.clientClose();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                networkManager.clientClose();
             }
         }));
 
@@ -120,31 +124,38 @@ public class TDCCore
 
     // EDTいじいじするのでEdtでよい　Editではない
 
-    private static void onEdt(Runnable r) {
+    private static void onEdt(Runnable r)
+    {
         if (SwingUtilities.isEventDispatchThread()) r.run();
         else SwingUtilities.invokeLater(r);
     }
 
-    private void resetBlinkState() {
+    private void resetBlinkState()
+    {
         blinkTimer.stop();
         resetDoorButtonColors();
         buttonCommand = null;
         buttonDo = -1;
     }
 
-    private void resetDoorButtonColors() {
+    private void resetDoorButtonColors()
+    {
         ActionButton.setBackground(COLOR_DEFAULT);
         doorOpenLButton.setBackground(COLOR_DEFAULT);
         doorOpenRButton.setBackground(COLOR_DEFAULT);
-        doorCloseButton.setBackground(COLOR_DEFAULT);
+        doorCloseButtonL.setBackground(COLOR_DEFAULT);
+        doorCloseButtonR.setBackground(COLOR_DEFAULT);
         doorReOpenButton.setBackground(COLOR_DEFAULT);
     }
 
-    private void toggleBlink(JButton source, String command, int value) {
-        if (command.equals(buttonCommand) && buttonDo == value) {
+    private void toggleBlink(JButton source, String command, int value)
+    {
+        if (command.equals(buttonCommand) && buttonDo == value)
+        {
             resetBlinkState();
-        } else {
-            // 新しいボタンを押したとき
+        }
+        else
+        {
             buttonCommand = command;
             buttonDo = value;
             blinkTimer.start();
@@ -153,8 +164,10 @@ public class TDCCore
         }
     }
 
-    private void createNumberButtons(JPanel parent, int startX, int startY, int size, ActionListener listener) {
-        for (int i = 0; i <= 9; i++) {
+    private void createNumberButtons(JPanel parent, int startX, int startY, int size, ActionListener listener)
+    {
+        for (int i = 0; i <= 9; i++)
+        {
             JButton btn = new JButton(String.valueOf(i));
             int row = (i < 5) ? 0 : 1;
             int col = (i < 5) ? i : i - 5;
@@ -164,15 +177,17 @@ public class TDCCore
         }
     }
 
-    private JLabel createLabel(String text, int x, int y, int w, int h) {
+    private JLabel createLabel(String text)
+    {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("ＭＳ ゴシック", Font.PLAIN, 20));
+        label.setFont(new Font("ＭＳ ゴシック", Font.PLAIN, 18));
         label.setForeground(Color.BLACK);
-        label.setBounds(x, y, w, h);
+        label.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 10));
         return label;
     }
 
-    private JFrame createFrame(String title, int w, int h, JPanel content) {
+    private JFrame createFrame(String title, int w, int h, JPanel content)
+    {
         JFrame frame = new JFrame(title);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         frame.setSize(w, h);
@@ -180,11 +195,48 @@ public class TDCCore
         return frame;
     }
 
+    private static void style(JButton b, Dimension size)
+    {
+        b.setPreferredSize(size);
+        b.setMargin(new Insets(2, 10, 2, 10));
+    }
+
+    private static JPanel row(JPanel p)
+    {
+        p.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        p.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
+        return p;
+    }
+
     public void setupUI() 
     {
-        // フレーム（ウィンドウ）を作成
-        JPanel p = new JPanel();
-        p.setLayout(null);
+        JPanel root = new JPanel(new BorderLayout());
+
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
+
+        JPanel TEPanel       = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        JPanel reverserPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        JPanel utilPanel     = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+
+        JPanel doorMatrix = new JPanel(new GridBagLayout());
+
+        GridBagConstraints g = new GridBagConstraints();
+        g.fill = GridBagConstraints.HORIZONTAL;
+        g.insets = new Insets(2, 2, 2, 2);
+
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+
+        FlowLayout tight = new FlowLayout(FlowLayout.LEFT, 12, 2);
+
+        // 各行パネル
+        JPanel meterPanel = new JPanel(tight); // 速度/圧/距離/ノッチ
+        JPanel stateRow   = new JPanel(tight); // 状態:
+        JPanel atsRow     = new JPanel(tight); // ATS:
+        JPanel tascRow    = new JPanel(tight); // TASC:
+        JPanel extraRow   = new JPanel(tight); // 情報2
+        JPanel idRow      = new JPanel(tight); // 列車番号/編成
 
         JPanel q = new JPanel();
         q.setLayout(null);
@@ -197,266 +249,295 @@ public class TDCCore
 
         // kilo
 
-            JFrame distanceResetFrame = createFrame("キロ程リセット", 640, 480, q);
+        JFrame distanceResetFrame = createFrame("キロ程リセット", 640, 480, q);
 
-            createNumberButtons(q, 0, 0, 50, e -> distanceSetText += ((JButton)e.getSource()).getText());
-            
-            JButton setDistancePeriodButton = new JButton(".");
-            setDistancePeriodButton.setBounds(250, 50, 50, 50);
-            JButton setDistanceButton = new JButton("設定");
-            setDistanceButton.setBounds(300, 50, 100, 50);
-            distanceSetUPButton = new JButton("上り");
-            distanceSetUPButton.setBounds(0, 100, 100, 50);
-            dictanceSetDOWNButton = new JButton("下り");
-            dictanceSetDOWNButton.setBounds(100, 100, 100, 50);
+        createNumberButtons(q, 0, 0, 50, e -> distanceSetText += ((JButton)e.getSource()).getText());
+        
+        JButton setDistancePeriodButton = new JButton(".");
+        setDistancePeriodButton.setBounds(250, 50, 50, 50);
+        JButton setDistanceButton = new JButton("設定");
+        setDistanceButton.setBounds(300, 50, 100, 50);
+        distanceSetUPButton = new JButton("上り");
+        distanceSetUPButton.setBounds(0, 100, 100, 50);
+        dictanceSetDOWNButton = new JButton("下り");
+        dictanceSetDOWNButton.setBounds(100, 100, 100, 50);
 
-            setDistancePeriodButton.addActionListener(keyword -> distanceSetText += ".");
-            distanceSetUPButton.addActionListener(keyword -> networkManager.sendCommand("send", "moveTo", 0));
-            dictanceSetDOWNButton.addActionListener(keyword -> networkManager.sendCommand("send", "moveTo", 1));
+        setDistancePeriodButton.addActionListener(keyword -> distanceSetText += ".");
+        distanceSetUPButton.addActionListener(keyword -> networkManager.sendCommand("send", "moveTo", 0));
+        dictanceSetDOWNButton.addActionListener(keyword -> networkManager.sendCommand("send", "moveTo", 1));
 
-            setDistanceButton.addActionListener(new ActionListener() 
+        setDistanceButton.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
             {
-                @Override
-                public void actionPerformed(ActionEvent e) 
+                try 
                 {
-                    try 
-                    {
-                        float newDistance = Float.parseFloat(distanceSetText);
-                       networkManager.sendCommand("send", "move", newDistance *1000f);
-                    }
-                    catch (NumberFormatException ef) 
-                    {
-                        System.out.println(ef);
-                    }
-                    distanceSetText = "0";
-                    distanceResetFrame.setVisible(false);
+                    float newDistance = Float.parseFloat(distanceSetText);
+                    networkManager.sendCommand("send", "move", newDistance *1000f);
                 }
-            });
+                catch (NumberFormatException ef) 
+                {
+                    System.out.println(ef);
+                }
+                distanceSetText = "0";
+                distanceResetFrame.setVisible(false);
+            }
+        });
 
         // bg
 
-            JFrame epFrame = createFrame("防護無線", 480, 300, r);
+        JFrame epFrame = createFrame("防護無線", 480, 300, r);
 
-            epButton = new JButton("発報");
-            epButton.setBounds(140, 75, 200, 150);
-            epButton.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
+        epButton = new JButton("発報");
+        epButton.setBounds(140, 75, 200, 150);
+        epButton.setFont(new Font("ＭＳ　ゴシック", Font.PLAIN, 20));
 
-            epButtonTimer = new Timer(200, new ActionListener() 
+        epButtonTimer = new Timer(200, new ActionListener() 
+        {
+            private boolean on = true;
+            @Override
+            public void actionPerformed(ActionEvent e) 
             {
-                private boolean on = true;
-                @Override
-                public void actionPerformed(ActionEvent e) 
+                r.setBackground(on ? COLOR_ALERT : COLOR_DEFAULT);
+                on = !on;
+            } 
+        });
+
+        epButton.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                if (!tc.isRaisingEP()) 
                 {
-                    r.setBackground(on ? COLOR_ALERT : COLOR_DEFAULT);
-                    on = !on;
+                    epButtonTimer.start();
+                    epButton.setText("復位");
                 } 
-            });
-
-            epButton.addActionListener(new ActionListener() 
-            {
-                @Override
-                public void actionPerformed(ActionEvent e) 
+                else 
                 {
-                    if (!tc.isRaisingEP()) 
-                    {
-                        epButtonTimer.start();
-                        epButton.setText("復位");
-                    } 
-                    else 
-                    {
-                        epButtonTimer.stop();
-                        r.setBackground(COLOR_DEFAULT);
-                        epButton.setText("発報");
-                    }
-                    tc.setRaisingEP(!tc.isRaisingEP());
+                    epButtonTimer.stop();
+                    r.setBackground(COLOR_DEFAULT);
+                    epButton.setText("発報");
                 }
-            });
+                tc.setRaisingEP(!tc.isRaisingEP());
+            }
+        });
 
         // trainnum
 
-            JFrame trainNumSetFrame = createFrame("列車番号", 640, 480, s);
+        JFrame trainNumSetFrame = createFrame("列車番号", 640, 480, s);
 
-            createNumberButtons(s, 0, 0, 50, e -> tn.number += ((JButton)e.getSource()).getText());
+        createNumberButtons(s, 0, 0, 50, e -> tn.number += ((JButton)e.getSource()).getText());
 
-            JTextField textTrainStr = new JTextField("");
-            textTrainStr.setBounds(250, 50, 100, 50);
+        JTextField textTrainStr = new JTextField("");
+        textTrainStr.setBounds(250, 50, 50, 50);
 
-            JButton setTrainNumButton = new JButton("設定");
-            setTrainNumButton.setBounds(300, 50, 100, 50);
+        JButton setTrainNumButton = new JButton("設定");
+        setTrainNumButton.setBounds(300, 50, 100, 50);
 
-            setTrainNumButton.addActionListener(new ActionListener() 
+        setTrainNumButton.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
             {
-                @Override
-                public void actionPerformed(ActionEvent e) 
-                {
-                    tn.alphabet = textTrainStr.getText();
-                    tn.half = tn.number + tn.alphabet;
-                    trainNumSetFrame.setVisible(false);
-                }
-            });
+                tn.alphabet = textTrainStr.getText();
+                tn.half = tn.number + tn.alphabet;
+                trainNumSetFrame.setVisible(false);
+            }
+        });
 
         // main
 
-            JFrame frame = new JFrame("NetworkCatcher");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(480, 640);
+        JFrame frame = new JFrame("NetworkCatcher");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(480, 640);
 
-            JButton teButton = new JButton("TE装置");
-            teButton.setBounds(0, 0, 100, 50);
+        JButton teButton = new JButton("TE装置");
+        doorOpenLButton = new JButton("左ドア開");
+        doorOpenRButton = new JButton("右ドア開");
+        doorCloseButtonL = new JButton("ドア閉");
+        doorCloseButtonR = new JButton("ドア閉");
+        doorReOpenButton = new JButton("再開扉");
+        ActionButton = new JButton("設定");
 
-            doorOpenLButton = new JButton("左ドア開");
-            doorOpenLButton.setBounds(0, 50, 100, 50);
+        JButton showResetDistanceWindowButon = new JButton("キロ程リセット");
+        JButton showSetTrainNumWindowButton = new JButton("列車番号");
+        JButton allResetButon = new JButton("リセット");
 
-            doorOpenRButton = new JButton("右ドア開");
-            doorOpenRButton.setBounds(100, 50, 100, 50);
+        reverserSetFButton = new JButton("前");
+        reverserSetNButton = new JButton("中");
+        reverserSetBButton = new JButton("後");
 
-            doorCloseButton = new JButton("ドア閉");
-            doorCloseButton.setBounds(0, 100, 100, 50);
+        style(teButton, BUTTON_NORMAL);
 
-            doorReOpenButton = new JButton("再開扉");
-            doorReOpenButton.setBounds(100, 100, 100, 50);
+        style(doorOpenLButton,  BUTTON_MIDLARGE);
+        style(ActionButton,     BUTTON_MIDLARGE);
+        style(doorOpenRButton,  BUTTON_MIDLARGE);
 
-            ActionButton = new JButton("設定");
-            ActionButton.setBounds(200, 50, 200, 100);
+        style(doorCloseButtonL, BUTTON_NORMAL);
+        style(doorReOpenButton, BUTTON_NORMAL);        
+        style(doorCloseButtonR, BUTTON_NORMAL);
 
-            JButton showResetDistanceWindowButon = new JButton("キロ程リセット");
-            showResetDistanceWindowButon.setBounds(0, 150, 150, 50);
+        style(showResetDistanceWindowButon, BUTTON_LARGE);
+        style(showSetTrainNumWindowButton,  BUTTON_NORMAL);
+        style(allResetButon,                BUTTON_NORMAL);
+        style(reverserSetFButton,           BUTTON_SMALL);
+        style(reverserSetNButton,           BUTTON_SMALL);
+        style(reverserSetBButton,           BUTTON_SMALL);
 
-            JButton showSetTrainNumWindowButton = new JButton("列車番号");
-            showSetTrainNumWindowButton.setBounds(150, 150, 150, 50);
+        speedLabel       = createLabel(NA);
+        bcLabel          = createLabel(NA);
+        mrLabel          = createLabel(NA);
+        distanceLabel    = createLabel(NA);
+        notchPosLabel    = createLabel(NA);
+        infoTrainLabel   = createLabel("");
+        infoAtsLabel     = createLabel("");
+        infoTascLabel    = createLabel("");
+        infoTrainExLabel = createLabel("");
+        trainNumberLabel = createLabel("");
+        formationLabel   = createLabel("");
 
-            JButton allResetButon = new JButton("リセット");
-            allResetButon.setBounds(0, 500, 100, 50);
-
-            reverserSetFButton = new JButton("前");
-            reverserSetFButton.setBounds(300, 150, 50, 50);
-            reverserSetNButton = new JButton("中");
-            reverserSetNButton.setBounds(350, 150, 50, 50);
-            reverserSetBButton = new JButton("後");
-            reverserSetBButton.setBounds(400, 150, 50, 50);
-
-            speedLabel = createLabel(NA, 0, 200, 100, 20);
-            bcLabel = createLabel(NA, 100, 200, 75, 20);
-            mrLabel = createLabel(NA, 175, 200, 75, 20);
-            distanceLabel = createLabel(NA, 250, 200, 100, 20);
-            notchPosLabel = createLabel(NA, 350, 200, 50, 20);
-            infoTrainLabel = createLabel("", 0, 250, 600, 20);
-            infoAtsLabel = createLabel("", 0, 300, 600, 20);
-            infoTascLabel = createLabel("", 0, 350, 600, 20);
-            infoTrainExLabel = createLabel("", 0, 400, 600, 20);
-            trainNumberLabel = createLabel("", 0, 450, 200, 20);
-            formationLabel = createLabel("", 200, 450, 200, 20);
-
-            teButton.addActionListener(new ActionListener() 
+        teButton.addActionListener(new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
             {
-                @Override
-                public void actionPerformed(ActionEvent e) 
-                {
-                    tc.setTE(true);
-                }
-            });
+                tc.setTE(true);
+            }
+        });
 
-            doorOpenLButton.addActionListener(e -> toggleBlink(doorOpenLButton, "door", DOOR_LEFT));
-            doorOpenRButton.addActionListener(e -> toggleBlink(doorOpenRButton, "door", DOOR_RIGHT));
-            doorCloseButton.addActionListener(e -> toggleBlink(doorCloseButton, "door", DOOR_CLOSE));
+        doorOpenLButton.addActionListener(e -> toggleBlink(doorOpenLButton, "door", DOOR_LEFT));
+        doorOpenRButton.addActionListener(e -> toggleBlink(doorOpenRButton, "door", DOOR_RIGHT));
+        doorCloseButtonL.addActionListener(e -> toggleBlink(doorCloseButtonL, "door", DOOR_CLOSE));
+        doorCloseButtonR.addActionListener(e -> toggleBlink(doorCloseButtonR, "door", DOOR_CLOSE));
 
-            doorReOpenButton.addActionListener(e -> {
-                resetBlinkState();
-                if (tc.getPrevDoor() != -1)
-                    networkManager.sendCommand("send", "door", tc.getPrevDoor());
-            });
+        doorReOpenButton.addActionListener(e ->
+        {
+            resetBlinkState();
+            if (tc.getPrevDoor() != -1)
+                networkManager.sendCommand("send", "door", tc.getPrevDoor());
+        });
 
-            showResetDistanceWindowButon.addActionListener(keyword -> distanceResetFrame.setVisible(true));
-            showSetTrainNumWindowButton.addActionListener(new ActionListener()
+        showResetDistanceWindowButon.addActionListener(keyword -> distanceResetFrame.setVisible(true));
+        showSetTrainNumWindowButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
             {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    trainNumSetFrame.setVisible(true);
-                    tn.alphabet = "";
-                    tn.number = "";
-                    tn.half = "";
-                    tn.full = "";
-                }
-            });
+                trainNumSetFrame.setVisible(true);
+                tn.alphabet = "";
+                tn.number = "";
+                tn.half = "";
+                tn.full = "";
+            }
+        });
 
-            ActionButton.addActionListener(new ActionListener()
+        ActionButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
             {
-                @Override
-                public void actionPerformed(ActionEvent e)
+                if (buttonCommand != null)
                 {
-                    if (buttonCommand != null) {
-                        if ("door".equals(buttonCommand)) {
-                            if (buttonDo == 0) tc.setPrevDoor(tc.getDoor());
-                            networkManager.sendCommand("send", buttonCommand, buttonDo);
-                        }
-                        resetBlinkState();
-                    }
-                }
-            });
-
-            allResetButon.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    reset();
-                }
-            });
-
-            reverserSetFButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 0));
-            reverserSetNButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 1));
-            reverserSetBButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 2));
-
-            blinkTimer = new Timer(500, new ActionListener()
-            {
-                private boolean on = true;
-
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    switch (buttonCommand)
+                    if ("door".equals(buttonCommand))
                     {
-                        case "door":
-                            ActionButton.setBackground(on ? COLOR_ACTIVE : COLOR_DEFAULT);
-                            break;
-                    
-                        default:
-                            break;
+                        if (buttonDo == 0) tc.setPrevDoor(tc.getDoor());
+                        networkManager.sendCommand("send", buttonCommand, buttonDo);
                     }
-                    on = !on;
+                    resetBlinkState();
                 }
-            });
+            }
+        });
 
+        allResetButon.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                reset();
+            }
+        });
 
+        reverserSetFButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 0));
+        reverserSetNButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 1));
+        reverserSetBButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 2));
 
-        p.add(teButton);
-        p.add(doorOpenLButton);
-        p.add(doorOpenRButton);
-        p.add(doorCloseButton);
-        p.add(doorReOpenButton);
-        p.add(showResetDistanceWindowButon);
-        p.add(ActionButton);
-        p.add(allResetButon);
-        p.add(showSetTrainNumWindowButton);
+        blinkTimer = new Timer(500, new ActionListener()
+        {
+            private boolean on = true;
 
-        p.add(speedLabel);
-        p.add(bcLabel);
-        p.add(mrLabel);
-        p.add(distanceLabel);
-        p.add(notchPosLabel);
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                switch (buttonCommand)
+                {
+                    case "door":
+                        ActionButton.setBackground(on ? COLOR_ACTIVE : COLOR_DEFAULT);
+                        break;
+                
+                    default:
+                        break;
+                }
+                on = !on;
+            }
+        });
 
-        p.add(infoTrainLabel);
-        p.add(infoAtsLabel);
-        p.add(infoTascLabel);
-        p.add(infoTrainExLabel);
-        p.add(trainNumberLabel);
+        TEPanel.add(teButton);
 
-        p.add(formationLabel);
+        g.gridx = 0; g.gridy = 0; doorMatrix.add(doorOpenLButton, g);
+        g.gridx = 1; g.gridy = 0; doorMatrix.add(ActionButton,    g);
+        g.gridx = 2; g.gridy = 0; doorMatrix.add(doorOpenRButton, g);
 
-        p.add(reverserSetFButton);
-        p.add(reverserSetNButton);
-        p.add(reverserSetBButton);
+        g.gridx = 0; g.gridy = 1; doorMatrix.add(doorCloseButtonL,g);
+        g.gridx = 1; g.gridy = 1; doorMatrix.add(doorReOpenButton,g);
+        g.gridx = 2; g.gridy = 1; doorMatrix.add(doorCloseButtonR,g);
+
+        JPanel doorRow = new JPanel(new BorderLayout());
+        doorRow.add(doorMatrix, BorderLayout.WEST);
+
+        reverserPanel.add(reverserSetFButton);
+        reverserPanel.add(reverserSetNButton);
+        reverserPanel.add(reverserSetBButton);
+
+        utilPanel.add(showResetDistanceWindowButon);
+        utilPanel.add(showSetTrainNumWindowButton);
+        utilPanel.add(allResetButon);
+
+        meterPanel.add(speedLabel);
+        meterPanel.add(bcLabel);
+        meterPanel.add(mrLabel);
+        meterPanel.add(distanceLabel);
+        meterPanel.add(notchPosLabel);
+
+        stateRow.add(infoTrainLabel);
+        atsRow.add(infoAtsLabel);
+        tascRow.add(infoTascLabel);
+        extraRow.add(infoTrainExLabel);
+
+        idRow.add(trainNumberLabel);
+        idRow.add(formationLabel);
+
+        controlPanel.add(TEPanel);
+        controlPanel.add(doorRow);
+        controlPanel.add(reverserPanel);
+        controlPanel.add(utilPanel);
+
+        infoPanel.add(meterPanel);
+
+        for (JPanel p : new JPanel[]{meterPanel, stateRow, atsRow, tascRow, extraRow, idRow})
+        {
+            p.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+            p.setBorder(BorderFactory.createEmptyBorder(3, 6, 3, 6));
+            infoPanel.add(p);
+        }
+
+        JPanel infoContainer = new JPanel(new BorderLayout());
+        infoContainer.add(infoPanel, BorderLayout.NORTH);
+
+        root.add(controlPanel, BorderLayout.NORTH);
+        root.add(infoContainer, BorderLayout.CENTER);
+        frame.getContentPane().add(root);
 
         q.add(setDistancePeriodButton);
         q.add(setDistanceButton);
@@ -471,13 +552,12 @@ public class TDCCore
         ActionButton.setBackground(COLOR_DEFAULT);
         doorOpenLButton.setBackground(COLOR_DEFAULT);
         doorOpenRButton.setBackground(COLOR_DEFAULT);
-        doorCloseButton.setBackground(COLOR_DEFAULT);
+        doorCloseButtonL.setBackground(COLOR_DEFAULT);
+        doorCloseButtonR.setBackground(COLOR_DEFAULT);
 
-        frame.getContentPane().add(p, BorderLayout.CENTER);
         distanceResetFrame.getContentPane().add(q, BorderLayout.CENTER);
         epFrame.getContentPane().add(r, BorderLayout.CENTER);
         trainNumSetFrame.getContentPane().add(s, BorderLayout.CENTER);
-
 
         reverserSetFButton.setEnabled(false);
         reverserSetNButton.setEnabled(false);
@@ -558,29 +638,25 @@ public class TDCCore
         // ATS-P
         tc.refreshTrainStat();
 
-        if (tc.getboolTrainStat(TrainControl.TRAINSTAT_EB)) networkManager.sendCommand("send", "notch", TrainControl.NOTCH_EB);
-        if (tc.getboolTrainStat(TrainControl.TRAINSTAT_DS_BRAKE)) networkManager.sendCommand("send", "notch", TrainControl.NOTCH_EB);
+        int sendNotch = TrainControl.NOTCH_NONE;
+
+        if (tc.getboolTrainStat(TrainControl.TRAINSTAT_EB)) sendNotch = TrainControl.NOTCH_EB;
+        if (tc.getboolTrainStat(TrainControl.TRAINSTAT_DS_BRAKE)) sendNotch = TrainControl.NOTCH_EB;
+
+        networkManager.sendCommand("send", "notch", sendNotch);
     }
 
     private void updateTrainState()
     {
         // 走行時戸開禁止
-        if (tc.isRunningTrain())
-        {
-            doorCloseButton.setEnabled(false);
-            doorOpenLButton.setEnabled(false);
-            doorOpenRButton.setEnabled(false);
-            doorReOpenButton.setEnabled(false);
-            tc.setPrevDoor(-1);
-        }
-        else
-        {
-            doorCloseButton.setEnabled(true);
-            doorOpenLButton.setEnabled(true);
-            doorOpenRButton.setEnabled(true);
-            doorReOpenButton.setEnabled(true);
-        }
-        
+        boolean enableDoorButton = !tc.isRunningTrain();
+        doorCloseButtonL.setEnabled(enableDoorButton);
+        doorCloseButtonR.setEnabled(enableDoorButton);
+        doorOpenLButton.setEnabled(enableDoorButton);
+        doorOpenRButton.setEnabled(enableDoorButton);
+        doorReOpenButton.setEnabled(enableDoorButton);
+        if (!enableDoorButton) tc.setPrevDoor(-1);
+                
         // ノッチ位置表示
         boolean canChangeReverser = false;
         if (tc.getNotch() == TrainControl.NOTCH_EB)
@@ -671,7 +747,7 @@ public class TDCCore
             while(true)
             {
                 try {
-                    fetchData = networkManager.clientReciveString();
+                    fetchData = networkManager.clientReceiveString();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -710,8 +786,10 @@ public class TDCCore
                                 tc.handleATSNW();
                                 tc.handleArrivingStation();
                                 // GUI更新
-                                onEdt(() -> {
-                                    if (!refreshTimer.isRunning()) {
+                                onEdt(() ->
+                                {
+                                    if (!refreshTimer.isRunning())
+                                    {
                                         refreshTimer.start();
                                     }
                                 });
