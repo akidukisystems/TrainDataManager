@@ -83,7 +83,7 @@ public class TDCCore
     private static TrainNumber tn;
     private static TrainControl tc;
 
-    public static void main(String[] args) throws IOException 
+    public static void main(String[] args) 
     {
         TDCCore clientObject = new TDCCore();
         
@@ -101,9 +101,13 @@ public class TDCCore
             }
         }));
 
-        clientObject.running();
+        try {
+            clientObject.running();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
+    
     // EDTいじいじするのでEdtでよい　Editではない
 
     private static void onEdt(Runnable r) {
