@@ -32,136 +32,107 @@ public class NetworkManager
     public Socket getActiveSocket() { return (client != null ? client : s2c); }
     public PrintWriter getWriter() { return writer; }
 
-    public void clientInit(String adrs, int port) 
+    public void clientInit(String adrs, int port) throws UnknownHostException, IOException 
     {
         while (true) 
         {
-            try 
-            {
-                this.client = new Socket(adrs, port);
-                this.client.setTcpNoDelay(true);
-            } 
-            catch (UnknownHostException e) 
-            {
-                // e.printStackTrace();
-            } 
-            catch (IOException e) 
-            {
-                // e.printStackTrace();
-            }
+            this.client = new Socket(adrs, port);
+            this.client.setTcpNoDelay(true);
+
             if(this.client != null) break;
 
-            try 
-            {
+            try {
                 Thread.sleep(10);
-            } 
-            catch (InterruptedException e) 
-            {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        try 
-        {
-            this.writer = new PrintWriter(this.client.getOutputStream(), true);
-            this.reader = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
-        } 
-        catch (IOException e) 
-        {
-            e.printStackTrace();
-        }
+
+        this.writer = new PrintWriter(this.client.getOutputStream(), true);
+        this.reader = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
     }
 
-    public String clientReciveString() {
-        try {
-            String line;
-            while ((line = this.reader.readLine()) != null) {
-                HeartbeatLink local = hb;
-                if (local != null && local.consume(line)) {
-                    continue; // HB は飲み込む
-                }
-                return line;
+    public String clientReciveString() throws IOException
+    {
+        String line;
+        while ((line = this.reader.readLine()) != null) {
+            HeartbeatLink local = hb;
+            if (local != null && local.consume(line)) {
+                continue; // HB は飲み込む
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            return line;
         }
         return null;
     }
 
-    public void clientClose() 
+    public void clientClose() throws IOException 
     {
         System.out.println("exit");
-        try 
+
+        if (this.writer != null) this.writer.close();
+        if (this.reader != null) this.reader.close();
+        if (this.c2s != null) this.c2s.close();
+        if (this.client != null) this.client.close();
+    }
+
+
+
+    public void serverInit(int port) throws IOException
+    {
+        server = new ServerSocket(port);
+    }
+
+    public void serverWaitingClient() throws IOException
+    {
+        server.setSoTimeout(60000);
+        s2c = server.accept();
+        System.out.println("Connected s2c");
+
+        reader = new BufferedReader(new InputStreamReader(s2c.getInputStream()));
+        writer = new PrintWriter(s2c.getOutputStream(), true);
+    }
+
+    public void serverStartRead()
+    {
+        executor.submit(() ->
         {
-            if (this.writer != null) this.writer.close();
-            if (this.reader != null) this.reader.close();
-            if (this.c2s != null) this.c2s.close();
-            if (this.client != null) this.client.close();
-        } 
-        catch (IOException e) 
-        {
-            e.printStackTrace();
-        }
-    }
+            while (true)
+            {
+                String data = null;
 
-
-
-    public void serverInit(int port) {
-        try {
-            server = new ServerSocket(port);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void serverWaitingClient() {
-        try {
-            server.setSoTimeout(60000);
-            s2c = server.accept();
-            System.out.println("Connected s2c");
-
-            reader = new BufferedReader(new InputStreamReader(s2c.getInputStream()));
-            writer = new PrintWriter(s2c.getOutputStream(), true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void serverStartRead() {
-        executor.submit(() -> {
-            while (true) {
                 try {
-                    String data = reader.readLine();
-                    if (data == null) break;
-
-                    HeartbeatLink local = hb;
-                    if (local != null && local.consume(data)) {
-                        continue; // 飲み込んだので上位に流さない
-                    }
-
-                    sharedData.set(data);
+                    data = reader.readLine();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    break;
                 }
+
+                if (data == null) break;
+
+                HeartbeatLink local = hb;
+                if (local != null && local.consume(data))
+                {
+                    continue; // 飲み込んだので上位に流さない
+                }
+
+                sharedData.set(data);
             }
         });
     }
 
-    public String getLatestReceivedString()  {   
+    public String getLatestReceivedString()
+    {   
         String data = sharedData.get();
         sharedData.set(null);
         return data;
     }
 
-    public void serverClose() {
-        try {
-            if (writer != null) writer.close();
-            if (reader != null) reader.close();
-            if (s2c != null) s2c.close();
-            if (server != null) server.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void serverClose() throws IOException
+    {
+        if (writer != null) writer.close();
+        if (reader != null) reader.close();
+        if (s2c != null) s2c.close();
+        if (server != null) server.close();
+        
         sharedData.set(null);
         executor.shutdown();
     }
@@ -182,7 +153,8 @@ public class NetworkManager
         sendString(obj.toString());
     }
 
-    public void startHeartbeat(long intervalMs, long timeoutMs, Runnable onPeerDead) {
+    public void startHeartbeat(long intervalMs, long timeoutMs, Runnable onPeerDead)
+    {
         try {
             Socket sock = getActiveSocket();
             if (sock == null || writer == null) return;

@@ -1,4 +1,5 @@
 package jp.akidukisystems.software.debug.TDMEmulator;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,9 +23,21 @@ public class EmulatorCore {
     public static void main(String[] args) {
         EmulatorCore object = new EmulatorCore();
         networkManager = new NetworkManager();
-        networkManager.serverInit(PORT);        
-        networkManager.serverWaitingClient();
-        object.running();
+
+        try {
+            networkManager.serverInit(PORT);
+
+            try {
+                networkManager.serverWaitingClient();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }       
+
+        if(networkManager != null)
+            object.running();
     }
 
     public void running()
@@ -92,7 +105,12 @@ public class EmulatorCore {
                     switch (jsonObj.getString("type"))
                     {
                         case "kill":
-                            networkManager.clientClose();
+                            try {
+                                networkManager.clientClose();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
                             System.exit(0);
                             break;
 

@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -89,7 +90,15 @@ public class TDCCore
         
         tn = new TrainNumber();
         networkManager = new NetworkManager();
-        networkManager.clientInit("localhost", PORT);
+
+        try {
+            networkManager.clientInit("localhost", PORT);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
 
@@ -97,17 +106,18 @@ public class TDCCore
         {
             if (networkManager != null) {
                 networkManager.sendString("{\"type\":\"kill\"}");
-                networkManager.clientClose();
+
+                try {
+                    networkManager.clientClose();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }));
 
-        try {
-            clientObject.running();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        clientObject.running();
     }
-    
+
     // EDTいじいじするのでEdtでよい　Editではない
 
     private static void onEdt(Runnable r) {
@@ -630,7 +640,7 @@ public class TDCCore
         tn.reset();
     }
 
-    public void running() throws IOException
+    public void running()
     {
         System.out.println("client starting on port " + PORT + "...");
 
@@ -660,7 +670,11 @@ public class TDCCore
 
             while(true)
             {
-                fetchData = networkManager.clientReciveString();
+                try {
+                    fetchData = networkManager.clientReciveString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 if(fetchData != null)
                 {

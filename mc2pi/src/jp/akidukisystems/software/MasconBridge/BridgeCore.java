@@ -1,5 +1,7 @@
 package jp.akidukisystems.software.MasconBridge;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import org.json.JSONObject;
@@ -21,11 +23,28 @@ public class BridgeCore {
         reader = new MasConReader();
         
         gameNetworkManager = new NetworkManager();
-        gameNetworkManager.clientInit("localhost", GAME_PORT);  
+
+        try {
+            gameNetworkManager.clientInit("localhost", GAME_PORT);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }  
 
         piNetworkManager = new NetworkManager();
-        piNetworkManager.serverInit(PI_PORT);  
-        piNetworkManager.serverWaitingClient();    
+
+        try {
+            piNetworkManager.serverInit(PI_PORT);
+
+            try {
+                piNetworkManager.serverWaitingClient();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }  
+        } catch (IOException e) {
+            e.printStackTrace();
+        }  
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> 
         {
@@ -38,7 +57,8 @@ public class BridgeCore {
             }
         }));
 
-        clientObject.running(); 
+        if((gameNetworkManager != null) && (piNetworkManager != null))
+            clientObject.running(); 
     }
 
     public void running()
@@ -83,7 +103,13 @@ public class BridgeCore {
                 }
 
                 // データのブリッジ処理
-                String fetchGameData = gameNetworkManager.clientReciveString();
+                String fetchGameData = null;
+
+                try {
+                    fetchGameData = gameNetworkManager.clientReciveString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 
                 String fetchPiData = null;
                 fetchPiData = piNetworkManager.getLatestReceivedString();
@@ -96,7 +122,13 @@ public class BridgeCore {
                     switch (jsonObj.getString("type"))
                     {
                         case "kill":
-                            gameNetworkManager.clientClose();
+
+                            try {
+                                gameNetworkManager.clientClose();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
                             System.exit(0);
                             break;
                     }
@@ -106,7 +138,14 @@ public class BridgeCore {
                 else
                 {
                     gameNetworkManager = new NetworkManager();
-                    gameNetworkManager.clientInit("localhost", GAME_PORT);
+
+                    try {
+                        gameNetworkManager.clientInit("localhost", GAME_PORT);
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if(fetchPiData != null)
@@ -117,7 +156,12 @@ public class BridgeCore {
                     switch (jsonObj.getString("type"))
                     {
                         case "kill":
-                            piNetworkManager.serverClose();
+                            try {
+                                piNetworkManager.serverClose();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
                             System.exit(0);
                             break;
                     }
