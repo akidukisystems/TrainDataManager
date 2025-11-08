@@ -22,13 +22,15 @@ public final class HeartbeatLink implements AutoCloseable {
     private volatile boolean running = false;
 
     private HeartbeatLink(Socket socket, PrintWriter out,
-                          long intervalMs, long timeoutMs, Runnable onPeerDead) {
+                          long intervalMs, long timeoutMs, Runnable onPeerDead)
+    {
         this.socket = Objects.requireNonNull(socket);
         this.out = Objects.requireNonNull(out);
         this.intervalMs = intervalMs;
         this.timeoutMs = timeoutMs;
         this.onPeerDead = Objects.requireNonNull(onPeerDead);
-        this.ses = Executors.newScheduledThreadPool(2, r -> {
+        this.ses = Executors.newScheduledThreadPool(2, r ->
+        {
             Thread t = new Thread(r, "hb-link");
             t.setDaemon(true);
             return t;
@@ -44,10 +46,12 @@ public final class HeartbeatLink implements AutoCloseable {
         return hb;
     }
 
-    private void start() {
+    private void start()
+    {
         running = true;
 
-        ses.scheduleAtFixedRate(() -> {
+        ses.scheduleAtFixedRate(() ->
+        {
             if (!running) return;
             try {
                 JSONObject ping = new JSONObject().put("type", "hb").put("op", "ping");
@@ -55,39 +59,52 @@ public final class HeartbeatLink implements AutoCloseable {
             } catch (Exception ignored) {}
         }, 0, intervalMs, TimeUnit.MILLISECONDS);
 
-        ses.scheduleAtFixedRate(() -> {
+        ses.scheduleAtFixedRate(() ->
+        {
             if (!running) return;
             long elapsed = System.currentTimeMillis() - lastPong.get();
-            if (elapsed > timeoutMs) {
+
+            if (elapsed > timeoutMs)
+            {
                 try { onPeerDead.run(); } finally { closeQuiet(); }
             }
         }, timeoutMs / 3, timeoutMs / 3, TimeUnit.MILLISECONDS);
     }
 
-    public boolean consume(String line) {
+    public boolean consume(String line)
+    {
         if (line == null) return false;
         try {
             JSONObject obj = new JSONObject(line);
             if (!"hb".equals(obj.optString("type"))) return false;
+
             String op = obj.optString("op", "");
-            if ("ping".equals(op)) {
+            if ("ping".equals(op))
+            {
                 JSONObject pong = new JSONObject().put("type", "hb").put("op", "pong");
                 out.println(pong.toString());
                 return true;
-            } else if ("pong".equals(op)) {
+            }
+            else if ("pong".equals(op))
+            {
                 lastPong.set(System.currentTimeMillis());
                 return true;
             }
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            System.err.println(e);
         }
         return false;
     }
 
-    private void closeQuiet() {
+    private void closeQuiet()
+    {
         running = false;
         ses.shutdownNow();
         try { socket.close(); } catch (Exception ignored) {}
     }
 
-    @Override public void close() { closeQuiet(); }
+    @Override public void close()
+    {
+        closeQuiet();
+    }
 }

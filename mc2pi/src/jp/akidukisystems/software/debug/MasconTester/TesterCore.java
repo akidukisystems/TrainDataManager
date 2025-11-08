@@ -5,7 +5,8 @@ import jp.akidukisystems.software.utilty.MasConReader;
 public class TesterCore {
     
     private static MasConReader reader;
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         TesterCore object = new TesterCore();
         reader = new MasConReader();
         object.running();
@@ -17,7 +18,9 @@ public class TesterCore {
         {
             if(!reader.isRunning()) reader.start();
 
-            while (true) {
+            while (true)
+            
+            {
                 System.out.println(MasConReader.mapYtoNotch(reader.getValue("y")));
             }
         }).start();;

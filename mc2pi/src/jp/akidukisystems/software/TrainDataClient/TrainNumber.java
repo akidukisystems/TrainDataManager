@@ -18,7 +18,8 @@ public class TrainNumber
     // A,B,C,D,E,F,G,H,K,M,S,T,Y
     String alphabet;
 
-    public void reset() {
+    public void reset()
+    {
         alphabet = number = half = full = null;
     }
 }

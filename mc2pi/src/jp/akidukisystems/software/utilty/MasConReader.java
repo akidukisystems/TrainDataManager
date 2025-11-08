@@ -7,38 +7,53 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 
-public class MasConReader implements Runnable {
-
+public class MasConReader implements Runnable
+{
     private Controller target;
     private Component[] comps;
     private Map<String, Float> values = new ConcurrentHashMap<>();
     private volatile boolean running = false;
     private Thread thread;
+    private boolean isMasConConnected = false;
 
-    public MasConReader() {
-        for (Controller c : ControllerEnvironment.getDefaultEnvironment().getControllers()) {
+    public MasConReader()
+    {
+        for (Controller c : ControllerEnvironment.getDefaultEnvironment().getControllers())
+        {
             String n = c.getName().toLowerCase();
-            if (n.contains("zuiki") || n.contains("mascon") ||
+            if
+            (
+                n.contains("zuiki") ||
+                n.contains("mascon") ||
                 c.getType() == Controller.Type.STICK ||
-                c.getType() == Controller.Type.GAMEPAD) {
+                c.getType() == Controller.Type.GAMEPAD
+            )
+            {
                 target = c;
                 break;
             }
         }
 
-        if (target == null) {
+        if (target == null)
+        {
             System.err.println("MasCon not found");
-        } else {
+            isMasConConnected = false;
+        }
+        else
+        {
             System.out.println(" MasCon detected: " + target.getName());
             comps = target.getComponents();
-            for (Component cp : comps) {
+            for (Component cp : comps) 
+            {
                 values.put(cp.getIdentifier().getName(), 0f);
             }
+            isMasConConnected = true;
         }
     }
 
-    public void start() {
-        if (target == null) return;
+    public void start() 
+    {
+        if (target== null) return;
         if (running) return;
 
         running = true;
@@ -46,25 +61,35 @@ public class MasConReader implements Runnable {
         thread.start();
     }
 
-    public void stop() {
+    public void stop()
+    {
         running = false;
     }
 
-    public boolean isRunning() {
+    public boolean isRunning()
+    {
         return running;
     }
 
-    public float getValue(String id) {
+    public boolean isMasConConnected()
+    {
+        return isMasConConnected;
+    }
+
+    public float getValue(String id)
+    {
         return values.getOrDefault(id, 0f);
     }
 
-    public float getValue(int index) {
-        if (comps == null || index < 0 || index >= comps.length) return 0f;
+    public float getValue(int index)
+    {
+        if (comps== null|| index < 0 || index >= comps.length) return 0f;
         String id = comps[index].getIdentifier().getName();
         return getValue(id);
     }
 
-    private static final float[] Y_MARKS = new float[] {
+    private static final float[] Y_MARKS = new float[]
+    {
         -1.000000f,   // EB (-8)
         -0.960937f,   // B8 (-7)
         -0.851560f,   // B7 (-7)
@@ -82,7 +107,8 @@ public class MasConReader implements Runnable {
         1.000000f    // P5 ( 5)
     };
 
-    private static final int[] NOTCHES = new int[] {
+    private static final int[] NOTCHES = new int[]
+    {
         -8,  // EB
         -7,  // B8
         -7,  // B7
@@ -100,12 +126,15 @@ public class MasConReader implements Runnable {
         5   // P5
     };
 
-    public static int mapYtoNotch(float y) {
+    public static int mapYtoNotch(float y)
+    {
         int idx = 0;
         float best = Float.MAX_VALUE;
-        for (int i = 0; i < Y_MARKS.length; i++) {
+        for (int i = 0; i < Y_MARKS.length; i++)
+        {
             float d = Math.abs(y - Y_MARKS[i]);
-            if (d < best) {
+            if (d < best)
+            {
                 best = d;
                 idx = i;
             }
@@ -115,12 +144,15 @@ public class MasConReader implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void run()
+    {
         System.out.println("MasCon polling started");
         try {
-            while (running) {
+            while (running)
+            {
                 target.poll();
-                for (Component cp : comps) {
+                for (Component cp : comps)
+                {
                     float v = cp.getPollData();
                     values.put(cp.getIdentifier().getName(), v);
                 }
