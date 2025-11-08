@@ -281,6 +281,7 @@ public class TrainControl
 
     private int doorCloseCount = 0;
     private int ATSPBrakeNWC = 0;
+    private int prevReverser = -1;
 
 
 
@@ -322,6 +323,7 @@ public class TrainControl
         if (signal_1 == 1) beaconGetedPos = move;
         if (signal_1 == 2)
         {
+            // 強制的に通過判定
             beaconGetedPos = 0f;
             isArrivingStation = false;
         }
@@ -430,19 +432,55 @@ public class TrainControl
         }
     }
 
+    private boolean isTestingATS = false;
+    private long testStartTime = 0L;
+    private static final long TEST_DURATION_MS = 3000;
+
     public void refreshTrainStat()
     {
+        int currentReverser = getReverser();
 
-        if(getReverser() == 0)
+        if(currentReverser == 0 && prevReverser != currentReverser)
         {
-            boolTrainStat[ATS_POWER] = true;
-            boolTrainStat[ATS_P_POWER] = true;
+            // ATSテスト
+            isTestingATS = true;
+            testStartTime = System.currentTimeMillis();
+        }
+
+        if(isTestingATS)
+        {
+            long elapsed = System.currentTimeMillis() - testStartTime;
+            if(elapsed < TEST_DURATION_MS)
+            {
+                // テスト中
+                boolTrainStat[ATS_POWER] = true;
+                boolTrainStat[ATS_P_POWER] = true;
+                boolTrainStat[ATS_P_ERROR] = true;
+                boolTrainStat[ATS_OPERATING] = true;
+            }
+            else
+            {
+                // テストおわり
+                isTestingATS = false;
+                boolTrainStat[ATS_POWER] = true;
+                boolTrainStat[ATS_P_POWER] = true;
+                boolTrainStat[ATS_P_ERROR] = false;
+                boolTrainStat[ATS_OPERATING] = false;
+            }
         }
         else
         {
-            boolTrainStat[ATS_POWER] = false;
-            boolTrainStat[ATS_P_POWER] = false;
-            boolTrainStat[TASC_POWER] = false;
+            if(currentReverser == 0)
+            {
+                boolTrainStat[ATS_POWER] = true;
+                boolTrainStat[ATS_P_POWER] = true;
+            }
+            else
+            {
+                boolTrainStat[ATS_POWER] = false;
+                boolTrainStat[ATS_P_POWER] = false;
+                boolTrainStat[TASC_POWER] = false;
+            }
         }
 
         // ATS-P
@@ -498,7 +536,7 @@ public class TrainControl
         
         boolTrainStat[TASC_PATTERN_ACTIVE] = false;
         boolTrainStat[TASC_BRAKE] = false;
-        if (isTASCBraking && (getReverser() == 0))
+        if (isTASCBraking && (currentReverser == 0))
         {
             boolTrainStat[TASC_POWER] = true;
             boolTrainStat[TASC_PATTERN_ACTIVE] = true;
@@ -509,6 +547,8 @@ public class TrainControl
         boolTrainStat[TRAINSTAT_EX_DOOR_CLOSE] = isDoorClose;
 
         boolTrainStat[TRAINSTAT_EX_STA] = isArrivingStation;
+
+        prevReverser = currentReverser;
     }
 
     public void resetTrain()
