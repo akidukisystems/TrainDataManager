@@ -218,22 +218,27 @@ public class TrainControl
     {
         boolTrainStat = new boolean[size];
     }
+
+    private final Object boolLock = new Object();
+
     public boolean getboolTrainStat(int index)
     {
-        if (index < 0 || index >= boolTrainStat.length)
+        synchronized (boolLock)
         {
-            throw new IndexOutOfBoundsException("Invalid index");
+            if (index < 0 || index >= boolTrainStat.length)
+                throw new IndexOutOfBoundsException("Invalid index");
+            return boolTrainStat[index];
         }
-        return boolTrainStat[index];
     }
 
     public void setboolTrainStat(int index, boolean value)
     {
-        if (index < 0 || index >= boolTrainStat.length)
+        synchronized (boolLock)
         {
-            throw new IndexOutOfBoundsException("Invalid index");
+            if (index < 0 || index >= boolTrainStat.length)
+                throw new IndexOutOfBoundsException("Invalid index");
+            boolTrainStat[index] = value;
         }
-        boolTrainStat[index] = value;
     }
 
     private int cars = 0;
@@ -415,7 +420,7 @@ public class TrainControl
 
     public void doorOpen_Close()
     {
-            // ドア閉めるとき時間差で表示
+        // ドア閉めるとき時間差で表示
         if (door == 0)
         {
             if (!isDoorClose)
@@ -434,6 +439,113 @@ public class TrainControl
         }
     }
 
+    private float ATSPPatternDistance = 0f;
+    private boolean isATSPPatternActive = false;
+    private float catchedDistance = 0f;
+
+    public void setATSPStopPattern(float distance)
+    {
+        ATSPPatternDistance = distance;
+        if(ATSPPatternDistance == 0)
+        {
+            isATSPPatternActive = false;
+            catchedDistance = 0f;
+        }
+        else
+        {
+            isATSPPatternActive = true;
+            catchedDistance = move;
+            // ビーコン受信してパターン生成したら緩解表示は消える
+            setboolTrainStat(TrainControl.ATS_P_BRAKE_RELEASE, false);
+            setboolTrainStat(TrainControl.ATS_P_ACTIVE, true);
+        }
+    }
+
+    private Thread atspPatternWatcher;
+
+    public void startPatternWatcher()
+    {
+        if (atspPatternWatcher == null || !atspPatternWatcher.isAlive())
+        {
+            atspPatternWatcher = new Thread(() ->
+            {
+                final float decel = 1.25f; // 減速度 m/s/s
+                while (true)
+                {
+                    if (isATSPPatternActive && getboolTrainStat(ATS_POWER)
+                            && getboolTrainStat(ATS_P_POWER) && getboolTrainStat(ATS_P_ACTIVE))
+                    {
+                        float movedDistance = getMove() - catchedDistance;
+                        if (movedDistance < 0) movedDistance *= -1;
+
+                        float remain = ATSPPatternDistance - movedDistance -5; // 余裕持って5m手前にする
+                        float speed = getSpeed();
+
+                        System.out.println("ptrnDist:"+ ATSPPatternDistance +" movedDist:"+ movedDistance +" rem:"+ remain +"");
+
+                        if (remain <= 0)
+                        {
+                            // 停止限界超過
+                            setboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING_EB, true);
+                        }
+                        else
+                        {
+                            // パターン生成
+                            float vPattern = (float)Math.sqrt(2 * decel * remain) * 3.6f;
+                            System.out.println("speed:"+ speed +" vpat:"+ vPattern +"");
+
+                            // パターン超過
+                            if (speed > vPattern)
+                                setboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING, true);
+
+                            if (speed +10 > vPattern)
+                            {
+                                // パターン接近
+                                setboolTrainStat(TrainControl.ATS_P_NEAR_PATTERN, true);
+                            }
+                            else
+                            {
+                                // パターンの範囲内なら勝手に消える
+                                if(!getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING) && !getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING_EB))
+                                    setboolTrainStat(TrainControl.ATS_P_NEAR_PATTERN, false);
+                            }
+
+                            
+                        }
+                    }
+
+                    try { Thread.sleep(200); } catch (InterruptedException ignored) {}
+                }
+            }, "ATSPPatternWatcher");
+
+            atspPatternWatcher.setDaemon(true);
+            atspPatternWatcher.start();
+        }
+    }
+
+    public void releaseATSPBrake()
+    {
+        // ふつうに緩解
+        if(getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING))
+            setboolTrainStat(TrainControl.ATS_P_BRAKE_RELEASE, true);
+            
+        setboolTrainStat(TrainControl.ATS_P_NEAR_PATTERN, false);
+        setboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING, false);
+    }
+
+    private void resetATSP()
+    {
+        // ATS-P非常制動にあたっちゃったとかで緩解できない場合とか
+        // その場合はsuperがどうにかしてくれる
+        if (!isRunningTrain())
+        {
+            isATSPPatternActive = false;
+            ATSPPatternDistance = 0f;
+            catchedDistance = 0f;
+            releaseATSPBrake();
+        }
+    }
+
     private boolean isTestingATS = false;
     private long testStartTime = 0L;
     private static final long TEST_DURATION_MS = 3000;
@@ -447,6 +559,7 @@ public class TrainControl
             // ATSテスト
             isTestingATS = true;
             testStartTime = System.currentTimeMillis();
+            resetATSP();
         }
 
         if(isTestingATS)
@@ -490,22 +603,25 @@ public class TrainControl
         {
             boolTrainStat[ATS_P_ACTIVE] = limit != Integer.MAX_VALUE ? true : false;
             
-            boolTrainStat[ATS_P_NEAR_PATTERN] = false;
-            if ((limit -5) < speed)
+            if(!isATSPPatternActive)
             {
-                if( boolTrainStat[ATS_P_ACTIVE] == true)
-                    boolTrainStat[ATS_P_NEAR_PATTERN] = true;
-            }
+                boolTrainStat[ATS_P_NEAR_PATTERN] = false;
+                if ((limit -5) < speed)
+                {
+                    if( boolTrainStat[ATS_P_ACTIVE] == true)
+                        boolTrainStat[ATS_P_NEAR_PATTERN] = true;
+                }
 
-            boolTrainStat[ATS_P_BRAKE_OPERATING] = false;
-            if (limit < speed)
-            {
-                if( boolTrainStat[ATS_P_ACTIVE] == true)
-                    boolTrainStat[ATS_P_BRAKE_OPERATING] = true;
-            }
+                boolTrainStat[ATS_P_BRAKE_OPERATING] = false;
+                if (limit < speed)
+                {
+                    if( boolTrainStat[ATS_P_ACTIVE] == true)
+                        boolTrainStat[ATS_P_BRAKE_OPERATING] = true;
+                }
 
-            boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = false;
-            if (!isATSPBrakeWorking) boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = true;
+                boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = false;
+                if (!isATSPBrakeWorking) boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = true;
+            } 
         }
         else
         {
@@ -594,6 +710,9 @@ public class TrainControl
         boolTrainStat[ATS_POWER] = false;
         boolTrainStat[ATS_P_POWER] = false;
         boolTrainStat[TASC_POWER] = false;
+
+        startPatternWatcher();
+        resetATSP();
     }
 
     public void refreshTimer()

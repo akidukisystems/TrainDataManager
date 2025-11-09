@@ -364,6 +364,7 @@ public class TDCCore
         JButton showResetDistanceWindowButon = new JButton("キロ程リセット");
         JButton showSetTrainNumWindowButton = new JButton("列車番号");
         JButton allResetButon = new JButton("リセット");
+        JButton atspBrakeReleaseButton = new JButton("ATS-P緩解");
 
         reverserSetFButton = new JButton("前");
         reverserSetNButton = new JButton("中");
@@ -382,6 +383,7 @@ public class TDCCore
         style(showResetDistanceWindowButon, BUTTON_LARGE);
         style(showSetTrainNumWindowButton,  BUTTON_NORMAL);
         style(allResetButon,                BUTTON_NORMAL);
+        style(atspBrakeReleaseButton,             BUTTON_NORMAL);
         style(reverserSetFButton,           BUTTON_SMALL);
         style(reverserSetNButton,           BUTTON_SMALL);
         style(reverserSetBButton,           BUTTON_SMALL);
@@ -459,6 +461,15 @@ public class TDCCore
             }
         });
 
+        atspBrakeReleaseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                if(!tc.isRunningTrain())
+                    tc.releaseATSPBrake();
+            }
+        });
+
         reverserSetFButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 0));
         reverserSetNButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 1));
         reverserSetBButton.addActionListener(keyword ->networkManager.sendCommand("send", "reverser", 2));
@@ -503,6 +514,7 @@ public class TDCCore
         utilPanel.add(showResetDistanceWindowButon);
         utilPanel.add(showSetTrainNumWindowButton);
         utilPanel.add(allResetButon);
+        utilPanel.add(atspBrakeReleaseButton);
 
         meterPanel.add(speedLabel);
         meterPanel.add(bcLabel);
@@ -641,6 +653,7 @@ public class TDCCore
 
         int sendNotch = TrainControl.NOTCH_NONE;
 
+        if (tc.getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING)) sendNotch = TrainControl.NOTCH_MAX;
         if (tc.getboolTrainStat(TrainControl.TRAINSTAT_EB)) sendNotch = TrainControl.NOTCH_EB;
         if (tc.getboolTrainStat(TrainControl.TRAINSTAT_DS_BRAKE)) sendNotch = TrainControl.NOTCH_EB;
 
@@ -841,7 +854,11 @@ public class TDCCore
                                         tc.setArraivingStation(signal_1);
                                         break;
 
-                                    case 3:
+                                    case 10:
+                                        // ATS-P停止パターン生成
+                                        // signal_1 = 0...リセット
+                                        // それ以外：*10した値が停止限界までの距離
+                                        tc.setATSPStopPattern(signal_1 *10);
                                         break;
                                 
                                     default:
