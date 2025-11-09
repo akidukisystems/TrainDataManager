@@ -1,18 +1,13 @@
-## Getting Started
+# ビーコン情報
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
-
-## Folder Structure
-
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+|Signal_0の値|Signal_0の説明|Signai_1の値|Signai_1の説明|コメント|実装状態|
+|---|---|---|---|---|---|
+|1|||||
+|2|次駅接近報知|1|セット|所定の停止位置から150m手前に配置することを推奨|実装済|
+|||2|リセット||実装済|
+|3|現在位置更新|
+|10|ATS-P停止パターン生成|任意の正の整数|*10した値が停止限界までの距離<br>0の場合はリセット|車止めなど常に停止信号となる場所に配置することを推奨|
+|21|ATS-P速度制限パターン設定<br>（制限開始位置）|任意の正の整数|*10した値が制限開始位置までの距離|
+|22|ATS-P速度制限パターン設定<br>（制限速度）|任意の正の整数|*5した値が制限速度|
+|23|ATS-P速度制限パターン生成|1|生成|制限開始位置が未設定の場合は即座に制限開始<br>制限速度が未設定の場合は全てリセット|
+|||2|制限解除＆リセット||
