@@ -619,7 +619,8 @@ public class TDCCore
 
         StringBuilder trainStatEX = new StringBuilder("");
         if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_DOOR_CLOSE)) trainStatEX.append("戸閉　");
-        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_EB)) trainStatEX.append("EB装置　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_HIDE_EBBUZZER)) trainStatEX.append("EBﾀｲﾏ　");
+        if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_EB)) trainStatEX.append("EBﾌﾞﾚｰｷ　");
         if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_STA)) trainStatEX.append("次駅接近　");
         infoTrainExLabel.setText(trainStatEX.toString());
 

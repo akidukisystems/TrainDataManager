@@ -33,6 +33,8 @@ public class TrainControl
     public static final int TRAINSTAT_EX_EB = 31;
     public static final int TRAINSTAT_EX_STA = 32;
 
+    public static final int TRAINSTAT_HIDE_EBBUZZER = 100;
+
     public static final int NOTCH_EB = -8;
     public static final int NOTCH_MAX = -7;
     public static final int NOTCH_N = 0;
@@ -186,16 +188,6 @@ public class TrainControl
         this.isTE = isTE;
     }
 
-    private boolean isEBStop = false;
-    public boolean isEBStop()
-    {
-        return isEBStop;
-    }
-    public void setEB(boolean isEBStop)
-    {
-        this.isEBStop = isEBStop;
-    }
-
     private boolean isATSPBrakeWorking = true;
     public boolean isATSPBrakeWorking()
     {
@@ -343,13 +335,18 @@ public class TrainControl
 
     public void handleEBunlock()
     {
-        // EB装置解除用
-        if ((isEBStop) && (notch != NOTCH_EB) && !isRunningTrain())
+        // EB装置 非常制動信号解除用
+        if ((boolTrainStat[TRAINSTAT_EX_EB]) && !isRunningTrain())
         {
             boolTrainStat[TRAINSTAT_EX_EB] = false;
-            isEBStop = false;
             ebTimer.stop();
             ebActiveTimer.stop();
+        }
+
+        // EB装置 ブザー解除用
+        if ((boolTrainStat[TRAINSTAT_HIDE_EBBUZZER]) && (notch != NOTCH_EB) && !isRunningTrain())
+        {
+            boolTrainStat[TRAINSTAT_HIDE_EBBUZZER] = false;
         }
     }
 
@@ -360,17 +357,19 @@ public class TrainControl
         {
             if (prevNotch == notch)
             {
+                // ノッチいじいじされてないなら、タイマースタート
                 if (!ebTimer.isRunning()) ebTimer.start();
             }
             else
             {
-                if (ebActiveTimer.isRunning())
+                // ノッチいじいじしたのでタイマー消す
+                if (ebActiveTimer.isRunning() && !boolTrainStat[TRAINSTAT_EX_EB])
                 {
                     boolTrainStat[TRAINSTAT_EX_EB] = false;
+                    boolTrainStat[TRAINSTAT_HIDE_EBBUZZER] = false;
                 }
                 ebTimer.stop();
                 ebActiveTimer.stop();
-                isEBStop = false;
             }
         }
         else
@@ -378,10 +377,10 @@ public class TrainControl
             if (ebActiveTimer.isRunning())
             {
                 boolTrainStat[TRAINSTAT_EX_EB] = false;
+                boolTrainStat[TRAINSTAT_HIDE_EBBUZZER] = false;
             }
             ebTimer.stop();
             ebActiveTimer.stop();
-            isEBStop = false;
         }
     }
 
@@ -520,12 +519,12 @@ public class TrainControl
         boolTrainStat[TRAINSTAT_EB] = false;
         if (isTE) boolTrainStat[TRAINSTAT_EB] = true;
         if (isRunningDoorOpen) boolTrainStat[TRAINSTAT_EB] = true;
-        if (isEBStop) boolTrainStat[TRAINSTAT_EB] = true;
         if (!boolTrainStat[ATS_POWER]) boolTrainStat[TRAINSTAT_EB] = true;
         if (reverser != 0) boolTrainStat[TRAINSTAT_EB] = true;
         if (boolTrainStat[ATS_OPERATING]) boolTrainStat[TRAINSTAT_EB] = true;
         if (boolTrainStat[ATS_P_BRAKE_OPERATING_EB]) boolTrainStat[TRAINSTAT_EB] = true;
         if (boolTrainStat[ATS_P_ERROR]) boolTrainStat[TRAINSTAT_EB] = true;
+        if (boolTrainStat[TRAINSTAT_EX_EB]) boolTrainStat[TRAINSTAT_EB] = true;
 
         
         // 保安ブレーキ
@@ -573,7 +572,6 @@ public class TrainControl
         isTASCBraking = false;
 
         isTE = false;
-        isEBStop = false;
         isATSPBrakeWorking = true;
 
         prevDoor = -1;
@@ -603,15 +601,16 @@ public class TrainControl
         // EB装置関連
         ebTimer = new Timer(60000, keyword ->
         {
-            setboolTrainStat(TrainControl.TRAINSTAT_EX_EB, true);
+            // 60秒間操作ないぞ！！！
+            setboolTrainStat(TrainControl.TRAINSTAT_HIDE_EBBUZZER, true);
             ebActiveTimer.start();
             ebTimer.stop();
         });
 
         ebActiveTimer = new Timer(5000, keyword ->
         {
+            // 5秒経ってもなにもしないから止めるぞ！！！
             setboolTrainStat(TrainControl.TRAINSTAT_EX_EB, true);
-            isEBStop = true;
             ebTimer.stop();
             ebActiveTimer.stop();
         });
