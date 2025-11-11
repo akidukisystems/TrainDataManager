@@ -122,9 +122,7 @@ public class ATSPController {
                                 // パターンの範囲内なら勝手に消える
                                 if(!train.getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING) && !train.getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING_EB))
                                     train.setboolTrainStat(TrainControl.ATS_P_NEAR_PATTERN, false);
-                            }
-
-                            
+                            }                        
                         }
                     }
 
@@ -156,7 +154,7 @@ public class ATSPController {
         targetSpeed = -1;
     }
 
-    private void resetATSPFromInterface()
+    public void resetATSPFromInterface()
     {
         // ATS-P非常制動にあたっちゃったとかで緩解できない場合とか
         // その場合はsuperがどうにかしてくれる

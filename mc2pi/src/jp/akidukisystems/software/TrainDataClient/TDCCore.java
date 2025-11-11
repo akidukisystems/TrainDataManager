@@ -711,6 +711,7 @@ public class TDCCore
     {
         tc.resetTrain();
         atsp = tc.getATSPController();
+        atsp.resetATSPFromInterface();
         distanceSetText = "0";
         buttonCommand = null;
         buttonDo = -1;
