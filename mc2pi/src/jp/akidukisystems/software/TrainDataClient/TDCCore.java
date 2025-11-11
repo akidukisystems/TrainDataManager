@@ -25,6 +25,7 @@ import javax.swing.Timer;
 
 import org.json.JSONObject;
 
+import jp.akidukisystems.software.TrainDataClient.Protector.ATSPController;
 import jp.akidukisystems.software.utilty.NetworkManager;
 
 public class TDCCore 
@@ -47,9 +48,7 @@ public class TDCCore
     private static final Dimension BUTTON_SMALL = new Dimension(48, 48);
     private static final Dimension BUTTON_BIG = new Dimension(128, 64);
 
-    private static final String NA = "N/A";
-
-    private static NetworkManager networkManager = null;    
+    private static final String NA = "N/A"; 
 
     String distanceSetText = "0";
 
@@ -96,28 +95,17 @@ public class TDCCore
 
     JButton ActionButton;
 
-    private static TrainNumber tn;
-    private static TrainControl tc;
+    private NetworkManager networkManager = null;   
+    private TrainNumber tn = null;   
+    private TrainControl tc = null;   
+    private ATSPController atsp = null;
 
     public static void main(String[] args) 
     {
         TDCCore clientObject = new TDCCore();
-        
-        tn = new TrainNumber();
-        networkManager = new NetworkManager();
-        networkManager.clientInit("localhost", PORT, 60000, 32768);
 
-        tc = new TrainControl();
-        tc.boolTrainStatInit(128);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> 
-        {
-            if (networkManager != null)
-            {
-                networkManager.sendString("{\"type\":\"kill\"}");
-                networkManager.clientClose();
-            }
-        }));
+        // System.setProperty("awt.useSystemAAFontSettings", "off");
+        // System.setProperty("swing.aatext", "false");
 
         clientObject.running();
     }
@@ -278,7 +266,7 @@ public class TDCCore
                 }
                 catch (NumberFormatException ef) 
                 {
-                    System.out.println(ef);
+                    ef.printStackTrace();
                 }
                 distanceSetText = "0";
                 distanceResetFrame.setVisible(false);
@@ -466,7 +454,7 @@ public class TDCCore
             public void actionPerformed(ActionEvent e)
             {
                 if(!tc.isRunningTrain())
-                    tc.releaseATSPBrake();
+                    atsp.releaseATSPBrake();
             }
         });
 
@@ -722,6 +710,7 @@ public class TDCCore
     public void reset()
     {
         tc.resetTrain();
+        atsp = tc.getATSPController();
         distanceSetText = "0";
         buttonCommand = null;
         buttonDo = -1;
@@ -732,6 +721,22 @@ public class TDCCore
 
     public void running()
     {
+        tn = new TrainNumber();
+        networkManager = new NetworkManager();
+        networkManager.clientInit("localhost", PORT, 60000, 32768);
+
+        tc = new TrainControl();
+        tc.boolTrainStatInit(128);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> 
+        {
+            if (networkManager != null)
+            {
+                networkManager.sendString("{\"type\":\"kill\"}");
+                networkManager.clientClose();
+            }
+        }));
+
         System.out.println("client starting on port " + PORT + "...");
 
         tc.refreshTimer();
@@ -762,14 +767,17 @@ public class TDCCore
             {
                 try {
                     fetchData = networkManager.clientReceiveString();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    try{
+                        Thread.sleep(50);
+                    } catch (InterruptedException e2) {
+                        e2.printStackTrace();
+                    }
                 }
 
                 if(fetchData != null)
                 {
-                    System.out.println(fetchData);
-
                     try
                     {
                         JSONObject jsonObj = new JSONObject(fetchData);
@@ -792,7 +800,7 @@ public class TDCCore
                                 tc.setTASCBraking(jsonObj.getBoolean("isTASCBraking"));
                                 tc.setCars(jsonObj.getInt("formation"));
 
-                                tc.doorOpen_Close();
+                                tc.handleDoors();
                                 tc.handleTEunlock();
                                 tc.handleEBunlock();
                                 tc.handleEB();
@@ -858,7 +866,23 @@ public class TDCCore
                                         // ATS-P停止パターン生成
                                         // signal_1 = 0...リセット
                                         // それ以外：*10した値が停止限界までの距離
-                                        tc.setATSPStopPattern(signal_1 *10);
+                                        //
+                                        atsp.setStopPattern(signal_1 *10);
+                                        break;
+
+                                    case 21:
+                                        // ATS-P制限速度パターン 制限開始距離セット
+                                        atsp.setDistance(signal_1 *10);
+                                        break;
+
+                                    case 22:
+                                        // ATS-P制限速度パターン 制限速度セット
+                                        atsp.setTargetSpeed(signal_1);
+                                        break;
+
+                                    case 23:
+                                        // ATS-P制限速度パターン 制限開始
+                                        atsp.setDecelPattern();
                                         break;
                                 
                                     default:
@@ -875,7 +899,7 @@ public class TDCCore
                     }
                     catch (Exception e)
                     {
-                        System.err.println("JSON parse error: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
             }
