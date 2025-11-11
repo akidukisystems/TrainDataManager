@@ -1,5 +1,6 @@
 package jp.akidukisystems.software.debug.TDMEmulator;
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -102,7 +103,6 @@ public class EmulatorCore {
 
                 if(fetchData != null)
                 {
-                    System.out.println(fetchData);
                     JSONObject jsonObj = new JSONObject(fetchData);
 
                     switch (jsonObj.getString("type"))
@@ -156,5 +156,21 @@ public class EmulatorCore {
                 networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":0,\"moveTo\":0,\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
             }
         }).start();
+
+        new Thread(() -> {
+            try (Scanner sc = new Scanner(System.in)) {
+                while (true)
+                {
+                    String line = sc.nextLine();
+                    if (line.equalsIgnoreCase("exit")) break;
+
+                    networkManager.sendString(line);
+
+                    System.out.println("[KEYBOARD] Sended :"+ line);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, "ConsoleInput").start();
     }
 }
