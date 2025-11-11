@@ -176,12 +176,16 @@ public class NetworkManager
 
     public synchronized boolean sendString(String data)
     {
-        if (!isAliveClient() && !isAliveServer()) return false;
-        if (this.writer == null) return false;
-        this.writer.println(data);
-        this.writer.flush();
-        return !this.writer.checkError();
+        if (writer == null) return false;
+        try {
+            writer.println(data);
+            writer.flush();
+            return !writer.checkError();
+        } catch (Exception e) {
+            return false;
+        }
     }
+
 
 
     public void sendCommand(String type, String message, Object value) 
