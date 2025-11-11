@@ -41,7 +41,7 @@ public class MasConReader implements Runnable
         }
         else
         {
-            System.out.println(" MasCon detected: " + target.getName());
+            System.out.println("MasCon detected: " + target.getName());
             comps = target.getComponents();
             for (Component cp : comps) 
             {
@@ -53,7 +53,7 @@ public class MasConReader implements Runnable
 
     public void start() 
     {
-        if (target== null) return;
+        if (target == null) return;
         if (running) return;
 
         running = true;
@@ -157,7 +157,7 @@ public class MasConReader implements Runnable
                     values.put(cp.getIdentifier().getName(), v);
                 }
                 
-                Thread.sleep(50);
+                Thread.sleep(100);
             }
         } catch (Exception e) {
             e.printStackTrace();
