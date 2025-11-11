@@ -143,7 +143,6 @@ public class BridgeCore {
                     }
 
                     piNetworkManager.sendString(data);
-                    System.out.println("[G2P] "+ data);
 
                     JSONObject json = new JSONObject(data);
                     if ("kill".equals(json.optString("type")))
@@ -168,7 +167,6 @@ public class BridgeCore {
                 if (data != null)
                 {
                     JSONObject json = new JSONObject(data);
-                    System.out.println("[P2G] "+ data);
 
                     switch (json.optString("type"))
                     {
