@@ -42,9 +42,9 @@ public class ATSPController {
         this.distance = distance;
         if(distance != 0)
         {
-            isPatternActive = true;
             catchedDistance = train.getMove();
             targetSpeed = -1; // 停止パターンなのでターゲット速度は0にする
+            isPatternActive = true;
 
             // ビーコン受信してパターン生成したら緩解表示は消える
             // ついでにATS-Pの計器ランプもつける
@@ -59,6 +59,7 @@ public class ATSPController {
 
         targetSpeed = targetSpeedTemp;
         distance = distancetemp;
+        catchedDistance = train.getMove();
         isPatternActive = true;
 
         // ビーコン受信してパターン生成したら緩解表示は消える
@@ -87,7 +88,7 @@ public class ATSPController {
 
                         System.out.println("ptrnDist:"+ distance +" movedDist:"+ movedDistance +" rem:"+ remain +"");
 
-                        if (remain <= 0)
+                        if ((remain <= 0) && (targetSpeed == -1))
                         {
                             // 停止限界超過
                             train.setboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING_EB, true);
@@ -95,10 +96,16 @@ public class ATSPController {
                         else
                         {
                             // パターン生成
-                            float vPattern;
+                            float vPattern = 0;
 
                             if (targetSpeed != -1)
-                                vPattern = (float)Math.sqrt((targetSpeed / 3.6f) * (targetSpeed / 3.6f) + 2 * decel * remain) * 3.6f; // 減速パターン
+                            {
+                                // 減速パターン
+                                if (remain > 0)
+                                    vPattern = (float)Math.sqrt((targetSpeed / 3.6f) * (targetSpeed / 3.6f) + 2 * decel * remain) * 3.6f;
+                                else
+                                    vPattern = targetSpeed; // 制限区間内ならtargetSpeed
+                            }
                             else
                                 vPattern = (float)Math.sqrt(2 * decel * remain) * 3.6f; // 停車パターン
                             
