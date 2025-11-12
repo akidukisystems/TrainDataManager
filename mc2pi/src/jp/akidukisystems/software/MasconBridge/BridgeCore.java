@@ -1,10 +1,16 @@
 package jp.akidukisystems.software.MasconBridge;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.JFrame;
+
 import org.json.JSONObject;
+
+import jp.akidukisystems.software.MasconBridge.GUI.Indicator;
 import jp.akidukisystems.software.utilty.MasConReader;
 import jp.akidukisystems.software.utilty.NetworkManager;
 
@@ -18,8 +24,10 @@ public class BridgeCore {
 
     private static final int RESET_NOTCH = -32768;
 
-    private static final AtomicInteger lastUserNotch    = new AtomicInteger(RESET_NOTCH);
+    private static final AtomicInteger lastUserNotch    = new AtomicInteger(-8);
     private static final AtomicInteger lastPiNotch      = new AtomicInteger(RESET_NOTCH);
+
+    private static final boolean KEY_INPUT = false;
 
     public static void main(String[] args)
     {
@@ -80,7 +88,9 @@ public class BridgeCore {
         if((piNotch == RESET_NOTCH) && (userNotch != RESET_NOTCH))
         {
             gameNetworkManager.sendCommand("send", "notch", userNotch);
-            lastUserNotch.set(RESET_NOTCH);
+
+            if(!KEY_INPUT)
+                lastUserNotch.set(RESET_NOTCH);
             return;
         }
 
@@ -101,7 +111,8 @@ public class BridgeCore {
                 gameNetworkManager.sendCommand("send", "notch", userNotch);
             }
 
-            lastUserNotch.set(RESET_NOTCH);
+            if(!KEY_INPUT)
+                lastUserNotch.set(RESET_NOTCH);
             return;
         }
     }
@@ -211,7 +222,53 @@ public class BridgeCore {
             }
         }, "Pi2Game").start();
 
-        // マスコン
+        // ノッチ位置表示用
+
+        Indicator notchPanel = null;
+
+        if(KEY_INPUT)
+        {
+            JFrame frame = new JFrame("Mascon Notch Meter");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(100, 480);
+
+            notchPanel = new Indicator();
+            frame.add(notchPanel);
+
+            frame.setVisible(true);
+            
+            notchPanel.setFocusable(true);
+            notchPanel.requestFocusInWindow();
+
+            notchPanel.addKeyListener(new KeyAdapter()
+            {
+                @Override
+                public void keyPressed(KeyEvent e)
+                {
+                    int code = e.getKeyCode();
+
+                    if (code == KeyEvent.VK_W)
+                    {
+                        if(lastUserNotch.get() > -8)
+                            lastUserNotch.decrementAndGet();
+
+                        notchPanel.setNotch(lastUserNotch.get());
+                        sendNotch();
+                    }
+                    else if (code == KeyEvent.VK_S)
+                    {
+                        if(lastUserNotch.get() < 5)
+                            lastUserNotch.incrementAndGet();
+
+                        notchPanel.setNotch(lastUserNotch.get());
+                        sendNotch();
+                    }
+                }
+            });
+        }
+        
+
+        // マスコン / キー入力
         new Thread(() ->
         {
             while (true)
@@ -221,7 +278,16 @@ public class BridgeCore {
                     int notch = MasConReader.mapYtoNotch(reader.getValue("y"));
                     gameNetworkManager.sendCommand("send", "notch", notch);
                     lastUserNotch.set(notch);
+
+                    if(KEY_INPUT)
+                        notchPanel.setNotch(notch);
+
                     sendNotch();
+                }
+                else
+                {
+                    if(KEY_INPUT)
+                        sendNotch();
                 }
                 try { Thread.sleep(100); } catch (InterruptedException ignored) {}
             }
@@ -235,6 +301,10 @@ public class BridgeCore {
                     String line = sc.nextLine();
                     if (line.equalsIgnoreCase("exit")) break;
                     lastUserNotch.set(Integer.parseInt(line));
+
+                    if(KEY_INPUT)
+                        notchPanel.setNotch(lastUserNotch.get());
+
                     sendNotch();
 
                     System.out.println("[KEYBOARD] Sended notch:"+ Integer.parseInt(line));
