@@ -27,7 +27,7 @@ public class BridgeCore {
     private static final AtomicInteger lastUserNotch    = new AtomicInteger(-8);
     private static final AtomicInteger lastPiNotch      = new AtomicInteger(RESET_NOTCH);
 
-    private static final boolean KEY_INPUT = false;
+    private static final boolean KEY_INPUT = true;
 
     public static void main(String[] args)
     {
@@ -224,7 +224,7 @@ public class BridgeCore {
 
         // ノッチ位置表示用
 
-        Indicator notchPanel = null;
+        Indicator notchPanel;
 
         if(KEY_INPUT)
         {
@@ -289,7 +289,7 @@ public class BridgeCore {
                     if(KEY_INPUT)
                         sendNotch();
                 }
-                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                try { Thread.sleep(50); } catch (InterruptedException ignored) {}
             }
         }, "MasconLoop").start();
 

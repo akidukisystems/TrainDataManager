@@ -42,7 +42,7 @@ public class TrainControl
     public static final int NOTCH_NONE = -32768;
 
     public static final int DOOR_CLOSE_TIME = 8;
-    public static final int ATSP_BRAKE_NWC_TIME = 10;
+    public static final int ATSP_BRAKE_NWC_TIME = 50;
 
     Timer ebTimer;
     Timer ebActiveTimer;

@@ -30,6 +30,7 @@ import jp.akidukisystems.software.utilty.NetworkManager;
 
 public class TDCCore 
 {
+    private static final String ADRS = "192.168.137.1";
     private static final int PORT = 34575;
     public static final int DOOR_CLOSE = 0;
     public static final int DOOR_RIGHT = 1;
@@ -187,13 +188,6 @@ public class TDCCore
     {
         b.setPreferredSize(size);
         b.setMargin(new Insets(2, 10, 2, 10));
-    }
-
-    private static JPanel row(JPanel p)
-    {
-        p.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        p.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
-        return p;
     }
 
     public void setupUI() 
@@ -724,7 +718,7 @@ public class TDCCore
     {
         tn = new TrainNumber();
         networkManager = new NetworkManager();
-        networkManager.clientInit("localhost", PORT, 60000, 32768);
+        networkManager.clientInit(ADRS, PORT, 60000, 32768);
 
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
@@ -738,7 +732,7 @@ public class TDCCore
             }
         }));
 
-        System.out.println("client starting on port " + PORT + "...");
+        System.out.println("client starting on "+ ADRS +":"+ PORT +"...");
 
         tc.refreshTimer();
         reset();
