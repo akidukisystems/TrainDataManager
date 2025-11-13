@@ -422,6 +422,10 @@ public class TrainControl
                     isATSPBrakeWorking = false;
                 }
             }
+            else
+            {
+                ATSPBrakeNWC --;
+            }
         }
     }
 
