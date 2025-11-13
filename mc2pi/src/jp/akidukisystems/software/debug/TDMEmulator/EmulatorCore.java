@@ -14,7 +14,7 @@ public class EmulatorCore {
     private static final int PORT = 34565;
     int bc = 0;
     int targetBc = 0;
-    int mr = 880;
+    float mr = 880f;
     int notch = -8;
     float speed = 0f;
     boolean isComplessorActive = false;
@@ -63,18 +63,16 @@ public class EmulatorCore {
                         bc += 17;
 
                     if(beforeBC < bc)
-                        mr -= 1;
+                        mr -= 0.5f;
 
-                    if(mr < 800)
+                    if(mr < 780f)
                         isComplessorActive = true;
 
                     if(isComplessorActive)
-                        mr += 1;
+                        mr += 0.4f;
 
-                    if(isComplessorActive && (mr > 880))
+                    if(isComplessorActive && (mr > 880f))
                         isComplessorActive = false;
-
-
 
                     if(notch > 0)
                     {
@@ -153,7 +151,7 @@ public class EmulatorCore {
                     }
                 }
 
-                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":0,\"moveTo\":0,\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
+                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":0,\"moveTo\":0,\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
             }
         }).start();
 
