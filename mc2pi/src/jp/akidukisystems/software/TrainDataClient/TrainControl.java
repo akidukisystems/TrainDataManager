@@ -424,7 +424,7 @@ public class TrainControl
             }
             else
             {
-                ATSPBrakeNWC --;
+                ATSPBrakeNWC = 0;
             }
         }
     }
