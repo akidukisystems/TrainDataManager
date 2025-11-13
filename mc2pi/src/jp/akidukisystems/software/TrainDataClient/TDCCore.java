@@ -30,7 +30,11 @@ import jp.akidukisystems.software.utilty.NetworkManager;
 
 public class TDCCore 
 {
-    private static final String ADRS = "192.168.137.1";
+    enum ADRS_LIST {ADRS_LAPTOP, ADRS_LOCALHOST};
+    private static final ADRS_LIST ADRS_SELECT = ADRS_LIST.ADRS_LOCALHOST;
+    private static final String ADRS_LAPTOP = "192.168.137.1";
+    private static final String ADRS_LOCALHOST = "localhost";
+    
     private static final int PORT = 34575;
     public static final int DOOR_CLOSE = 0;
     public static final int DOOR_RIGHT = 1;
@@ -47,9 +51,11 @@ public class TDCCore
     private static final Dimension BUTTON_LARGE = new Dimension(128, 48);
     private static final Dimension BUTTON_MIDLARGE = new Dimension(96, 64);
     private static final Dimension BUTTON_SMALL = new Dimension(48, 48);
-    private static final Dimension BUTTON_BIG = new Dimension(128, 64);
+    // private static final Dimension BUTTON_BIG = new Dimension(128, 64);
 
     private static final String NA = "N/A"; 
+
+    String address = null;
 
     String distanceSetText = "0";
 
@@ -365,7 +371,7 @@ public class TDCCore
         style(showResetDistanceWindowButon, BUTTON_LARGE);
         style(showSetTrainNumWindowButton,  BUTTON_NORMAL);
         style(allResetButon,                BUTTON_NORMAL);
-        style(atspBrakeReleaseButton,             BUTTON_NORMAL);
+        style(atspBrakeReleaseButton,       BUTTON_NORMAL);
         style(reverserSetFButton,           BUTTON_SMALL);
         style(reverserSetNButton,           BUTTON_SMALL);
         style(reverserSetBButton,           BUTTON_SMALL);
@@ -716,9 +722,22 @@ public class TDCCore
 
     public void running()
     {
+        switch (ADRS_SELECT) {
+            case ADRS_LIST.ADRS_LOCALHOST:
+                address = ADRS_LOCALHOST;
+                break;
+
+            case ADRS_LIST.ADRS_LAPTOP:
+                address = ADRS_LAPTOP;
+                break;
+        
+            default:
+                break;
+        }
+
         tn = new TrainNumber();
         networkManager = new NetworkManager();
-        networkManager.clientInit(ADRS, PORT, 60000, 32768);
+        networkManager.clientInit(address, PORT, 60000, 32768);
 
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
@@ -732,7 +751,7 @@ public class TDCCore
             }
         }));
 
-        System.out.println("client starting on "+ ADRS +":"+ PORT +"...");
+        System.out.println("client starting on "+ address +":"+ PORT +"...");
 
         tc.refreshTimer();
         reset();
