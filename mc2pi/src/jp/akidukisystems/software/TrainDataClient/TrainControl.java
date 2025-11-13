@@ -409,11 +409,12 @@ public class TrainControl
         }
     }
 
-    // ATS異常時に列車とめる
+    // ATS-P異常時に列車とめる
     public void handleATSNW()
     {
         if (boolTrainStat[ATS_P_BRAKE_OPERATING] && (bc < 50))
         {
+            // ATS-Pブレーキ動作時にBC圧が50kpa未満
             if (isATSPBrakeWorking)
             {
                 ATSPBrakeNWC ++;
@@ -422,10 +423,10 @@ public class TrainControl
                     isATSPBrakeWorking = false;
                 }
             }
-            else
-            {
-                ATSPBrakeNWC = 0;
-            }
+        }
+        else
+        {
+            ATSPBrakeNWC = 0;
         }
     }
 
