@@ -180,6 +180,8 @@ public class NetworkManager
         try {
             writer.println(data);
             writer.flush();
+            if(onSend != null)
+                onSend.run();
             return !writer.checkError();
         } catch (Exception e) {
             return false;
@@ -187,6 +189,11 @@ public class NetworkManager
     }
 
 
+    private Runnable onSend = null;
+    public void setOnSendCallback(Runnable callback)
+    {
+        this.onSend = callback;
+    }
 
     public void sendCommand(String type, String message, Object value) 
     {

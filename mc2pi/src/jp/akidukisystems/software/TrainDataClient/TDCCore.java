@@ -25,8 +25,11 @@ import javax.swing.Timer;
 
 import org.json.JSONObject;
 
+import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator;
+import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator.TRTYPE;
 import jp.akidukisystems.software.TrainDataClient.Protector.ATSPController;
 import jp.akidukisystems.software.utilty.NetworkManager;
+import jp.akidukisystems.software.utilty.WrapLayout;
 
 public class TDCCore 
 {
@@ -47,10 +50,10 @@ public class TDCCore
     private static final Color COLOR_ALERT = Color.RED;
 
     // ボタンサイズ定義
-    private static final Dimension BUTTON_NORMAL = new Dimension(96, 48);
-    private static final Dimension BUTTON_LARGE = new Dimension(128, 48);
-    private static final Dimension BUTTON_MIDLARGE = new Dimension(96, 64);
-    private static final Dimension BUTTON_SMALL = new Dimension(48, 48);
+    private static final Dimension BUTTON_NORMAL = new Dimension(128, 64);
+    private static final Dimension BUTTON_LARGE = new Dimension(192, 64);
+    private static final Dimension BUTTON_MIDLARGE = new Dimension(128, 96);
+    private static final Dimension BUTTON_SMALL = new Dimension(64, 64);
     // private static final Dimension BUTTON_BIG = new Dimension(128, 64);
 
     private static final String NA = "N/A"; 
@@ -101,6 +104,8 @@ public class TDCCore
     JButton epButton;
 
     JButton ActionButton;
+
+    NetworkIndicator indicator;
 
     private NetworkManager networkManager = null;   
     private TrainNumber tn = null;   
@@ -205,7 +210,9 @@ public class TDCCore
 
         JPanel TEPanel       = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
         JPanel reverserPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
-        JPanel utilPanel     = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+        JPanel utilPanel     = new JPanel(new WrapLayout(FlowLayout.LEFT, 4, 2));
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 2));
 
         JPanel doorMatrix = new JPanel(new GridBagLayout());
 
@@ -388,6 +395,8 @@ public class TDCCore
         trainNumberLabel = createLabel("");
         formationLabel   = createLabel("");
 
+        indicator.setPreferredSize(new Dimension(12, 12));
+
         teButton.addActionListener(new ActionListener() 
         {
             @Override
@@ -518,6 +527,8 @@ public class TDCCore
         idRow.add(trainNumberLabel);
         idRow.add(formationLabel);
 
+        bottomPanel.add(indicator);
+
         controlPanel.add(TEPanel);
         controlPanel.add(doorRow);
         controlPanel.add(reverserPanel);
@@ -537,6 +548,7 @@ public class TDCCore
 
         root.add(controlPanel, BorderLayout.NORTH);
         root.add(infoContainer, BorderLayout.CENTER);
+        root.add(bottomPanel, BorderLayout.SOUTH);
         frame.getContentPane().add(root);
 
         q.add(setDistancePeriodButton);
@@ -742,6 +754,9 @@ public class TDCCore
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
 
+        indicator = new NetworkIndicator();
+        networkManager.setOnSendCallback(() -> onEdt(() -> indicator.flash(TRTYPE.SEND)));
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> 
         {
             if (networkManager != null)
@@ -792,6 +807,8 @@ public class TDCCore
 
                 if(fetchData != null)
                 {
+                    onEdt(() -> indicator.flash(TRTYPE.RECIEVE));
+
                     try
                     {
                         JSONObject jsonObj = new JSONObject(fetchData);
