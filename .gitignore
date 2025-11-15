@@ -31,3 +31,4 @@ mc2pi/lib/
 mc2pi/*.txt
 mc2pi/.vscode/*.json
 .vscode/*.json
+mc2pi/src/jp/akidukisystems/software/utilty/WrapLayout.java

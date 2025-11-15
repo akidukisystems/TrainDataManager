@@ -8,7 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class NetworkManager {
     ServerSocket server;
@@ -17,7 +18,8 @@ public class NetworkManager {
     Socket s2c = null;
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
-    AtomicReference<String> sharedData = new AtomicReference<>(null);
+    
+    private final BlockingQueue<String> queue = new LinkedBlockingQueue<>();
 
     public void serverInit(int port) {
         try {
@@ -45,7 +47,7 @@ public class NetworkManager {
                 try {
                     String data = reader.readLine();
                     if (data != null) {
-                        sharedData.set(data);
+                        queue.offer(data);
                     } else {
                         break;
                     }
@@ -58,9 +60,7 @@ public class NetworkManager {
     }
 
     public String getLatestReceivedString()  {
-        String data = sharedData.get();
-        sharedData.set(null);
-        return data;
+        return queue.poll();
     }
 
     public void serverSendString(String data) {
@@ -76,7 +76,7 @@ public class NetworkManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        sharedData.set(null);
+        queue.clear();
         executor.shutdown();
     }
 }

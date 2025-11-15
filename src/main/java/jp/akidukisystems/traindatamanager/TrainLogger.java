@@ -288,11 +288,24 @@ public class TrainLogger {
         }
 
         // お前列車に乗ってんの？
-        if (player.isRiding() && player.getRidingEntity() instanceof EntityTrainBase) {
+        if (player.isRiding() && player.getRidingEntity() instanceof EntityTrainBase)
+        {
             // MARK: GET
             // データ取得
             String getData = null;
-            getData = networkManager.getLatestReceivedString();
+            boolean refreshedTrain = false;
+
+            while ((getData = networkManager.getLatestReceivedString()) != null)
+            {
+                System.out.println(getData);
+                if(!refreshedTrain)
+                {
+                    refreshedTrain = true;
+                    getTrainData(player);
+                }
+                handleGetData(getData);   // オラッ！全部吐け！！お前が握ってるのは知ってんだよ！！！！（データを全部吐かせる）
+            }
+
 
             // jsonパース
             // データあるのとデータ送信するtickなら初期化
@@ -302,8 +315,7 @@ public class TrainLogger {
             // 列車情報取得
             // 取得情報処理
             tickCounter++;
-            if (getData != null || tickCounter >= TICK_GET_DATA_INTERVAL) getTrainData(player);
-            if (getData != null) handleGetData(getData);
+            if (!refreshedTrain && tickCounter >= TICK_GET_DATA_INTERVAL) getTrainData(player);
 
             if (tickCounter < TICK_GET_DATA_INTERVAL) return; // 10tickごと
             tickCounter = 0;
