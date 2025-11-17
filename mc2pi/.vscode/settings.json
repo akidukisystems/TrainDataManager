@@ -1,5 +1,10 @@
 {
     "java.project.sourcePaths": [
         "src"
+    ],
+    "java.project.referencedLibraries": [
+        "c:\\Users\\akiduki\\Desktop\\ゲーム\\mods1122\\mc2pi\\lib\\jinput-2.0.10.jar",
+        "c:\\Users\\akiduki\\Desktop\\ゲーム\\mods1122\\mc2pi\\lib\\orgJSON.jar",
+        "C:\\Program Files\\Java\\JavaFX\\lib\\*.jar"
     ]
 }

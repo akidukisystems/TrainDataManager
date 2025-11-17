@@ -6,6 +6,14 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TimsSetup",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.TrainDataClient.GUI.TIMS.TimsSetup",
+            "projectName": "mc2pi_1378da23",
+            "vmArgs": "--module-path \"C:/Program Files/Java/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
+        },
+        {
+            "type": "java",
             "name": "Indicator",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.MasconBridge.GUI.Indicator",

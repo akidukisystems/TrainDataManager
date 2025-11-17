@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.Group?>
+
+<BorderPane 
+    xmlns="http://javafx.com/javafx"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.UA00AA"
+    style="-fx-background-color: black;"
+>
+
+    <top>
+        <AnchorPane prefHeight="80" style="-fx-background-color: #000000;">
+            <Button
+                fx:id="btnS00AB"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="80"
+                prefHeight="80"
+                AnchorPane.rightAnchor="0"
+                AnchorPane.topAnchor="0"
+            />
+        </AnchorPane>
+    </top>
+
+    <center>
+        <AnchorPane
+            style="-fx-background-color: #2f3e56;"
+            AnchorPane.topAnchor="0"
+            AnchorPane.leftAnchor="0"
+            AnchorPane.rightAnchor="0"
+            AnchorPane.bottomAnchor="0"
+        >
+
+            <!-- 左上の画面コード -->
+            <Label
+                text="UA00AA"
+                layoutX="30"
+                layoutY="0"
+                styleClass="screen-code"
+            />
+
+            <!-- タイトル -->
+            <Label
+                fx:id="title"
+                text="設定メニュー"
+                layoutX="200"
+                layoutY="0"
+                styleClass="title"
+            />
+        </AnchorPane>
+    </center>
+
+
+    <bottom>
+        <AnchorPane prefHeight="120" style="-fx-background-color: #000000;">
+            <!-- ステータスバーやスライダーを置く領域 -->
+        </AnchorPane>
+    </bottom>
+</BorderPane>

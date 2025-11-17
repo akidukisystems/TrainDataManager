@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.Group?>
+
+<AnchorPane
+    xmlns="http://javafx.com/javafx"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.S00AB"
+    style="-fx-background-color: black;"
+>
+    <!-- 左上の画面コード -->
+    <Label
+        text="S00AB"
+        layoutX="30"
+        layoutY="80"
+        styleClass="screen-code"
+    />
+
+    <!-- タイトル -->
+    <Label
+        fx:id="title"
+        text="初期選択"
+        layoutX="200"
+        layoutY="80"
+        styleClass="title"
+    />
+
+    <!-- 中央のボタンたち -->
+    <HBox
+        spacing="0"
+        AnchorPane.leftAnchor="0"
+        AnchorPane.rightAnchor="0"
+        AnchorPane.topAnchor="200"
+        alignment="CENTER"
+    >
+        <Button fx:id="btnD00AA" text="運転士" styleClass="menu-button, tims-bigbutton" prefWidth="280" prefHeight="400"/>
+        <Button fx:id="btnC00AA" text="車  掌" styleClass="menu-button, tims-bigbutton" prefWidth="280" prefHeight="400"/>
+        <Button fx:id="btnUA00AA" text="設　定" styleClass="menu-button, tims-bigbutton" prefWidth="280" prefHeight="400"/>
+    </HBox>
+</AnchorPane>

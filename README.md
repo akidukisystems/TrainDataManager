@@ -15,3 +15,6 @@ Minecraft JE 1.12.2、Real Train Mod、ATS Assist Mod、ズイキマスコン、
 + Arduino（UNO R3以上推奨）
   + HT16K33をI2Cで接続することを推奨
 + タッチディスプレイ（HDMI入力、FHD 2枚接続を推奨）
++ org.json
++ jinput
++ WrapLayout

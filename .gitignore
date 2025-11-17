@@ -1,3 +1,6 @@
+*.code-workspace
+.history/
+
 # eclipse
 bin
 *.launch
@@ -29,6 +32,4 @@ libs
 mc2pi/lib/
 *.old
 mc2pi/*.txt
-mc2pi/.vscode/*.json
-.vscode/*.json
 mc2pi/src/jp/akidukisystems/software/utilty/WrapLayout.java

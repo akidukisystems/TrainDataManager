@@ -1,0 +1,137 @@
+.label, .menu-button {
+    -fx-font-smoothing-type: gray;
+}
+
+.menu-button {
+    -fx-font-family: "MS Gothic";
+}
+
+.title {
+    -fx-text-fill: #76D0B2;
+    -fx-font-size: 24px;
+    -fx-font-family: "MS Gothic";
+}
+
+.screen-code {
+    -fx-text-fill: #9DA2AA;
+    -fx-font-size: 24px;
+    -fx-font-family: "MS Gothic";
+}
+
+.plane-text {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 24px;
+    -fx-font-family: "MS Gothic";
+}
+
+
+
+.menu-button {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+    -fx-padding: 0;
+}
+
+.menu-button:pressed {
+    -fx-text-fill: #000000;
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+    -fx-padding: 0;
+}
+
+.normal-button {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 24px;
+    -fx-padding: 0;
+}
+
+.normal-button:pressed {
+    -fx-text-fill: #000000;
+    -fx-font-size: 24px;
+    -fx-padding: 0;
+}
+
+.tims-bigbutton {
+    -fx-border-color: #91a7ff #0b1125 #0b1125 #91a7ff;
+    -fx-border-width: 6px;
+    -fx-border-radius: 16;
+
+    -fx-background-color:
+        #2F4D85,   /* ← 中間層（境界ぼかし） */
+        #304D87;   /* ← 本体色 */
+
+    -fx-background-insets: 6px, 10px;
+    -fx-background-radius: 14, 10;
+}
+
+.tims-bigbutton:pressed {
+    -fx-border-color: #544C32 #FFFFC7 #FFFFC7 #544C32;
+    -fx-border-width: 6px;
+    -fx-border-radius: 16;
+
+    -fx-background-color:
+        #FFF088,   /* ← 中間層（境界ぼかし） */
+        #FFE699;   /* ← 本体色 */
+
+    -fx-background-insets: 6px, 10px;
+    -fx-background-radius: 14, 10;
+
+    -fx-translate-y: 2px;
+}
+
+.tims-button {
+    -fx-border-color: #91a7ff #0b1125 #0b1125 #91a7ff;
+    -fx-border-width: 4px;
+    -fx-border-radius: 8;
+
+    -fx-background-color:
+        #2F4D85,   /* ← 中間層（境界ぼかし） */
+        #304D87;   /* ← 本体色 */
+
+    -fx-background-insets: 4px, 6px;
+    -fx-background-radius: 6, 4;
+}
+
+.tims-button:pressed {
+    -fx-border-color: #544C32 #FFFFC7 #FFFFC7 #544C32;
+    -fx-border-width: 4px;
+    -fx-border-radius: 8;
+
+    -fx-background-color:
+        #FFF088,   /* ← 中間層（境界ぼかし） */
+        #FFE699;   /* ← 本体色 */
+
+    -fx-background-insets: 4px, 6px;
+    -fx-background-radius: 6, 8;
+
+    -fx-translate-y: 1px;
+}
+
+.tims-button-sharp {
+    -fx-border-color: #91a7ff #0b1125 #0b1125 #91a7ff;
+    -fx-border-width: 6px;
+    -fx-border-radius: 1;
+
+    -fx-background-color:
+        #2F4D85,   /* ← 中間層（境界ぼかし） */
+        #304D87;   /* ← 本体色 */
+
+    -fx-background-insets: 6px, 10px;
+    -fx-background-radius: 1, 10;
+}
+
+.tims-button-sharp:pressed {
+    -fx-border-color: #544C32 #FFFFC7 #FFFFC7 #544C32;
+    -fx-border-width: 6px;
+    -fx-border-radius: 1;
+
+    -fx-background-color:
+        #FFF088,   /* ← 中間層（境界ぼかし） */
+        #FFE699;   /* ← 本体色 */
+
+    -fx-background-insets: 6px, 10px;
+    -fx-background-radius: 1, 10;
+
+    -fx-translate-y: 2px;
+}
