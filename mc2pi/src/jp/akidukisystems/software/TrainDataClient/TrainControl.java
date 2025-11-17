@@ -42,7 +42,6 @@ public class TrainControl
     public static final int NOTCH_NONE = -32768;
 
     public static final int DOOR_CLOSE_TIME = 8;
-    public static final int ATSP_BRAKE_NWC_TIME = 50;
 
     Timer ebTimer;
     Timer ebActiveTimer;
@@ -199,19 +198,10 @@ public class TrainControl
         this.isTE = isTE;
     }
 
-    private boolean isATSPBrakeWorking = true;
-    public boolean isATSPBrakeWorking()
-    {
-        return isATSPBrakeWorking;
-    }
-    public void setATSPBrakeWorking(boolean isATSPBrakeWorking)
-    {
-        this.isATSPBrakeWorking = isATSPBrakeWorking;
-    }
-
     private boolean isArrivingStation = false;
     private float beaconGetedPos = 0;
     private boolean isRaisingEP = false;
+    private boolean isCatchingEP = false;
 
     public boolean isRaisingEP()
     {
@@ -220,6 +210,15 @@ public class TrainControl
     public void setRaisingEP(boolean isRaisingEP)
     {
         this.isRaisingEP = isRaisingEP;
+    }
+
+    public boolean isCatchingEP()
+    {
+        return isCatchingEP;
+    }
+    public void setCatchingEP(boolean isCatchingEP)
+    {
+        this.isCatchingEP = isCatchingEP;
     }
 
     private boolean boolTrainStat[];
@@ -289,7 +288,6 @@ public class TrainControl
     }
 
     private int doorCloseCount = 0;
-    private int ATSPBrakeNWC = 0;
     private int prevReverser = -1;
 
     public boolean isRunningTrain()
@@ -409,27 +407,6 @@ public class TrainControl
         }
     }
 
-    // ATS-P異常時に列車とめる
-    public void handleATSNW()
-    {
-        if (boolTrainStat[ATS_P_BRAKE_OPERATING] && (bc < 50))
-        {
-            // ATS-Pブレーキ動作時にBC圧が50kpa未満
-            if (isATSPBrakeWorking)
-            {
-                ATSPBrakeNWC ++;
-                if (ATSPBrakeNWC > ATSP_BRAKE_NWC_TIME)
-                {
-                    isATSPBrakeWorking = false;
-                }
-            }
-        }
-        else
-        {
-            ATSPBrakeNWC = 0;
-        }
-    }
-
     public void handleDoors()
     {
         // ドア閉めるとき時間差で表示
@@ -525,7 +502,7 @@ public class TrainControl
                 }
 
                 boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = false;
-                if (!isATSPBrakeWorking) boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = true;
+                if (!atspController.isATSPBrakeWorking()) boolTrainStat[ATS_P_BRAKE_OPERATING_EB] = true;
             } 
         }
         else
@@ -593,7 +570,6 @@ public class TrainControl
         isTASCBraking = false;
 
         isTE = false;
-        isATSPBrakeWorking = true;
 
         prevDoor = -1;
         prevNotch = 0;
@@ -602,7 +578,6 @@ public class TrainControl
         isRunningDoorOpen = false;
 
         doorCloseCount = 0;
-        ATSPBrakeNWC = 0;
 
         isArrivingStation = false;
         beaconGetedPos = 0;

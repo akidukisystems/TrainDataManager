@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator;
 import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator.TRTYPE;
+import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.TimsSetup;
 import jp.akidukisystems.software.TrainDataClient.Protector.ATSPController;
 import jp.akidukisystems.software.utilty.NetworkManager;
 import jp.akidukisystems.software.utilty.WrapLayout;
@@ -788,6 +789,9 @@ public class TDCCore
             }
         );
 
+        TimsSetup timsSetup = new TimsSetup();
+        timsSetup.init();
+
         new Thread(() ->
         {
             String fetchData = null;
@@ -836,7 +840,7 @@ public class TDCCore
                                 tc.handleEBunlock();
                                 tc.handleEB();
                                 tc.handleRunningOpen();
-                                tc.handleATSNW();
+                                atsp.handleATSNW();
                                 tc.handleArrivingStation();
                                 // GUI更新
                                 onEdt(() ->

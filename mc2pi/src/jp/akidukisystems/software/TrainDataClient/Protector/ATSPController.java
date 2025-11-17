@@ -2,8 +2,9 @@ package jp.akidukisystems.software.TrainDataClient.Protector;
 
 import jp.akidukisystems.software.TrainDataClient.TrainControl;
 
-public class ATSPController {
-    
+public class ATSPController
+{
+    public static final int ATSP_BRAKE_NWC_TIME = 50;
     private final TrainControl train;
     private Thread atspPatternWatcher;
 
@@ -14,6 +15,16 @@ public class ATSPController {
 
     private int targetSpeedTemp = -1;
     private float distancetemp = 0f;
+
+    private boolean isATSPBrakeWorking = true;
+    public boolean isATSPBrakeWorking()
+    {
+        return isATSPBrakeWorking;
+    }
+    public void setATSPBrakeWorking(boolean isATSPBrakeWorking)
+    {
+        this.isATSPBrakeWorking = isATSPBrakeWorking;
+    }
 
     public ATSPController(TrainControl train)
     {
@@ -92,6 +103,7 @@ public class ATSPController {
                         {
                             // 停止限界超過
                             train.setboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING_EB, true);
+                            train.setboolTrainStat(TrainControl.ATS_P_BRAKE_RELEASE, false);
                         }
                         else
                         {
@@ -113,7 +125,10 @@ public class ATSPController {
 
                             // パターン超過
                             if (speed > vPattern)
+                            {
                                 train.setboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING, true);
+                                train.setboolTrainStat(TrainControl.ATS_P_BRAKE_RELEASE, false);
+                            }
 
                             // 減速パターンの場合のみ自動で緩解
                             if ((targetSpeed != -1) && (speed < targetSpeed))
@@ -159,6 +174,8 @@ public class ATSPController {
         distance = 0f;
         catchedDistance = 0f;
         targetSpeed = -1;
+        isATSPBrakeWorking = true;
+        ATSPBrakeNWC = 0;
     }
 
     public void resetATSPFromInterface()
@@ -169,6 +186,29 @@ public class ATSPController {
         {
             resetATSP();
             releaseATSPBrake();
+        }
+    }
+
+    private int ATSPBrakeNWC = 0;
+
+    // ATS-P異常時に列車とめる
+    public void handleATSNW()
+    {
+        if (train.getboolTrainStat(TrainControl.ATS_P_BRAKE_OPERATING) && (train.getBc() < 50))
+        {
+            // ATS-Pブレーキ動作時にBC圧が50kpa未満
+            if (isATSPBrakeWorking)
+            {
+                ATSPBrakeNWC ++;
+                if (ATSPBrakeNWC > ATSP_BRAKE_NWC_TIME)
+                {
+                    isATSPBrakeWorking = false;
+                }
+            }
+        }
+        else
+        {
+            ATSPBrakeNWC = 0;
         }
     }
 }
