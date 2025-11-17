@@ -25,6 +25,7 @@ import javax.swing.Timer;
 
 import org.json.JSONObject;
 
+import javafx.application.Application;
 import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator;
 import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator.TRTYPE;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.TimsSetup;
@@ -110,7 +111,7 @@ public class TDCCore
 
     private NetworkManager networkManager = null;   
     private TrainNumber tn = null;   
-    private TrainControl tc = null;   
+    public TrainControl tc = null;   
     private ATSPController atsp = null;
 
     public static void main(String[] args) 
@@ -119,6 +120,9 @@ public class TDCCore
 
         // System.setProperty("awt.useSystemAAFontSettings", "off");
         // System.setProperty("swing.aatext", "false");
+
+        System.setProperty("prism.lcdtext", "false");
+        System.setProperty("prism.text", "t2k");
 
         clientObject.running();
     }
@@ -789,8 +793,10 @@ public class TDCCore
             }
         );
 
-        TimsSetup timsSetup = new TimsSetup();
-        timsSetup.init();
+        new Thread(() -> {
+            TimsSetup.setCore(this);
+            Application.launch(TimsSetup.class);
+        }).start();
 
         new Thread(() ->
         {

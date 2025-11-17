@@ -52,6 +52,22 @@
                 layoutY="0"
                 styleClass="title"
             />
+            
+            <Label
+                fx:id="speed"
+                text=""
+                layoutX="30"
+                layoutY="30"
+                styleClass="plane-text"
+            />
+
+            <Label
+                fx:id="move"
+                text=""
+                layoutX="30"
+                layoutY="60"
+                styleClass="plane-text"
+            />
         </AnchorPane>
     </center>
 

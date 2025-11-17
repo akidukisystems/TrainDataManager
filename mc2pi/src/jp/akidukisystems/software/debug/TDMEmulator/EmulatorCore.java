@@ -8,8 +8,8 @@ import org.json.JSONObject;
 
 import jp.akidukisystems.software.utilty.NetworkManager;
 
-public class EmulatorCore {
-    
+public class EmulatorCore
+{    
     private static NetworkManager networkManager = null; 
     private static final int PORT = 34565;
     int bc = 0;
