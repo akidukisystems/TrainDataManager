@@ -3,8 +3,10 @@
         "src"
     ],
     "java.project.referencedLibraries": [
-        "c:\\Users\\akiduki\\Desktop\\ゲーム\\mods1122\\mc2pi\\lib\\jinput-2.0.10.jar",
-        "c:\\Users\\akiduki\\Desktop\\ゲーム\\mods1122\\mc2pi\\lib\\orgJSON.jar",
-        "C:\\Program Files\\Java\\JavaFX\\lib\\*.jar"
+        "lib/*.jar",
+        "c:\\Program Files\\Java\\JavaFX\\lib\\*.jar",
+        "c:\\JavaFX\\lib\\*.jar",
+        "/home/admin/JavaFX/lib/*.jar",
+        "/home/admin/ドキュメント/workspaces/TrainDataManager/mc2pi/lib/*.jar"
     ]
 }
