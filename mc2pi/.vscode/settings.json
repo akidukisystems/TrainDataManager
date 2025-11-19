@@ -3,8 +3,18 @@
         "src"
     ],
     "java.project.referencedLibraries": [
-        "c:\\Users\\akiduki\\Desktop\\ゲーム\\mods1122\\mc2pi\\lib\\jinput-2.0.10.jar",
-        "c:\\Users\\akiduki\\Desktop\\ゲーム\\mods1122\\mc2pi\\lib\\orgJSON.jar",
-        "C:\\Program Files\\Java\\JavaFX\\lib\\*.jar"
+        "c:\\JavaFX\\lib\\javafx.fxml.jar",
+        "c:\\JavaFX\\lib\\jfx.incubator.richtext.jar",
+        "c:\\JavaFX\\lib\\javafx.swing.jar",
+        "c:\\JavaFX\\lib\\jfx.incubator.input.jar",
+        "c:\\JavaFX\\lib\\jdk.jsobject.jar",
+        "c:\\Users\\kase\\OneDrive\\ドキュメント\\workspaces\\TrainDataManager\\mc2pi\\lib\\org.json.jar",
+        "c:\\JavaFX\\lib\\javafx.controls.jar",
+        "c:\\JavaFX\\lib\\javafx.web.jar",
+        "c:\\JavaFX\\lib\\javafx.graphics.jar",
+        "c:\\JavaFX\\lib\\javafx.media.jar",
+        "c:\\Users\\kase\\OneDrive\\ドキュメント\\workspaces\\TrainDataManager\\mc2pi\\lib\\jinput-2.0.10.jar",
+        "c:\\JavaFX\\lib\\javafx-swt.jar",
+        "c:\\JavaFX\\lib\\javafx.base.jar"
     ]
 }
