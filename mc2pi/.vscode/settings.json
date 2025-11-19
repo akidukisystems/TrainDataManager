@@ -3,6 +3,7 @@
         "src"
     ],
     "java.project.referencedLibraries": [
+<<<<<<< HEAD
         "c:\\JavaFX\\lib\\javafx.fxml.jar",
         "c:\\JavaFX\\lib\\jfx.incubator.richtext.jar",
         "c:\\JavaFX\\lib\\javafx.swing.jar",
@@ -16,5 +17,20 @@
         "c:\\Users\\kase\\OneDrive\\ドキュメント\\workspaces\\TrainDataManager\\mc2pi\\lib\\jinput-2.0.10.jar",
         "c:\\JavaFX\\lib\\javafx-swt.jar",
         "c:\\JavaFX\\lib\\javafx.base.jar"
+=======
+        "/home/admin/JavaFX/lib/javafx.swing.jar",
+        "/home/admin/JavaFX/lib/javafx-swt.jar",
+        "/home/admin/ドキュメント/workspaces/TrainDataManager/mc2pi/lib/org.json.jar",
+        "/home/admin/JavaFX/lib/jdk.jsobject.jar",
+        "/home/admin/JavaFX/lib/jfx.incubator.input.jar",
+        "/home/admin/JavaFX/lib/javafx.controls.jar",
+        "/home/admin/ドキュメント/workspaces/TrainDataManager/mc2pi/lib/jinput-2.0.9.jar",
+        "/home/admin/JavaFX/lib/javafx.media.jar",
+        "/home/admin/JavaFX/lib/javafx.fxml.jar",
+        "/home/admin/JavaFX/lib/javafx.web.jar",
+        "/home/admin/JavaFX/lib/javafx.graphics.jar",
+        "/home/admin/JavaFX/lib/javafx.base.jar",
+        "/home/admin/JavaFX/lib/jfx.incubator.richtext.jar"
+>>>>>>> c2c8a1d6b0411811ca250ae06e634cb0e1053ce0
     ]
 }
