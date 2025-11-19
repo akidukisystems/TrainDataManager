@@ -14,12 +14,13 @@ import javafx.util.Duration;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.BaseController;
 
-public class D00AA extends BaseController 
+public class UA01AA extends BaseController 
 {
     @FXML private Button btnS00AB;
-    @FXML private Button btnD01AA;
-    @FXML private Button btnB00AA;
+    @FXML private Button btnUA00AA;
     @FXML private Label title;
+    @FXML private Label speed;
+    @FXML private Label move;
 
     Timeline timeline;
 
@@ -46,6 +47,8 @@ public class D00AA extends BaseController
     {
         btnS00AB.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/S00AB.fxml"));
         btnS00AB.setText("初期\n選択");
+        btnUA00AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/UA00AA.fxml"));
+        btnUA00AA.setText("設定\nメニュー");
         title.getTransforms().add(new Scale(2, 1, 0, 0));
     }
 
@@ -53,7 +56,8 @@ public class D00AA extends BaseController
     {
         if (core != null && core.tc != null)
         {
-            
+            speed.setText(String.format(    "速度  ：%.0f km/h", core.tc.getSpeed()));
+            move.setText(String.format(     "キロ程：%.1f km", core.tc.getMove() /1000f));
         }
     }
 

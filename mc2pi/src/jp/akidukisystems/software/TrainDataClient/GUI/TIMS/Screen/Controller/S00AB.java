@@ -26,8 +26,8 @@ public class S00AB extends BaseController
     @FXML
     public void initialize()
     {
-        btnD00AA.setOnAction(e -> goNext("driver.fxml"));
-        btnC00AA.setOnAction(e -> goNext("attendant.fxml"));
+        btnD00AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/D00AA.fxml"));
+        btnC00AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/C00AA.fxml"));
         btnUA00AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/UA00AA.fxml"));
         title.getTransforms().add(new Scale(2, 1, 0, 0));
     }
@@ -41,7 +41,7 @@ public class S00AB extends BaseController
             Object obj = loader.getController();
             if (obj instanceof BaseController bc)
             {
-                bc.init(core);   // ★ どの画面でも自動で core が渡る
+                bc.init(core);
             }
 
             Stage stage = (Stage) btnD00AA.getScene().getWindow();

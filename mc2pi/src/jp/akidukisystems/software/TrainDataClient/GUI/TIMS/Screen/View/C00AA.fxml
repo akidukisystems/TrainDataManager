@@ -9,7 +9,7 @@
 <BorderPane 
     xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
-    fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.UA00AA"
+    fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.C00AA"
     style="-fx-background-color: black;"
 >
 
@@ -39,7 +39,7 @@
 
             <!-- 左上の画面コード -->
             <Label
-                text="UA00AA"
+                text="C00AA"
                 layoutX="25"
                 layoutY="10"
                 styleClass="screen-code"
@@ -48,15 +48,15 @@
             <!-- タイトル -->
             <Label
                 fx:id="title"
-                text="設定メニュー"
+                text="車掌メニュー"
                 layoutX="96"
                 layoutY="10"
                 styleClass="title"
             />
 
             <Button
-                fx:id="btnUA01AA"
-                text="一般情報"
+                fx:id="btnC01AA"
+                text="車掌情報"
                 styleClass="large-button, tims-button"
                 prefWidth="180"
                 prefHeight="75"

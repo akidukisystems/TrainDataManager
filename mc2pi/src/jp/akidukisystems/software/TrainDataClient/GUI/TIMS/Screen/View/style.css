@@ -1,109 +1,117 @@
-.label, .menu-button {
+.label, .menu-button .normal-button {
     -fx-font-smoothing-type: gray;
-}
-
-.menu-button {
     -fx-font-family: "MS Gothic";
 }
 
 .title {
     -fx-text-fill: #76D0B2;
-    -fx-font-size: 24px;
-    -fx-font-family: "MS Gothic";
+    -fx-font-size: 16px;
 }
 
 .screen-code {
     -fx-text-fill: #9DA2AA;
-    -fx-font-size: 24px;
-    -fx-font-family: "MS Gothic";
+    -fx-font-size: 16px;
 }
 
 .plane-text {
     -fx-text-fill: #ffffff;
-    -fx-font-size: 24px;
-    -fx-font-family: "MS Gothic";
+    -fx-font-size: 16px;
 }
 
 
 
 .menu-button {
     -fx-text-fill: #ffffff;
-    -fx-font-size: 42px;
+    -fx-font-size: 32px;
     -fx-font-weight: bold;
     -fx-padding: 0;
 }
 
 .menu-button:pressed {
     -fx-text-fill: #000000;
-    -fx-font-size: 42px;
+    -fx-font-size: 32px;
     -fx-font-weight: bold;
     -fx-padding: 0;
 }
 
 .normal-button {
     -fx-text-fill: #ffffff;
-    -fx-font-size: 24px;
+    -fx-font-size: 16px;
     -fx-padding: 0;
 }
 
 .normal-button:pressed {
     -fx-text-fill: #000000;
-    -fx-font-size: 24px;
+    -fx-font-size: 16px;
+    -fx-padding: 0;
+}
+
+.large-button {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-padding: 0;
+}
+
+.large-button:pressed {
+    -fx-text-fill: #000000;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
     -fx-padding: 0;
 }
 
 .tims-bigbutton {
     -fx-border-color: #91a7ff #0b1125 #0b1125 #91a7ff;
-    -fx-border-width: 6px;
-    -fx-border-radius: 16;
+    -fx-border-width: 4px;
+    -fx-border-radius: 12;
 
     -fx-background-color:
         #2F4D85,   /* ← 中間層（境界ぼかし） */
         #304D87;   /* ← 本体色 */
 
-    -fx-background-insets: 6px, 10px;
-    -fx-background-radius: 14, 10;
+    -fx-background-insets: 4px, 8px;
+    -fx-background-radius: 10, 8;
 }
 
 .tims-bigbutton:pressed {
     -fx-border-color: #544C32 #FFFFC7 #FFFFC7 #544C32;
-    -fx-border-width: 6px;
-    -fx-border-radius: 16;
+    -fx-border-width: 4px;
+    -fx-border-radius: 12;
 
     -fx-background-color:
         #FFF088,   /* ← 中間層（境界ぼかし） */
         #FFE699;   /* ← 本体色 */
 
-    -fx-background-insets: 6px, 10px;
-    -fx-background-radius: 14, 10;
+    -fx-background-insets: 4px, 8px;
+    -fx-background-radius: 10, 8;
 
     -fx-translate-y: 2px;
 }
 
 .tims-button {
     -fx-border-color: #91a7ff #0b1125 #0b1125 #91a7ff;
-    -fx-border-width: 4px;
-    -fx-border-radius: 8;
+    -fx-border-width: 3px;
+    -fx-border-radius: 6;
 
     -fx-background-color:
         #2F4D85,   /* ← 中間層（境界ぼかし） */
         #304D87;   /* ← 本体色 */
 
-    -fx-background-insets: 4px, 6px;
-    -fx-background-radius: 6, 4;
+    -fx-background-insets: 3px, 6px;
+    -fx-background-radius: 4, 3;
 }
 
 .tims-button:pressed {
     -fx-border-color: #544C32 #FFFFC7 #FFFFC7 #544C32;
-    -fx-border-width: 4px;
-    -fx-border-radius: 8;
+    -fx-border-width: 3px;
+    -fx-border-radius: 6;
 
     -fx-background-color:
         #FFF088,   /* ← 中間層（境界ぼかし） */
         #FFE699;   /* ← 本体色 */
 
-    -fx-background-insets: 4px, 6px;
-    -fx-background-radius: 6, 8;
+    -fx-background-insets: 3px, 6px;
+    -fx-background-radius: 4, 3;
 
     -fx-translate-y: 1px;
 }
@@ -134,4 +142,8 @@
     -fx-background-radius: 1, 10;
 
     -fx-translate-y: 2px;
+}
+
+.button-tight {
+    -fx-label-padding: -4 0 -4 0;
 }
