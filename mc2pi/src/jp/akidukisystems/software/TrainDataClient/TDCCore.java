@@ -36,7 +36,7 @@ import jp.akidukisystems.software.utilty.WrapLayout;
 public class TDCCore 
 {
     enum ADRS_LIST {ADRS_LAPTOP, ADRS_LOCALHOST};
-    private static final ADRS_LIST ADRS_SELECT = ADRS_LIST.ADRS_LOCALHOST;
+    private static final ADRS_LIST ADRS_SELECT = ADRS_LIST.ADRS_LAPTOP;
     private static final String ADRS_LAPTOP = "192.168.137.1";
     private static final String ADRS_LOCALHOST = "localhost";
     
