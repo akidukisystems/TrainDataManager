@@ -13,6 +13,12 @@ import javafx.scene.transform.Scale;
 import javafx.util.Duration;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.BaseController;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.Direction;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.DutyCardData;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.Line;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.Station;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.TimeTable;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.TrainNumber;
 
 public class D01AA extends BaseController 
 {
@@ -220,6 +226,53 @@ public class D01AA extends BaseController
             labelPpassing.getStyleClass().remove("P-passing");
             labelPtrainNumberPassing.setText("");
             labelPtrainNumberPassing.getStyleClass().remove("plane-text");
+        }
+
+        if(om.getTrainNumber() != null)
+        {
+            TrainNumber dcrTrainNumber = om.getTrainNumber();
+            Line line = om.getLine();
+            Direction direction = om.getDirection();
+            float kilopost = tc.getMove();
+            TimeTable timeTable = om.getTimeTable();
+
+            // わからん！！！！！！！！！
+
+            // Line, Direction, Kilopost, Timetableから、「前の駅」「次の駅」「その次の駅」を取得したいな
+            // 駅の表からじゃなくて、時刻表エントリから
+            // 1. 各駅のキロポストと所属路線を取得
+            // 2. 自車の現在地点（キロポスト）と現在路線から、「前の駅」を探す
+            // 3.  このとき、directionがUPの場合、上り方面なので、
+            //     例  A駅(1.4km) - (←自車←) - B駅(2.1km)
+            //     とあった場合、B駅を取得する
+            // 4. B駅の次の駅(A駅)、その次の駅を「時刻表をベースとして」取得する
+            // 5. なぜ時刻表ベースなのかというと、駅一覧ベースで探索して、途中で分岐して支線に入る場合、その支線の駅にたどり着けないから（別の路線所属）
+            // 6. ポイント
+            //     - 前の駅が存在しない場合（つまり始発）、次の駅、その次の駅、そのまた次の駅を返す
+            //     - ある駅と現在地点が同じキロポストの場合、その駅を「次の駅」とする
+            //     - 次の次の駅が存在しない場合、nullとする
+
+            System.out.println(kilopost);
+            System.out.println(line.id);
+            System.out.println(direction);
+            System.out.println(timeTable.id);
+
+            Station[] sta = repo.getSurroundingStations(kilopost /1000f, line, direction, timeTable);
+
+            if(sta[0] != null)
+                System.out.println(sta[0].name);
+            else
+                System.out.println("null");
+           
+            if(sta[1] != null)
+                System.out.println(sta[1].name);
+            else
+                System.out.println("null");
+
+            if(sta[2] != null)
+                System.out.println(sta[2].name);
+            else
+                System.out.println("null");
         }
     }
 

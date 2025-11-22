@@ -32,6 +32,36 @@ public class OperationManager
         this.direction = direction;
     }
 
+    private DutyCardReader.Line line;
+
+    public DutyCardReader.Line getLine() {
+        return line;
+    }
+
+    public void setLine(DutyCardReader.Line line) {
+        this.line = line;
+    }
+
+    private DutyCardReader.StopPattern stopPattern;
+
+    public DutyCardReader.StopPattern getStopPattern() {
+        return stopPattern;
+    }
+
+    public void setStopPattern(DutyCardReader.StopPattern stopPattern) {
+        this.stopPattern = stopPattern;
+    }
+
+    private DutyCardReader.TimeTable timeTable;
+
+    public DutyCardReader.TimeTable getTimeTable() {
+        return timeTable;
+    }
+
+    public void setTimeTable(DutyCardReader.TimeTable timeTable) {
+        this.timeTable = timeTable;
+    }
+
     private boolean isPassing = false;
 
     public boolean isPassing() {

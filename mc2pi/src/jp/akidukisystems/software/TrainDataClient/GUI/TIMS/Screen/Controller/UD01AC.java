@@ -87,6 +87,7 @@ public class UD01AC extends BaseController
 
                 om.setTrainNumber(repo.getTrainNumber(trainNumberEntry));
                 om.setDirection(repo.getDirectionOfTimeTable(trainNumberEntry));
+                om.setTimeTable(repo.getTimeTable(repo.getTrainNumber(trainNumberEntry).timeTableId));
 
                 tn.setAlphabet(repo.getTrainNumber(trainNumberEntry).numberStr);
                 tn.setNumber(""+ repo.getTrainNumber(trainNumberEntry).numberInt);

@@ -70,6 +70,7 @@ public class D13AA extends BaseController
                 String stationEntry = om.unformatStationName(selectedButton.getText());
 
                 om.setStation(repo.getStationByName(stationEntry));
+                om.setLine(repo.getLine(repo.getStationByName(stationEntry).lineId));
 
                 nm.sendCommand("send", "move", 1000f * repo.getStationByName(stationEntry).linePost);
                 

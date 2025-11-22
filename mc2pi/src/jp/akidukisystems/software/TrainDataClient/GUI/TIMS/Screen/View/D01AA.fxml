@@ -178,7 +178,7 @@
             >
                 <Rectangle
                     width="958"
-                    height="140"
+                    height="160"
                     fill="#475065"
                 />
 
@@ -269,49 +269,49 @@
                         fx:id="labelLine2Sta"
                         text="青物横丁"
                         AnchorPane.leftAnchor="0"
-                        AnchorPane.topAnchor="60"
+                        AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2Arrive"
                         text="     ⇩"
                         AnchorPane.leftAnchor="220"
-                        AnchorPane.topAnchor="60"
+                        AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2ArriveSec"
                         text=""
                         AnchorPane.leftAnchor="420"
-                        AnchorPane.topAnchor="60"
+                        AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2Depart"
                         text="      ３８"
                         AnchorPane.leftAnchor="540"
-                        AnchorPane.topAnchor="60"
+                        AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2DepartSec"
                         text="１５"
                         AnchorPane.leftAnchor="740"
-                        AnchorPane.topAnchor="60"
+                        AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2Track"
                         text=""
                         AnchorPane.leftAnchor="820"
-                        AnchorPane.topAnchor="60"
+                        AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2Limit"
                         text="45 / 60"
                         AnchorPane.rightAnchor="0"
-                        AnchorPane.topAnchor="60"
+                        AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
 
@@ -319,49 +319,49 @@
                         fx:id="labelLine3Sta"
                         text=" やべっ"
                         AnchorPane.leftAnchor="0"
-                        AnchorPane.topAnchor="100"
+                        AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3Arrive"
                         text="      ３９"
                         AnchorPane.leftAnchor="220"
-                        AnchorPane.topAnchor="100"
+                        AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3ArriveSec"
                         text="４５"
                         AnchorPane.leftAnchor="420"
-                        AnchorPane.topAnchor="100"
+                        AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3Depart"
                         text="      ４１"
                         AnchorPane.leftAnchor="540"
-                        AnchorPane.topAnchor="100"
+                        AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3DepartSec"
                         text="１５"
                         AnchorPane.leftAnchor="740"
-                        AnchorPane.topAnchor="100"
+                        AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3Track"
                         text="１０"
                         AnchorPane.leftAnchor="820"
-                        AnchorPane.topAnchor="100"
+                        AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3Limit"
                         text="45 /   "
                         AnchorPane.rightAnchor="0"
-                        AnchorPane.topAnchor="100"
+                        AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                 </AnchorPane>
