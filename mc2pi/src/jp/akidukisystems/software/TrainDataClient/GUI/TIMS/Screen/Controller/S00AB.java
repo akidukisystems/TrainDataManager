@@ -2,7 +2,6 @@ package jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.stage.Stage;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.BaseController;
 import javafx.fxml.FXML;
@@ -32,20 +31,25 @@ public class S00AB extends BaseController
         title.getTransforms().add(new Scale(2, 1, 0, 0));
     }
 
-    private void goNext(String fxml)
+    @Override
+    protected void onReady()
     {
+        tu.setCurrentController(this);
+    }
+
+    private void goNext(String fxml) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-            Parent root = loader.load();
+            Parent child = loader.load();
 
             Object obj = loader.getController();
-            if (obj instanceof BaseController bc)
-            {
+            if (obj instanceof BaseController bc) {
                 bc.init(core);
+                bc.setContainer(this.container);
             }
 
-            Stage stage = (Stage) btnD00AA.getScene().getWindow();
-            stage.getScene().setRoot(root);
+            // Stage の Scene に直接 setRoot する代わりに
+            setScreen(child);
 
         } catch (Exception ex) {
             ex.printStackTrace();

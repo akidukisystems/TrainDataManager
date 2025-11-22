@@ -1,5 +1,11 @@
 package jp.akidukisystems.software.TrainDataClient;
 
+/* 処理系 */
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import org.json.JSONObject;
+
+/* AWT系 */
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,9 +16,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
+/* Swing系 */
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -23,20 +28,23 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.json.JSONObject;
-
+/* JavaFX */
 import javafx.application.Application;
+
+/* 子とか孫とかいろいろ */
 import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator;
 import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator.TRTYPE;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.TimsSetup;
 import jp.akidukisystems.software.TrainDataClient.Protector.ATSPController;
+import jp.akidukisystems.software.TrainDataClient.duty.OperationManager;
+import jp.akidukisystems.software.utilty.DutyCardRepository;
 import jp.akidukisystems.software.utilty.NetworkManager;
 import jp.akidukisystems.software.utilty.WrapLayout;
 
 public class TDCCore 
 {
     enum ADRS_LIST {ADRS_LAPTOP, ADRS_LOCALHOST};
-    private static final ADRS_LIST ADRS_SELECT = ADRS_LIST.ADRS_LAPTOP;
+    private static final ADRS_LIST ADRS_SELECT = ADRS_LIST.ADRS_LOCALHOST;
     private static final String ADRS_LAPTOP = "192.168.137.1";
     private static final String ADRS_LOCALHOST = "localhost";
     
@@ -74,6 +82,7 @@ public class TDCCore
 
     Timer blinkTimer;
     Timer refreshTimer;
+    Timer timsRefreshTimer;
 
     JLabel speedLabel;
     JLabel bcLabel;
@@ -109,11 +118,14 @@ public class TDCCore
 
     NetworkIndicator indicator;
 
-    private NetworkManager networkManager = null;   
-    private TrainNumber tn = null;   
+    public NetworkManager networkManager = null;   
+    public TrainNumber tn = null;   
     public TrainControl tc = null;   
+    public DutyCardRepository dcr = null;
+    public OperationManager om = null;
     private ATSPController atsp = null;
-
+    public TimsUpdater timsUpdater = null;
+    
     public static void main(String[] args) 
     {
         TDCCore clientObject = new TDCCore();
@@ -134,6 +146,8 @@ public class TDCCore
         if (SwingUtilities.isEventDispatchThread()) r.run();
         else SwingUtilities.invokeLater(r);
     }
+
+    
 
     private void resetBlinkState()
     {
@@ -328,7 +342,7 @@ public class TDCCore
 
         JFrame trainNumSetFrame = createFrame("列車番号", 640, 480, s);
 
-        createNumberButtons(s, 0, 0, 50, e -> tn.number += ((JButton)e.getSource()).getText());
+        createNumberButtons(s, 0, 0, 50, e -> tn.setNumber(tn.getNumber() + ((JButton)e.getSource()).getText()));
 
         JTextField textTrainStr = new JTextField("");
         textTrainStr.setBounds(250, 50, 50, 50);
@@ -341,8 +355,8 @@ public class TDCCore
             @Override
             public void actionPerformed(ActionEvent e) 
             {
-                tn.alphabet = textTrainStr.getText();
-                tn.half = tn.number + tn.alphabet;
+                tn.setAlphabet(textTrainStr.getText());
+                tn.setHalf(tn.getNumber() + tn.getAlphabet());
                 trainNumSetFrame.setVisible(false);
             }
         });
@@ -430,10 +444,10 @@ public class TDCCore
             public void actionPerformed(ActionEvent e)
             {
                 trainNumSetFrame.setVisible(true);
-                tn.alphabet = "";
-                tn.number = "";
-                tn.half = "";
-                tn.full = "";
+                tn.setAlphabet("");
+                tn.setNumber("");
+                tn.setHalf("");
+                tn.setFull("");
             }
         });
 
@@ -641,9 +655,9 @@ public class TDCCore
         if(tc.getboolTrainStat(TrainControl.TRAINSTAT_EX_STA)) trainStatEX.append("次駅接近　");
         infoTrainExLabel.setText(trainStatEX.toString());
 
-        if (tn.half != null)
+        if (tn.getHalf() != null)
         {
-            trainNumberLabel.setText("列車番号: "+ tn.half);
+            trainNumberLabel.setText("列車番号: "+ tn.getHalf());
         }
         else
         {
@@ -737,6 +751,9 @@ public class TDCCore
         tn.reset();
     }
 
+
+
+    // MARK: 
     public void running()
     {
         switch (ADRS_SELECT) {
@@ -758,6 +775,17 @@ public class TDCCore
 
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
+
+        dcr = new DutyCardRepository();
+        om = new OperationManager();
+
+        timsUpdater = new TimsUpdater();
+        timsUpdater.init(tc);
+
+        timsRefreshTimer = new Timer(1000, e -> 
+        {
+            timsUpdater.refresh();
+        });
 
         indicator = new NetworkIndicator();
         networkManager.setOnSendCallback(() -> onEdt(() -> indicator.flash(TRTYPE.SEND)));
@@ -857,6 +885,11 @@ public class TDCCore
                                     }
                                 });
 
+                                if(!timsRefreshTimer.isRunning())
+                                {
+                                    timsRefreshTimer.start();
+                                }
+
                                 break;
 
                             case "kill":
@@ -882,7 +915,8 @@ public class TDCCore
                                     infoTrainExLabel.setText("");
                                 });
 
-                                if (refreshTimer.isRunning()) refreshTimer.stop();
+                                if(refreshTimer.isRunning()) refreshTimer.stop();
+                                if(timsRefreshTimer.isRunning()) timsRefreshTimer.stop();
 
                                 break;
 

@@ -9,13 +9,13 @@
     xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
     fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.S00AB"
-    style="-fx-background-color: black;"
+    style="-fx-background-color: transparent;"
 >
     <!-- 左上の画面コード -->
     <Label
         text="S00AB"
         layoutX="25"
-        layoutY="64"
+        layoutY="80"
         styleClass="screen-code"
     />
 
@@ -24,7 +24,7 @@
         fx:id="title"
         text="初期選択"
         layoutX="96"
-        layoutY="64"
+        layoutY="80"
         styleClass="title"
     />
 
@@ -38,6 +38,6 @@
     >
         <Button fx:id="btnD00AA" text="運転士" styleClass="menu-button, tims-bigbutton" prefWidth="160" prefHeight="230"/>
         <Button fx:id="btnC00AA" text="車  掌" styleClass="menu-button, tims-bigbutton" prefWidth="160" prefHeight="230"/>
-        <Button fx:id="btnUA00AA" text="設　定" styleClass="menu-button, tims-bigbutton" prefWidth="160" prefHeight="230"/>
+        <Button fx:id="btnUA00AA" text="設  定" styleClass="menu-button, tims-bigbutton" prefWidth="160" prefHeight="230"/>
     </HBox>
 </AnchorPane>

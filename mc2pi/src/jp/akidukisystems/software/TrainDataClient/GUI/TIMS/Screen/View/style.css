@@ -1,24 +1,72 @@
-.label, .menu-button .normal-button {
+.label, .menu-button, .normal-button, .trainNumber{
     -fx-font-smoothing-type: gray;
     -fx-font-family: "MS Gothic";
 }
 
 .title {
     -fx-text-fill: #76D0B2;
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
 }
 
 .screen-code {
     -fx-text-fill: #9DA2AA;
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
+}
+
+.trainNumber {
+    -fx-text-fill: #76D0B2;
+    -fx-font-size: 20px;
 }
 
 .plane-text {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-size: 20px;
+}
+
+.plane-text-ff {
     -fx-text-fill: #ffffff;
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
 }
 
 
+.fatalerror {
+    -fx-text-fill: #d0d0d0;
+    -fx-font-size: 66px;
+    -fx-font-family: "HG丸ｺﾞｼｯｸM-PRO";
+}
+
+.shirei-renraku {
+    -fx-text-fill: #d0d0d0;
+    -fx-font-size: 32px;
+    -fx-font-family: "HG丸ｺﾞｼｯｸM-PRO";
+}
+
+.container {
+    -fx-border-color: gray;
+    -fx-border-width: 2;
+    -fx-border-style: solid;
+}
+
+
+
+#btnNext.blink {
+    -fx-text-fill: #0000ff;
+    -fx-border-color: #ffffff #606060 #606060 #ffffff;
+    -fx-background-color:
+        #f7f7f7,   /* ← 中間層（境界ぼかし） */
+        #fafafa;   /* ← 本体色 */
+}
+
+.selected-button {
+    -fx-text-fill: #000000 !important;
+}
+
+.selected-button {
+    -fx-border-color: #544C32 #FFFFC7 #FFFFC7 #544C32 !important;
+    -fx-background-color:
+        #FFF088,   /* ← 中間層（境界ぼかし） */
+        #FFE699 !important;   /* ← 本体色 */
+}
 
 .menu-button {
     -fx-text-fill: #ffffff;
@@ -36,13 +84,13 @@
 
 .normal-button {
     -fx-text-fill: #ffffff;
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
     -fx-padding: 0;
 }
 
 .normal-button:pressed {
     -fx-text-fill: #000000;
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
     -fx-padding: 0;
 }
 
@@ -146,4 +194,20 @@
 
 .button-tight {
     -fx-label-padding: -4 0 -4 0;
+}
+
+.P-setteiOK {
+    -fx-font-smoothing-type: gray;
+    -fx-font-family: "MS Gothic";
+    -fx-text-fill: #000000;
+    -fx-background-color: #80FFE8;
+    -fx-font-size: 20px;
+}
+
+.P-passing {
+    -fx-font-smoothing-type: gray;
+    -fx-font-family: "MS Gothic";
+    -fx-text-fill: #000000;
+    -fx-background-color: #ffff20;
+    -fx-font-size: 20px;
 }

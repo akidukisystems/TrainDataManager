@@ -9,7 +9,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.transform.Scale;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.BaseController;
@@ -54,23 +53,30 @@ public class UA01AA extends BaseController
 
     private void update()
     {
-        if (core != null && core.tc != null)
+        if (core != null && tc != null)
         {
-            speed.setText(String.format(    "速度  ：%.0f km/h", core.tc.getSpeed()));
-            move.setText(String.format(     "キロ程：%.1f km", core.tc.getMove() /1000f));
+            speed.setText(String.format(    "速度  ：%.0f km/h", tc.getSpeed()));
+            move.setText(String.format(     "キロ程：%.1f km", tc.getMove() /1000f));
         }
+    }
+
+    @Override
+    protected void onReady()
+    {
+        tu.setCurrentController(this);
     }
 
     private void goNext(String fxml)
     {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-            Parent root = loader.load();
+            Parent child = loader.load();
 
             Object obj = loader.getController();
             if (obj instanceof BaseController bc)
             {
                 bc.init(core);
+                bc.setContainer(this.container);
             }
 
             if (timeline != null)
@@ -78,8 +84,7 @@ public class UA01AA extends BaseController
                 timeline.stop();
             }
 
-            Stage stage = (Stage) btnS00AB.getScene().getWindow();
-            stage.getScene().setRoot(root);
+            setScreen(child);
 
         } catch (Exception ex) {
             ex.printStackTrace();

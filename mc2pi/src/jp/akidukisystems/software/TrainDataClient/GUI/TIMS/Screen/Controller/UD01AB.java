@@ -1,5 +1,9 @@
 package jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller;
 
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -13,17 +17,15 @@ import javafx.util.Duration;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.BaseController;
 
-public class D00AA extends BaseController 
+public class UD01AB extends BaseController 
 {
     @FXML private Button btnS00AB;
+    @FXML private Button btnD00AA;
     @FXML private Button btnD01AA;
-    @FXML private Button btnB00AA;
-    @FXML private Button btnUD01AA;
-    @FXML private Button btnUD01AC;
-    @FXML private Button btnD13AA;
-    @FXML private Button btnA06AA;
+    @FXML private Button btnX1;
     @FXML private Label title;
-
+    @FXML private Label result;
+    
     Timeline timeline;
 
     @Override
@@ -43,18 +45,36 @@ public class D00AA extends BaseController
         timeline.play();
         update();
     }
-
+    
     @FXML
     public void initialize()
     {
         btnS00AB.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/S00AB.fxml"));
         btnS00AB.setText("初期\n選択");
+        btnD00AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/D00AA.fxml"));
+        btnD00AA.setText("運転士\nメニュー");
         btnD01AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/D01AA.fxml"));
-        btnUD01AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/UD01AA.fxml"));
-        btnUD01AC.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/UD01AC.fxml"));
-        btnD13AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/D13AA.fxml"));
-        btnA06AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/A06AA.fxml"));
+        btnD01AA.setText("運転情報\n画面");
         title.getTransforms().add(new Scale(2, 1, 0, 0));
+    }
+
+    
+    @Override
+    protected void onReady()
+    {
+        tu.setCurrentController(this);
+
+        Path path = Paths.get("card.csv");
+        Charset cs = Charset.forName("UTF-8");
+        try {
+            repo.load(path, cs);
+            result.setText("読込みました。");
+            btnX1.setText("行路選択");
+            btnX1.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/UD01AC.fxml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setText("読込みに失敗しました。");
+        }
     }
 
     private void update()
@@ -63,12 +83,6 @@ public class D00AA extends BaseController
         {
             
         }
-    }
-
-    @Override
-    protected void onReady()
-    {
-        tu.setCurrentController(this);
     }
 
     private void goNext(String fxml)

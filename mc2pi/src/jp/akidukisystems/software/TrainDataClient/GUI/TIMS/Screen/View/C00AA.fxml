@@ -14,16 +14,16 @@
 >
 
     <top>
-        <AnchorPane prefHeight="54" style="-fx-background-color: #000000;">
+        <AnchorPane prefHeight="70" style="-fx-background-color: #000000;">
             <!-- 初期選択 -->
             <Button
                 fx:id="btnS00AB"
                 text=""
                 styleClass="normal-button, tims-button, button-tight"
-                prefWidth="50"
-                prefHeight="50"
-                AnchorPane.rightAnchor="1"
-                AnchorPane.topAnchor="1"
+                prefWidth="60"
+                prefHeight="60"
+                AnchorPane.rightAnchor="5"
+                AnchorPane.topAnchor="5"
             />
         </AnchorPane>
     </top>
@@ -63,12 +63,178 @@
                 layoutX="25"
                 layoutY="60"
             />
+
+            <Button
+                fx:id="btnB00AA"
+                text="応急ﾏﾆｭｱﾙ"
+                styleClass="large-button, tims-button"
+                prefWidth="180"
+                prefHeight="75"
+                layoutX="25"
+                layoutY="140"
+            />
+
+
+
+            <Button
+                fx:id="btnEmpty"
+                text="案内簡易設定"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="60"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text="行先設定"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="120"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text="サービス機器制御"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="180"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text="案内設定"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="240"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="300"
+            />
+
+
+
+            <Button
+                fx:id="btnEmprt"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="60"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="120"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="180"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="240"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="300"
+            />
+
+
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="60"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="120"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="180"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="240"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="300"
+            />
         </AnchorPane>
     </center>
 
 
     <bottom>
-        <AnchorPane prefHeight="96" style="-fx-background-color: #000000;">
+        <AnchorPane prefHeight="100" style="-fx-background-color: #000000;">
             <!-- ステータスバーやスライダーを置く領域 -->
         </AnchorPane>
     </bottom>

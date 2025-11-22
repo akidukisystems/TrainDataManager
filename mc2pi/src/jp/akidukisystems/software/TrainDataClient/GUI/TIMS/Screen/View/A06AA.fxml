@@ -9,28 +9,16 @@
 <BorderPane 
     xmlns="http://javafx.com/javafx"
     xmlns:fx="http://javafx.com/fxml"
-    fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.UA00AA"
+    fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.A06AA"
     style="-fx-background-color: black;"
 >
 
     <top>
-        <AnchorPane prefHeight="70" style="-fx-background-color: #000000;">
-            <!-- 初期選択 -->
-            <Button
-                fx:id="btnS00AB"
-                text=""
-                styleClass="normal-button, tims-button, button-tight"
-                prefWidth="60"
-                prefHeight="60"
-                AnchorPane.rightAnchor="5"
-                AnchorPane.topAnchor="5"
-            />
-        </AnchorPane>
     </top>
 
     <center>
         <AnchorPane
-            style="-fx-background-color: #2f3e56;"
+            style="-fx-background-color: #ff0000;"
             AnchorPane.topAnchor="0"
             AnchorPane.leftAnchor="0"
             AnchorPane.rightAnchor="0"
@@ -39,30 +27,42 @@
 
             <!-- 左上の画面コード -->
             <Label
-                text="UA00AA"
+                text="A06AA"
                 layoutX="25"
-                layoutY="10"
+                layoutY="64"
                 styleClass="screen-code"
             />
 
             <!-- タイトル -->
             <Label
                 fx:id="title"
-                text="設定メニュー"
+                text=""
                 layoutX="96"
-                layoutY="10"
+                layoutY="64"
                 styleClass="title"
             />
 
-            <Button
-                fx:id="btnUA01AA"
-                text="一般情報"
-                styleClass="large-button, tims-button"
-                prefWidth="180"
-                prefHeight="75"
-                layoutX="25"
-                layoutY="60"
+            <Label
+                fx:id="message"
+                text=""
+                AnchorPane.topAnchor="50"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0"
+                styleClass="fatalerror"
+                alignment="CENTER"
+                textAlignment="CENTER"
             />
+
+            <Label
+                text="指令に連絡"
+                AnchorPane.topAnchor="200"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0"
+                styleClass="shirei-renraku"
+                alignment="CENTER"
+                textAlignment="CENTER"
+            />
+
         </AnchorPane>
     </center>
 
@@ -70,6 +70,14 @@
     <bottom>
         <AnchorPane prefHeight="100" style="-fx-background-color: #000000;">
             <!-- ステータスバーやスライダーを置く領域 -->
+            <Button
+                fx:id="btnD00AA"
+                text=""
+                styleClass="normal-button, tims-button, button-tight"
+                prefWidth="100"
+                prefHeight="60"
+                AnchorPane.leftAnchor="5"
+            />
         </AnchorPane>
     </bottom>
 </BorderPane>

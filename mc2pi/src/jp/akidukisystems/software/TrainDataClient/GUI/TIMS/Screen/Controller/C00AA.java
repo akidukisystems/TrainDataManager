@@ -9,7 +9,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.transform.Scale;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.BaseController;
@@ -56,16 +55,23 @@ public class C00AA extends BaseController
         }
     }
 
+    @Override
+    protected void onReady()
+    {
+        tu.setCurrentController(this);
+    }
+
     private void goNext(String fxml)
     {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-            Parent root = loader.load();
+            Parent child = loader.load();
 
             Object obj = loader.getController();
             if (obj instanceof BaseController bc)
             {
                 bc.init(core);
+                bc.setContainer(this.container);
             }
 
             if (timeline != null)
@@ -73,8 +79,7 @@ public class C00AA extends BaseController
                 timeline.stop();
             }
 
-            Stage stage = (Stage) btnS00AB.getScene().getWindow();
-            stage.getScene().setRoot(root);
+            setScreen(child);
 
         } catch (Exception ex) {
             ex.printStackTrace();

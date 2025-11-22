@@ -6,6 +6,41 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ScreenManager",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.utilty.ScreenManager",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.utilty.Test",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "FullscreenDemo",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.utilty.FullscreenDemo",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "DutyCardRepository",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.utilty.DutyCardRepository",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "DutyCardReader",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
             "name": "BridgeCore",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",

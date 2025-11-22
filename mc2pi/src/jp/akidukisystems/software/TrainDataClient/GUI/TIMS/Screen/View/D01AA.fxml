@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.Line?>
+
+<BorderPane 
+    xmlns="http://javafx.com/javafx"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.D01AA"
+    style="-fx-background-color: black;"
+>
+
+    <top>
+        <AnchorPane prefHeight="70" style="-fx-background-color: #000000;">
+            <Line
+                startX="300" startY="1"
+                endX="300" endY="70"
+                stroke="#2f3e56"
+                strokeWidth="2"
+            />
+            <Label
+                fx:id="labelTime"
+                text="００：００：００"
+                AnchorPane.rightAnchor="400"
+                AnchorPane.topAnchor="0"
+                styleClass="plane-text"
+            />
+            <Label
+                fx:id="labelSpeed"
+                text="００km/h"
+                AnchorPane.rightAnchor="400"
+                AnchorPane.topAnchor="25"
+                styleClass="plane-text"
+            />
+            <Label
+                fx:id="labelKiloPost"
+                text="００．０km"
+                AnchorPane.rightAnchor="400"
+                AnchorPane.topAnchor="50"
+                styleClass="plane-text"
+            />
+            <Line
+                startX="560" startY="1"
+                endX="560" endY="70"
+                stroke="#2f3e56"
+                strokeWidth="2"
+            />
+            <!-- 初期選択 -->
+            <Button
+                fx:id="btnS00AB"
+                text=""
+                styleClass="normal-button, tims-button, button-tight"
+                prefWidth="60"
+                prefHeight="60"
+                AnchorPane.rightAnchor="5"
+                AnchorPane.topAnchor="5"
+            />
+        </AnchorPane>
+    </top>
+
+    <center>
+        <AnchorPane
+            style="-fx-background-color: #2f3e56;"
+            AnchorPane.topAnchor="0"
+            AnchorPane.leftAnchor="0"
+            AnchorPane.rightAnchor="0"
+            AnchorPane.bottomAnchor="0"
+        >
+
+            <!-- 左上の画面コード -->
+            <Label
+                text="D01AA"
+                AnchorPane.leftAnchor="25"
+                AnchorPane.topAnchor="0"
+                styleClass="screen-code"
+            />
+
+            <!-- タイトル -->
+            <Label
+                fx:id="labelTitle"
+                text="運転情報"
+                AnchorPane.leftAnchor="96"
+                AnchorPane.topAnchor="0"
+                styleClass="title"
+            />
+
+            <Label
+                text="列車番号"
+                AnchorPane.leftAnchor="25"
+                AnchorPane.topAnchor="20"
+                styleClass="plane-text"
+            />
+
+            <Label
+                fx:id="labelTrainNumber"
+                text=""
+                AnchorPane.leftAnchor="180"
+                AnchorPane.topAnchor="20"
+                styleClass="trainNumber"
+            />
+
+            <Label
+                fx:id="labelPsettei"
+                text=" 設定完了 "
+                AnchorPane.rightAnchor="10"
+                AnchorPane.topAnchor="0"
+                styleClass="P-setteiOK"
+            />
+
+            <Label
+                fx:id="labelPpassing"
+                text=""
+                AnchorPane.rightAnchor="10"
+                AnchorPane.topAnchor="20"
+                styleClass=""
+            />
+
+            <Label
+                text="Ｐ列番"
+                AnchorPane.rightAnchor="120"
+                AnchorPane.topAnchor="0"
+                styleClass="plane-text"
+            />
+
+            <Label
+                fx:id="labelPtrainNumber"
+                text=""
+                AnchorPane.rightAnchor="200"
+                AnchorPane.topAnchor="0"
+                styleClass="plane-text"
+            />
+
+            <Label
+                fx:id="labelPtrainNumberPassing"
+                text=""
+                AnchorPane.rightAnchor="310"
+                AnchorPane.topAnchor="0"
+                styleClass=""
+            />
+
+            <Label
+                text="無線"
+                AnchorPane.rightAnchor="238"
+                AnchorPane.topAnchor="20"
+                styleClass="plane-text"
+            />
+
+            <Label
+                fx:id="labelMusenCh"
+                text="D4"
+                AnchorPane.rightAnchor="198"
+                AnchorPane.topAnchor="20"
+                styleClass="plane-text"
+            />
+
+            <Label
+                text="ch"
+                AnchorPane.rightAnchor="178"
+                AnchorPane.topAnchor="20"
+                styleClass="plane-text"
+            />
+
+
+            <Button
+                fx:id="btnSenbetsu"
+                text="列車選別"
+                styleClass="normal-button, tims-button"
+                prefWidth="150"
+                prefHeight="50"
+                AnchorPane.rightAnchor="160"
+                AnchorPane.bottomAnchor="5"
+            />
+            <Button
+                fx:id="btnNext"
+                text="設  定"
+                styleClass="normal-button, tims-button"
+                prefWidth="150"
+                prefHeight="50"
+                AnchorPane.rightAnchor="5"
+                AnchorPane.bottomAnchor="5"
+            />
+        </AnchorPane>
+    </center>
+
+
+    <bottom>
+        <AnchorPane prefHeight="100" style="-fx-background-color: #000000;">
+            <!-- ステータスバーやスライダーを置く領域 -->
+            <Button
+                fx:id="btnD00AA"
+                text=""
+                styleClass="normal-button, tims-button, button-tight"
+                prefWidth="100"
+                prefHeight="60"
+                AnchorPane.leftAnchor="5"
+            />
+            <Button
+                fx:id="btnD01AA"
+                text=""
+                styleClass="normal-button, tims-button, button-tight"
+                prefWidth="100"
+                prefHeight="60"
+                AnchorPane.leftAnchor="110"
+            />
+            <Button
+                fx:id="btnB00AA"
+                text=""
+                styleClass="normal-button, tims-button, button-tight"
+                prefWidth="100"
+                prefHeight="60"
+                AnchorPane.leftAnchor="215"
+            />
+        </AnchorPane>
+    </bottom>
+</BorderPane>

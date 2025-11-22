@@ -14,16 +14,16 @@
 >
 
     <top>
-        <AnchorPane prefHeight="54" style="-fx-background-color: #000000;">
+        <AnchorPane prefHeight="70" style="-fx-background-color: #000000;">
             <!-- 初期選択 -->
             <Button
                 fx:id="btnS00AB"
                 text=""
                 styleClass="normal-button, tims-button, button-tight"
-                prefWidth="50"
-                prefHeight="50"
-                AnchorPane.rightAnchor="1"
-                AnchorPane.topAnchor="1"
+                prefWidth="60"
+                prefHeight="60"
+                AnchorPane.rightAnchor="5"
+                AnchorPane.topAnchor="5"
             />
         </AnchorPane>
     </top>
@@ -74,14 +74,14 @@
 
 
     <bottom>
-        <AnchorPane prefHeight="96" style="-fx-background-color: #000000;">
+        <AnchorPane prefHeight="100" style="-fx-background-color: #000000;">
             <!-- ステータスバーやスライダーを置く領域 -->
             <Button
                 fx:id="btnUA00AA"
                 text=""
                 styleClass="normal-button, tims-button, button-tight"
-                prefWidth="75"
-                prefHeight="50"
+                prefWidth="100"
+                prefHeight="60"
                 AnchorPane.leftAnchor="5"
             />
         </AnchorPane>

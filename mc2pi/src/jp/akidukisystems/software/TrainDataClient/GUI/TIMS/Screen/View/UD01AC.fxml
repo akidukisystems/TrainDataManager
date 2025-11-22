@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Rectangle?>
+
+<BorderPane 
+    xmlns="http://javafx.com/javafx"
+    xmlns:fx="http://javafx.com/fxml"
+    fx:controller="jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller.UD01AC"
+    style="-fx-background-color: black;"
+>
+
+    <top>
+        <AnchorPane prefHeight="70" style="-fx-background-color: #000000;">
+            <!-- 初期選択 -->
+            <Button
+                fx:id="btnS00AB"
+                text=""
+                styleClass="normal-button, tims-button, button-tight"
+                prefWidth="60"
+                prefHeight="60"
+                AnchorPane.rightAnchor="5"
+                AnchorPane.topAnchor="5"
+            />
+        </AnchorPane>
+    </top>
+
+    <center>
+        <AnchorPane
+            style="-fx-background-color: #2f3e56;"
+            AnchorPane.topAnchor="0"
+            AnchorPane.leftAnchor="0"
+            AnchorPane.rightAnchor="0"
+            AnchorPane.bottomAnchor="0"
+        >
+
+            <!-- 左上の画面コード -->
+            <Label
+                text="UD01AC"
+                layoutX="25"
+                layoutY="10"
+                styleClass="screen-code"
+            />
+
+            <!-- タイトル -->
+            <Label
+                fx:id="title"
+                text="行路選択"
+                layoutX="96"
+                layoutY="10"
+                styleClass="title"
+            />
+
+            
+
+            <StackPane
+                AnchorPane.topAnchor="0"
+                AnchorPane.bottomAnchor="0"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0"
+            >
+                <!-- GridPaneに背景色つけると全体に行くので、仕方なく裏にペタペタする -->
+                <Rectangle
+                    width="710"
+                    height="260"
+                    fill="#000000"
+                />
+
+                <!-- なぜか罫線はうまくいく -->
+                <GridPane
+                    alignment="CENTER"
+                    style="-fx-grid-lines-visible: true;"
+                >
+                    <Button
+                        fx:id="btnX1"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="0"
+                        GridPane.columnIndex="0"
+                    />
+                    <Label
+                        fx:id="textX1"
+                        text=""
+                        styleClass="plane-text-ff"
+                        GridPane.rowIndex="0"
+                        GridPane.columnIndex="1"
+                         minWidth="300" prefWidth="300" maxWidth="300"
+                    />
+
+                    <Button
+                        fx:id="btnX2"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="1"
+                        GridPane.columnIndex="0"
+                    />
+                    <Label
+                        fx:id="textX2"
+                        text=""
+                        GridPane.rowIndex="1"
+                        GridPane.columnIndex="1"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Button
+                        fx:id="btnX3"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="2"
+                        GridPane.columnIndex="0"
+                    />
+                    <Label
+                        fx:id="textX3"
+                        text=""
+                        GridPane.rowIndex="2"
+                        GridPane.columnIndex="1"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Button
+                        fx:id="btnX4"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="3"
+                        GridPane.columnIndex="0"
+                    />
+                    <Label
+                        fx:id="textX4"
+                        text=""
+                        GridPane.rowIndex="3"
+                        GridPane.columnIndex="1"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Button
+                        fx:id="btnX5"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="4"
+                        GridPane.columnIndex="0"
+                    />
+                    <Label
+                        fx:id="textX5"
+                        text=""
+                        GridPane.rowIndex="4"
+                        GridPane.columnIndex="1"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Button
+                        fx:id="btnX6"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="0"
+                        GridPane.columnIndex="2"
+                    />
+                    <Label
+                        fx:id="textX6"
+                        text=""
+                        GridPane.rowIndex="0"
+                        GridPane.columnIndex="3"
+                        styleClass="plane-text-ff"
+                        minWidth="300" prefWidth="300" maxWidth="300"
+                    />
+
+                    <Button
+                        fx:id="btnX7"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="1"
+                        GridPane.columnIndex="2"
+                    />
+                    <Label
+                        fx:id="textX7"
+                        text=""
+                        GridPane.rowIndex="1"
+                        GridPane.columnIndex="3"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Button
+                        fx:id="btnX8"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="2"
+                        GridPane.columnIndex="2"
+                    />
+                    <Label
+                        fx:id="textX8"
+                        text=""
+                        GridPane.rowIndex="2"
+                        GridPane.columnIndex="3"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Button
+                        fx:id="btnX9"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="3"
+                        GridPane.columnIndex="2"
+                    />
+                    <Label
+                        fx:id="textX9"
+                        text=""
+                        GridPane.rowIndex="3"
+                        GridPane.columnIndex="3"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Button
+                        fx:id="btnX10"
+                        text=""
+                        styleClass="normal-button, tims-button"
+                        prefWidth="50"
+                        prefHeight="50"
+                        GridPane.rowIndex="4"
+                        GridPane.columnIndex="2"
+                    />
+                    <Label
+                        fx:id="textX10"
+                        text=""
+                        GridPane.rowIndex="4"
+                        GridPane.columnIndex="3"
+                        styleClass="plane-text-ff"
+                    />
+                </GridPane>
+            </StackPane>
+
+            <Button
+                fx:id="btnNext"
+                text="設  定"
+                styleClass="normal-button, tims-button"
+                prefWidth="150"
+                prefHeight="50"
+                AnchorPane.rightAnchor="5"
+                AnchorPane.bottomAnchor="5"
+            />
+        </AnchorPane>
+    </center>
+
+
+    <bottom>
+        <AnchorPane prefHeight="100" style="-fx-background-color: #000000;">
+            <!-- ステータスバーやスライダーを置く領域 -->
+            <Button
+                fx:id="btnD00AA"
+                text=""
+                styleClass="normal-button, tims-button, button-tight"
+                prefWidth="100"
+                prefHeight="60"
+                AnchorPane.leftAnchor="5"
+            />
+            <Button
+                fx:id="btnD01AA"
+                text=""
+                styleClass="normal-button, tims-button, button-tight"
+                prefWidth="100"
+                prefHeight="60"
+                AnchorPane.leftAnchor="110"
+            />
+        </AnchorPane>
+    </bottom>
+</BorderPane>

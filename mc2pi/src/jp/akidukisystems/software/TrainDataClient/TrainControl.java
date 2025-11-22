@@ -46,6 +46,14 @@ public class TrainControl
     Timer ebTimer;
     Timer ebActiveTimer;
 
+    enum formationInfo
+    {
+        Tc,
+        T,
+        M,
+        Mc
+    }
+
     public TrainControl()
     {
         atspController = new ATSPController(this);

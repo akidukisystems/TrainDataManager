@@ -14,16 +14,16 @@
 >
 
     <top>
-        <AnchorPane prefHeight="54" style="-fx-background-color: #000000;">
+        <AnchorPane prefHeight="70" style="-fx-background-color: #000000;">
             <!-- 初期選択 -->
             <Button
                 fx:id="btnS00AB"
                 text=""
                 styleClass="normal-button, tims-button, button-tight"
-                prefWidth="50"
-                prefHeight="50"
-                AnchorPane.rightAnchor="1"
-                AnchorPane.topAnchor="1"
+                prefWidth="60"
+                prefHeight="60"
+                AnchorPane.rightAnchor="5"
+                AnchorPane.topAnchor="5"
             />
         </AnchorPane>
     </top>
@@ -73,12 +73,168 @@
                 layoutX="25"
                 layoutY="140"
             />
+
+
+
+            <Button
+                fx:id="btnUD01AA"
+                text="仕業カード"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="60"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text="列番設定"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="120"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text="時計設定"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="180"
+            />
+
+            <Button
+                fx:id="btnUD01AC"
+                text="行  路"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="240"
+            />
+
+            <Button
+                fx:id="btnD13AA"
+                text="駅名選択"
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="220"
+                layoutY="300"
+            />
+
+
+
+            <Button
+                fx:id="btnA06AA"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="60"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="120"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="180"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="240"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="390"
+                layoutY="300"
+            />
+
+
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="60"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="120"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="180"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="240"
+            />
+
+            <Button
+                fx:id="btnEmpty"
+                text=""
+                styleClass="normal-button, tims-button"
+                prefWidth="155"
+                prefHeight="50"
+                layoutX="560"
+                layoutY="300"
+            />
         </AnchorPane>
     </center>
 
 
     <bottom>
-        <AnchorPane prefHeight="96" style="-fx-background-color: #000000;">
+        <AnchorPane prefHeight="100" style="-fx-background-color: #000000;">
             <!-- ステータスバーやスライダーを置く領域 -->
         </AnchorPane>
     </bottom>
