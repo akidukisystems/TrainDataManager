@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -27,27 +28,28 @@
                 stroke="#2f3e56"
                 strokeWidth="2"
             />
-            <Label
-                fx:id="labelTime"
-                text="００：００：００"
+            <VBox
+                spacing="2"
                 AnchorPane.rightAnchor="400"
                 AnchorPane.topAnchor="0"
-                styleClass="plane-text"
-            />
-            <Label
-                fx:id="labelSpeed"
-                text="００km/h"
-                AnchorPane.rightAnchor="400"
-                AnchorPane.topAnchor="25"
-                styleClass="plane-text"
-            />
-            <Label
-                fx:id="labelKiloPost"
-                text="００．０km"
-                AnchorPane.rightAnchor="400"
-                AnchorPane.topAnchor="50"
-                styleClass="plane-text"
-            />
+                alignment="TOP_RIGHT"
+            >
+                <Label
+                    fx:id="labelTime"
+                    text="００：００：００"
+                    styleClass="plane-text"
+                />
+                <Label
+                    fx:id="labelSpeed"
+                    text="km/h"
+                    styleClass="plane-text"
+                />
+                <Label
+                    fx:id="labelKiloPost"
+                    text="km"
+                    styleClass="plane-text"
+                />
+            </VBox>
             <Line
                 startX="560" startY="1"
                 endX="560" endY="70"
@@ -168,6 +170,202 @@
                 AnchorPane.topAnchor="20"
                 styleClass="plane-text"
             />
+
+            <StackPane
+                AnchorPane.topAnchor="40"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0"
+            >
+                <Rectangle
+                    width="958"
+                    height="140"
+                    fill="#475065"
+                />
+
+                <AnchorPane>
+                    <Label
+                        text="停車場名"
+                        AnchorPane.leftAnchor="40"
+                        AnchorPane.topAnchor="0"
+                        styleClass="plane-text"
+                    />
+                    <Label
+                        text="着"
+                        AnchorPane.leftAnchor="310"
+                        AnchorPane.topAnchor="0"
+                        styleClass="plane-text"
+                    />
+                    <Label
+                        text="発"
+                        AnchorPane.leftAnchor="630"
+                        AnchorPane.topAnchor="0"
+                        styleClass="plane-text"
+                    />
+
+                    <Label
+                        text="番線"
+                        AnchorPane.leftAnchor="820"
+                        AnchorPane.topAnchor="0"
+                        styleClass="plane-text"
+                    />
+                    <Label
+                        text="制限"
+                        AnchorPane.rightAnchor="0"
+                        AnchorPane.topAnchor="0"
+                        styleClass="plane-text"
+                    />
+
+                    <Label
+                        fx:id="labelLine1Sta"
+                        text=" 上  野"
+                        AnchorPane.leftAnchor="0"
+                        AnchorPane.topAnchor="20"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine1Arrive"
+                        text="１０：２６"
+                        AnchorPane.leftAnchor="220"
+                        AnchorPane.topAnchor="20"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine1ArriveSec"
+                        text="００"
+                        AnchorPane.leftAnchor="420"
+                        AnchorPane.topAnchor="20"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine1Depart"
+                        text="１０：２８"
+                        AnchorPane.leftAnchor="540"
+                        AnchorPane.topAnchor="20"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine1DepartSec"
+                        text="００"
+                        AnchorPane.leftAnchor="740"
+                        AnchorPane.topAnchor="20"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine1Track"
+                        text="６"
+                        AnchorPane.leftAnchor="820"
+                        AnchorPane.topAnchor="20"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine1Limit"
+                        text=""
+                        AnchorPane.rightAnchor="0"
+                        AnchorPane.topAnchor="20"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Label
+                        fx:id="labelLine2Sta"
+                        text="青物横丁"
+                        AnchorPane.leftAnchor="0"
+                        AnchorPane.topAnchor="60"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine2Arrive"
+                        text="     ⇩"
+                        AnchorPane.leftAnchor="220"
+                        AnchorPane.topAnchor="60"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine2ArriveSec"
+                        text=""
+                        AnchorPane.leftAnchor="420"
+                        AnchorPane.topAnchor="60"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine2Depart"
+                        text="      ３８"
+                        AnchorPane.leftAnchor="540"
+                        AnchorPane.topAnchor="60"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine2DepartSec"
+                        text="１５"
+                        AnchorPane.leftAnchor="740"
+                        AnchorPane.topAnchor="60"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine2Track"
+                        text=""
+                        AnchorPane.leftAnchor="820"
+                        AnchorPane.topAnchor="60"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine2Limit"
+                        text="45 / 60"
+                        AnchorPane.rightAnchor="0"
+                        AnchorPane.topAnchor="60"
+                        styleClass="plane-text-ff"
+                    />
+
+                    <Label
+                        fx:id="labelLine3Sta"
+                        text=" やべっ"
+                        AnchorPane.leftAnchor="0"
+                        AnchorPane.topAnchor="100"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine3Arrive"
+                        text="      ３９"
+                        AnchorPane.leftAnchor="220"
+                        AnchorPane.topAnchor="100"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine3ArriveSec"
+                        text="４５"
+                        AnchorPane.leftAnchor="420"
+                        AnchorPane.topAnchor="100"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine3Depart"
+                        text="      ４１"
+                        AnchorPane.leftAnchor="540"
+                        AnchorPane.topAnchor="100"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine3DepartSec"
+                        text="１５"
+                        AnchorPane.leftAnchor="740"
+                        AnchorPane.topAnchor="100"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine3Track"
+                        text="１０"
+                        AnchorPane.leftAnchor="820"
+                        AnchorPane.topAnchor="100"
+                        styleClass="plane-text-ff"
+                    />
+                    <Label
+                        fx:id="labelLine3Limit"
+                        text="45 /   "
+                        AnchorPane.rightAnchor="0"
+                        AnchorPane.topAnchor="100"
+                        styleClass="plane-text-ff"
+                    />
+                </AnchorPane>
+            </StackPane>
 
 
             <Button

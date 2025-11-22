@@ -37,11 +37,39 @@ public class D01AA extends BaseController
     @FXML private Label labelTime;
     @FXML private Label labelSpeed;
     @FXML private Label labelKiloPost;
+
+    @FXML private Label labelLine1Sta;
+    @FXML private Label labelLine1Arrive;
+    @FXML private Label labelLine1ArriveSec;
+    @FXML private Label labelLine1Depart;
+    @FXML private Label labelLine1DepartSec;
+    @FXML private Label labelLine1Track;
+    @FXML private Label labelLine1Limit;
+
+    @FXML private Label labelLine2Sta;
+    @FXML private Label labelLine2Arrive;
+    @FXML private Label labelLine2ArriveSec;
+    @FXML private Label labelLine2Depart;
+    @FXML private Label labelLine2DepartSec;
+    @FXML private Label labelLine2Track;
+    @FXML private Label labelLine2Limit;
+
+    @FXML private Label labelLine3Sta;
+    @FXML private Label labelLine3Arrive;
+    @FXML private Label labelLine3ArriveSec;
+    @FXML private Label labelLine3Depart;
+    @FXML private Label labelLine3DepartSec;
+    @FXML private Label labelLine3Track;
+    @FXML private Label labelLine3Limit;
     
     Timeline timeline;
     Timeline blink;
     
     private Button selectedButton = null;
+
+    private Label[] labelLine1;
+    private Label[] labelLine2;
+    private Label[] labelLine3;
 
     @Override
     public void init(TDCCore core)
@@ -64,6 +92,27 @@ public class D01AA extends BaseController
     @FXML
     public void initialize()
     {
+        labelLine1 = new Label[]
+        {
+            labelLine1Sta,
+            labelLine1Arrive,
+            labelLine1Depart
+        };
+
+        labelLine2 = new Label[]
+        {
+            labelLine2Sta,
+            labelLine2Arrive,
+            labelLine2Depart
+        };
+
+        labelLine3 = new Label[]
+        {
+            labelLine3Sta,
+            labelLine3Arrive,
+            labelLine3Depart
+        };
+
         btnS00AB.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/S00AB.fxml"));
         btnS00AB.setText("初期\n選択");
         btnD00AA.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/D00AA.fxml"));
@@ -99,6 +148,22 @@ public class D01AA extends BaseController
 
         labelTitle.getTransforms().add(new Scale(2, 1, 0, 0));
         labelTrainNumber.getTransforms().add(new Scale(2, 1, 0, 0));
+
+        for(Label s : labelLine1)
+        {
+            s.getTransforms().add(new Scale(2, 1, 0, 0));
+        }
+
+        for(Label s : labelLine2)
+        {
+            s.getTransforms().add(new Scale(2, 1, 0, 0));
+        }
+
+
+        for(Label s : labelLine3)
+        {
+            s.getTransforms().add(new Scale(2, 1, 0, 0));
+        }
 
         blink = new Timeline(new KeyFrame(Duration.seconds(0.5), e -> {
             if (selectedButton != null) {
