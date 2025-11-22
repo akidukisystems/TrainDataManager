@@ -20,6 +20,8 @@ public class EmulatorCore
     boolean isComplessorActive = false;
     int door = 0;
     int reverser = 1;
+    float move = 0f;
+    int moveTo = 0;
 
     public static void main(String[] args)
     {
@@ -135,6 +137,14 @@ public class EmulatorCore
                                     reverser = jsonObj.getInt("reverser");
                                     break;
 
+                                case "move":
+                                    move = jsonObj.getFloat("move");
+                                    break;
+
+                                case "moveTo":
+                                    moveTo = jsonObj.getInt("moveTo");
+                                    break;
+
                                 default:
                                     break;
                             }
@@ -151,7 +161,7 @@ public class EmulatorCore
                     }
                 }
 
-                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":0,\"moveTo\":0,\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
+                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":"+ move +",\"moveTo\":"+ moveTo +",\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
             }
         }).start();
 
