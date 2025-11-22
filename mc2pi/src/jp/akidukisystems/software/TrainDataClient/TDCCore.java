@@ -817,7 +817,7 @@ public class TDCCore
                 System.err.println("Peer dead. Exiting...");
                 try { networkManager.clientClose(); } catch (Exception ignored) {}
                 try { networkManager.serverClose(); } catch (Exception ignored) {}
-                System.exit(0);
+                // System.exit(0);
             }
         );
 
@@ -894,7 +894,7 @@ public class TDCCore
 
                             case "kill":
                                 networkManager.clientClose();
-                                System.exit(0);
+                                // System.exit(0);
                                 break;
 
                             case "notRidingTrain":
