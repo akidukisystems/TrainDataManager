@@ -12,16 +12,16 @@ public class EmulatorCore
 {    
     private static NetworkManager networkManager = null; 
     private static final int PORT = 34565;
-    int bc = 0;
-    int targetBc = 0;
-    float mr = 880f;
-    int notch = -8;
-    float speed = 0f;
-    boolean isComplessorActive = false;
-    int door = 0;
-    int reverser = 1;
-    float move = 0f;
-    int moveTo = 0;
+    volatile int bc = 0;
+    volatile int targetBc = 0;
+    volatile float mr = 880f;
+    volatile int notch = -8;
+    volatile float speed = 0f;
+    volatile boolean isComplessorActive = false;
+    volatile int door = 0;
+    volatile int reverser = 1;
+    volatile float move = 0f;
+    volatile int moveTo = 0;
 
     public static void main(String[] args)
     {
@@ -56,6 +56,7 @@ public class EmulatorCore
                 @Override
                 public void run()
                 {
+
                     int beforeBC = bc;
 
                     if(bc > targetBc)
@@ -86,6 +87,7 @@ public class EmulatorCore
                         speed -= 0.0012f * bc;
                         if(speed < 0f)
                             speed = 0f;
+                    
                     }
                 }
             }, 0, 80);
@@ -161,7 +163,8 @@ public class EmulatorCore
                     }
                 }
 
-                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":"+ move +",\"moveTo\":"+ moveTo +",\"formation\":2,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
+                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":"+ move +",\"moveTo\":"+ moveTo +",\"totalMove\":0.0,\"formation\":8,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
+                
             }
         }).start();
 

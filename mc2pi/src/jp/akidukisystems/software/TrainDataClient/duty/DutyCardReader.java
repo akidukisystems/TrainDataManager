@@ -15,7 +15,7 @@ import java.util.*;
 public class DutyCardReader {
 
     // ---------- モデル ----------
-    public static class Line {
+    public static class DcrLine {
         public int id;
         public String name;
     }
@@ -75,7 +75,7 @@ public class DutyCardReader {
     }
 
     public static class DutyCardData {
-        public final Map<Integer, Line> lines = new LinkedHashMap<>();
+        public final Map<Integer, DcrLine> lines = new LinkedHashMap<>();
         public final Map<Integer, Station> stations = new LinkedHashMap<>();
         public final Map<Integer, TrainType> trainTypes = new LinkedHashMap<>();
         public final Map<Integer, Track> tracks = new LinkedHashMap<>();
@@ -144,7 +144,7 @@ public class DutyCardReader {
                     int id = getInt(cols, idx(headers, "index"), -1);
                     String name = getStr(cols, idx(headers, "lineName"));
                     if (id >= 0 && name != null) {
-                        Line x = new Line();
+                        DcrLine x = new DcrLine();
                         x.id = id;
                         x.name = name;
                         data.lines.put(id, x);
@@ -261,7 +261,7 @@ public class DutyCardReader {
 
     // ---------- 名前解決 ----------
     public static String lineName(DutyCardData d, int id) {
-        Line l = d.lines.get(id);
+        DcrLine l = d.lines.get(id);
         return l != null ? l.name : "#" + id;
     }
 

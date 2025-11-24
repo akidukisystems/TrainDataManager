@@ -1,6 +1,6 @@
 package jp.akidukisystems.software.TrainDataClient.duty;
 
-public class OperationManager
+public class TimsToolkit
 {
     private DutyCardReader.TrainNumber trainNumber;
 
@@ -32,13 +32,13 @@ public class OperationManager
         this.direction = direction;
     }
 
-    private DutyCardReader.Line line;
+    private DutyCardReader.DcrLine line;
 
-    public DutyCardReader.Line getLine() {
+    public DutyCardReader.DcrLine getLine() {
         return line;
     }
 
-    public void setLine(DutyCardReader.Line line) {
+    public void setLine(DutyCardReader.DcrLine line) {
         this.line = line;
     }
 
@@ -100,5 +100,49 @@ public class OperationManager
             }
         }
         return sb.toString();
+    }
+
+    public String formatString(String input) {
+        if (input == null) {
+            return "";
+        }
+
+        int length = input.length();
+
+        switch (length) {
+            case 1:
+                // 1文字なら前に半角スペース3つ
+                return "   " + input;
+            case 2:
+                // 2文字なら前に半角スペース1つ + 文字の間に半角スペース2つ
+                return " " + input.charAt(0) + "  " + input.charAt(1);
+            case 3:
+                // 3文字なら前に半角スペース1つ
+                return " " + input;
+            case 4:
+                // 4文字なら何もしない
+                return input;
+            default:
+                // それ以外はそのまま
+                return input;
+        }
+    }
+
+    public String formatSpeedLimit(int p1)
+    {
+        if(p1 == -1)
+        {
+            return "";
+        }
+
+        return Integer.toString(p1);
+    }
+
+    public String[] splitTime(String p1)
+    {
+        if(p1 == null)
+            return null;
+        String[] parts = p1.split(":");
+        return parts;
     }
 }

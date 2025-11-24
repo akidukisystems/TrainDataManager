@@ -13,7 +13,7 @@ import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.TimsUpdater;
 import jp.akidukisystems.software.TrainDataClient.TrainControl;
 import jp.akidukisystems.software.TrainDataClient.TrainNumber;
-import jp.akidukisystems.software.TrainDataClient.duty.OperationManager;
+import jp.akidukisystems.software.TrainDataClient.duty.TimsToolkit;
 import jp.akidukisystems.software.utilty.DutyCardRepository;
 import jp.akidukisystems.software.utilty.NetworkManager;
 
@@ -21,7 +21,7 @@ public abstract class BaseController {
     protected TDCCore core;
     protected TrainControl tc;
     protected DutyCardRepository repo;
-    protected OperationManager om;
+    protected TimsToolkit om;
     protected TrainNumber tn;
     protected NetworkManager nm;
     protected TimsUpdater tu;

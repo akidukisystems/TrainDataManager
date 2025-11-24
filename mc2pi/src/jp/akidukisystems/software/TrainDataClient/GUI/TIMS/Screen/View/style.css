@@ -1,4 +1,4 @@
-.label, .menu-button, .normal-button, .trainNumber{
+.label, .menu-button, .normal-button, .trainNumber, .speedLimit, .text-second{
     -fx-font-smoothing-type: gray;
     -fx-font-family: "MS Gothic";
 }
@@ -27,6 +27,17 @@
     -fx-text-fill: #ffffff;
     -fx-font-size: 20px;
 }
+
+.speedLimit {
+    -fx-text-fill: #ffff00;
+    -fx-font-size: 20px;
+}
+
+.text-second {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+}
+
 
 
 .fatalerror {

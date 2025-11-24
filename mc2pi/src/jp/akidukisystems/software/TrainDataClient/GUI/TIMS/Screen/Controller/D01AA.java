@@ -1,24 +1,40 @@
 package jp.akidukisystems.software.TrainDataClient.GUI.TIMS.Screen.Controller;
 
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
+import javafx.scene.shape.Line;
 import javafx.util.Duration;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.BaseController;
+import jp.akidukisystems.software.TrainDataClient.TrainControl.formationInfo;
 import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.Direction;
-import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.DutyCardData;
-import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.Line;
-import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.Station;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.DcrLine;
 import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.TimeTable;
-import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.TrainNumber;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.TimeTableEntry;
+import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.Track;
 
 public class D01AA extends BaseController 
 {
@@ -31,6 +47,8 @@ public class D01AA extends BaseController
     @FXML private Button btnSenbetsu;
 
     @FXML private GridPane gridPane;
+
+    @FXML private HBox formationHBox;
 
     @FXML private Label labelTitle;
     @FXML private Label labelTrainNumber;
@@ -77,6 +95,10 @@ public class D01AA extends BaseController
     private Label[] labelLine2;
     private Label[] labelLine3;
 
+     Rectangle[] rectDoorState;
+    Label[] labelDoorState;
+    Rectangle[] rectCarState;
+
     @Override
     public void init(TDCCore core)
     {
@@ -86,7 +108,7 @@ public class D01AA extends BaseController
         (
             new KeyFrame
             (
-                Duration.millis(200),   // 更新間隔（ms）
+                Duration.millis(600),   // 更新間隔（ms）
                 e -> update()
             )
         );
@@ -102,21 +124,27 @@ public class D01AA extends BaseController
         {
             labelLine1Sta,
             labelLine1Arrive,
-            labelLine1Depart
+            labelLine1ArriveSec,
+            labelLine1Depart,
+            labelLine1DepartSec
         };
 
         labelLine2 = new Label[]
         {
             labelLine2Sta,
             labelLine2Arrive,
-            labelLine2Depart
+            labelLine2ArriveSec,
+            labelLine2Depart,
+            labelLine2DepartSec
         };
 
         labelLine3 = new Label[]
         {
             labelLine3Sta,
             labelLine3Arrive,
-            labelLine3Depart
+            labelLine3ArriveSec,
+            labelLine3Depart,
+            labelLine3DepartSec
         };
 
         btnS00AB.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/S00AB.fxml"));
@@ -228,10 +256,153 @@ public class D01AA extends BaseController
             labelPtrainNumberPassing.getStyleClass().remove("plane-text");
         }
 
-        if(om.getTrainNumber() != null)
+        refreshTimeTable();
+
+        int n = tc.getCars();
+
+        rectDoorState  = new Rectangle[n];
+        labelDoorState = new Label[n];
+        rectCarState   = new Rectangle[n];
+
+        for(int i = 0; i < n; i++)
         {
-            TrainNumber dcrTrainNumber = om.getTrainNumber();
-            Line line = om.getLine();
+            VBox box = new VBox();
+            box.setAlignment(Pos.CENTER);
+            box.setSpacing(1);
+
+            // ----------- 上の「閉」 -----------
+            StackPane sp1 = new StackPane();
+
+            Rectangle r1 = new Rectangle(40, 20);
+            r1.setStroke(Color.WHITE);
+            r1.setFill(Color.BLACK);
+            rectDoorState[i] = r1;
+
+            Label l1 = new Label("閉");
+            l1.getStyleClass().add("plane-text-ff");
+            labelDoorState[i] = l1;
+
+            sp1.getChildren().addAll(r1, l1);
+
+            // ----------- 空白 -----------
+            Region gap = new Region();
+            gap.setPrefHeight(20);
+
+            // ----------- パンタ（統合部分） -----------
+            HBox pantagraph = new HBox();
+            pantagraph.setAlignment(Pos.CENTER);
+            pantagraph.setSpacing(25);
+
+            // 左グループ
+            Group g1 = new Group();
+
+            Line g1_l1 = new Line(3, 0, 0, 3);
+            g1_l1.setStrokeWidth(1);
+
+            Line g1_l2 = new Line(0, 3, 3, 6); 
+            g1_l2.setStrokeWidth(1);
+
+            g1.getChildren().addAll(g1_l1, g1_l2);
+
+            // 右グループ
+            Group g2 = new Group();
+
+            Line g2_l1 = new Line(0, 0, 3, 3);
+            g2_l1.setStrokeWidth(1);
+
+            Line g2_l2 = new Line(3, 3, 0, 6);
+            g2_l2.setStrokeWidth(1);
+
+            g2.getChildren().addAll(g2_l1, g2_l2);
+
+            pantagraph.getChildren().addAll(g1, g2);
+
+            // ----------- 下の編成 -----------
+            StackPane sp2 = new StackPane();
+
+            Rectangle r2 = new Rectangle(50, 20);
+            r2.setStroke(Color.WHITE);
+            r2.setFill(Color.web("#2f3e56"));
+
+            if(List.of(formationInfo.M, formationInfo.Mc, formationInfo.Tm).contains(tc.getFormationFromCar(i)))
+                rectCarState[i] = r2;
+
+            Label l2 = new Label(om.toZenkaku(Integer.toString(i + 1)));
+            l2.getStyleClass().add("plane-text-ff");
+
+            sp2.getChildren().addAll(r2, l2);
+
+            // ----------- 丸2つ -----------
+            HBox h = new HBox();
+            h.setAlignment(Pos.CENTER);
+            h.setSpacing(25);
+
+            Circle c1 = new Circle(4);
+            Circle c2 = new Circle(4);
+
+            switch (tc.getFormationFromCar(i)) {
+                case Mc:
+                    c1.setStroke(Color.GRAY);
+                    c1.setFill(Color.WHITE);
+                    c2.setStroke(Color.GRAY);
+                    c2.setFill(Color.WHITE);
+                    g1_l1.setStroke(Color.YELLOW);
+                    g1_l2.setStroke(Color.YELLOW);
+                    g2_l1.setStroke(Color.YELLOW);
+                    g2_l2.setStroke(Color.YELLOW);
+                    break;
+
+                case M:
+                    c1.setStroke(Color.GRAY);
+                    c1.setFill(Color.WHITE);
+                    c2.setStroke(Color.GRAY);
+                    c2.setFill(Color.WHITE);
+                    g1_l1.setStroke(Color.YELLOW);
+                    g1_l2.setStroke(Color.YELLOW);
+                    g2_l1.setStroke(Color.YELLOW);
+                    g2_l2.setStroke(Color.YELLOW);
+                    break;
+
+                case Tm:
+                    c1.setStroke(Color.GRAY);
+                    c1.setFill(Color.WHITE);
+                    c2.setStroke(Color.GRAY);
+                    c2.setFill(Color.WHITE);
+                    g1_l1.setStroke(Color.BLACK);
+                    g1_l2.setStroke(Color.BLACK);
+                    g2_l1.setStroke(Color.BLACK);
+                    g2_l2.setStroke(Color.BLACK);
+                    break;
+            
+                default:
+                    c1.setStroke(Color.GRAY);
+                    c1.setFill(Color.BLACK);
+                    c2.setStroke(Color.GRAY);
+                    c2.setFill(Color.BLACK);
+                    g1_l1.setStroke(Color.BLACK);
+                    g1_l2.setStroke(Color.BLACK);
+                    g2_l1.setStroke(Color.BLACK);
+                    g2_l2.setStroke(Color.BLACK);
+                    break;
+            } 
+
+            h.getChildren().addAll(c1, c2);
+
+            // ----------- まとめて VBoxへ -----------
+            box.getChildren().addAll(sp1, gap, pantagraph, sp2, h);
+
+            formationHBox.getChildren().add(box);
+        }
+
+
+    
+    }
+
+    private void refreshTimeTable()
+    {
+        if(om.getTrainNumber() != null && om.getLine() != null)
+        {
+            DcrLine line = om.getLine();
             Direction direction = om.getDirection();
             float kilopost = tc.getMove();
             TimeTable timeTable = om.getTimeTable();
@@ -252,27 +423,283 @@ public class D01AA extends BaseController
             //     - ある駅と現在地点が同じキロポストの場合、その駅を「次の駅」とする
             //     - 次の次の駅が存在しない場合、nullとする
 
-            System.out.println(kilopost);
-            System.out.println(line.id);
-            System.out.println(direction);
-            System.out.println(timeTable.id);
+            // 前の駅、次の駅、その次の駅を取得
+            // 停車場に停車中の場合、停車中の駅、次の駅、その次の駅となる
+            TimeTableEntry[] sta = repo.getSurroundingStations(kilopost /1000f, line, direction, timeTable);
 
-            Station[] sta = repo.getSurroundingStations(kilopost /1000f, line, direction, timeTable);
+            String timeHolder = "";
 
+            // 前の駅　または　停車中の駅
+            // これ多分メソッドにしたほうがいい 3駅分処理するので
             if(sta[0] != null)
-                System.out.println(sta[0].name);
+            {
+                System.out.println(repo.getStation(sta[0].stationId).name);
+
+                // 駅名をラベルに書き込む
+                // 4文字未満でも4文字分になるようにしてる
+                labelLine1Sta.setText(om.formatString(repo.getStation(sta[0].stationId).name));
+
+                // 到着時刻と出発時刻
+                String[] ArriveTime = om.splitTime(sta[0].arrive);
+                String[] DepartTime = om.splitTime(sta[0].depart);
+
+                if(ArriveTime != null)
+                {
+                    // 到着時刻がレ つまり、通過
+                    if(ArriveTime[0].equals("レ"))
+                    {
+                        // ほんとうは0.5文字分のスペースが追加でほしい。
+                        labelLine1Arrive.setText("    ⇩");
+                    }
+                    else
+                    {
+                        // 時刻はhh:mm:ssとなって格納されているので、予め分割してもらい、hh:mmとssでわけて表示
+                        labelLine1Arrive.setText(om.toZenkaku(ArriveTime[0] +":"+ ArriveTime[1]));
+                        labelLine1ArriveSec.setText(ArriveTime[2]);
+                    }
+                }
+                {
+                    labelLine1Arrive.setText("");
+                    labelLine1ArriveSec.setText("");
+                }
+
+                if(DepartTime != null)
+                {
+                    labelLine1Depart.setText(om.toZenkaku(DepartTime[0] +":"+ DepartTime[1]));
+                    labelLine1DepartSec.setText(DepartTime[2]);
+                    timeHolder = DepartTime[0];
+                }
+                else
+                {
+                    labelLine2Depart.setText("");
+                    labelLine2DepartSec.setText("");
+                }
+
+                // 到着番線
+                // nullのときがある
+                Track track = repo.getTrack(sta[0].trackId);
+                if(track != null)
+                {
+                    labelLine1Track.setText(om.toZenkaku(track.name));
+                }
+                else
+                {
+                    labelLine1Track.setText("");
+                }
+
+                // 速度制限
+                // int型なのでnullではなく-1のときがある
+                // 文字列に変換し、-1のものは""にしてもらう
+                String enterLimit = om.formatSpeedLimit(sta[0].enterLimit);
+                String exitLimit  = om.formatSpeedLimit(sta[0].exitLimit);
+
+                // なにかしら制限あるなら書いとく
+                if(enterLimit != "" || exitLimit != "")
+                {
+                    labelLine1Limit.setText(String.format("%2s / %2s", enterLimit, exitLimit));
+                }
+                else
+                {
+                    labelLine1Limit.setText("");
+                }
+            }
             else
+            {
+                // えっヌルですか？！
                 System.out.println("null");
-           
+                labelLine1Sta.setText("");
+                labelLine1Arrive.setText("");
+                labelLine1ArriveSec.setText("");
+                labelLine1Depart.setText("");
+                labelLine1DepartSec.setText("");
+                labelLine1Track.setText("");
+                labelLine1Limit.setText("");
+            }
+
+            //あとはおなじ
+
             if(sta[1] != null)
-                System.out.println(sta[1].name);
+            {
+                System.out.println(repo.getStation(sta[1].stationId).name);
+                labelLine2Sta.setText(om.formatString(repo.getStation(sta[1].stationId).name));
+
+                String[] ArriveTime = om.splitTime(sta[1].arrive);
+                String[] DepartTime = om.splitTime(sta[1].depart);
+
+                if(ArriveTime != null)
+                {
+                    if(ArriveTime[0].equals("レ"))
+                    {
+                        labelLine2Arrive.setText("    ⇩");
+                    }
+                    else
+                    {
+                        if(timeHolder.equals(ArriveTime[0]))
+                        {
+                            labelLine2Arrive.setText(om.toZenkaku("      "+ ArriveTime[1]));
+                        }
+                        else
+                        {
+                            labelLine2Arrive.setText(om.toZenkaku(ArriveTime[0] +":"+ ArriveTime[1]));
+                        }
+                        
+                        labelLine2ArriveSec.setText(ArriveTime[2]);
+                    }
+                }
+                else
+                {
+                    labelLine2Arrive.setText("");
+                    labelLine2ArriveSec.setText("");
+                }
+
+                if(DepartTime != null)
+                {
+                    if(timeHolder.equals(DepartTime[0]))
+                    {
+                        labelLine2Depart.setText(om.toZenkaku("      "+ DepartTime[1]));
+                        labelLine2DepartSec.setText(DepartTime[2]);
+                    }
+                    else if(DepartTime[0].equals("="))
+                    {
+                        labelLine2Depart.setText("    ＝");
+                    }
+                    else
+                    {
+                        labelLine2Depart.setText(om.toZenkaku(DepartTime[0] +":"+ DepartTime[1]));
+                        labelLine2DepartSec.setText(DepartTime[2]);
+                        timeHolder = DepartTime[0];
+                    }
+                }
+                else
+                {
+                    labelLine2Depart.setText("");
+                    labelLine2DepartSec.setText("");
+                }
+
+                Track track = repo.getTrack(sta[1].trackId);
+                if(track != null)
+                {
+                    labelLine2Track.setText(om.toZenkaku(track.name));
+                }
+                else
+                {
+                    labelLine2Track.setText("");
+                }
+
+                String enterLimit = om.formatSpeedLimit(sta[1].enterLimit);
+                String exitLimit  = om.formatSpeedLimit(sta[1].exitLimit);
+
+                if(enterLimit != "" || exitLimit != "")
+                {
+                    labelLine2Limit.setText(String.format("%2s / %2s", enterLimit, exitLimit));
+                }
+                else
+                {
+                    labelLine2Limit.setText("");
+                }
+            }
             else
+            {
                 System.out.println("null");
+                labelLine2Sta.setText("");
+                labelLine2Arrive.setText("");
+                labelLine2ArriveSec.setText("");
+                labelLine2Depart.setText("");
+                labelLine2DepartSec.setText("");
+                labelLine2Track.setText("");
+                labelLine2Limit.setText("");
+            }
 
             if(sta[2] != null)
-                System.out.println(sta[2].name);
+            {
+                System.out.println(repo.getStation(sta[2].stationId).name);
+                labelLine3Sta.setText(om.formatString(repo.getStation(sta[2].stationId).name));
+
+                String[] ArriveTime = om.splitTime(sta[2].arrive);
+                String[] DepartTime = om.splitTime(sta[2].depart);
+
+                if(ArriveTime != null)
+                {
+                    if(ArriveTime[0].equals("レ"))
+                    {
+                        labelLine3Arrive.setText("    ⇩");
+                    }
+                    else
+                    {
+                        if(timeHolder.equals(ArriveTime[0]))
+                        {
+                            labelLine3Arrive.setText(om.toZenkaku("      "+ ArriveTime[1]));
+                        }
+                        else
+                        {
+                            labelLine3Arrive.setText(om.toZenkaku(ArriveTime[0] +":"+ ArriveTime[1]));
+                        }
+
+                        labelLine3ArriveSec.setText(ArriveTime[2]);
+                    }
+                }
+                else
+                {
+                    labelLine3Arrive.setText("");
+                    labelLine3ArriveSec.setText("");
+                }
+
+                if(DepartTime != null)
+                {
+                    if(timeHolder.equals(DepartTime[0]))
+                    {
+                        labelLine3Depart.setText(om.toZenkaku("      "+ DepartTime[1]));
+                        labelLine3DepartSec.setText(DepartTime[2]);
+                    }
+                    else if(DepartTime[0].equals("="))
+                    {
+                        labelLine3Depart.setText("    ＝");
+                    }
+                    else
+                    {
+                        labelLine3Depart.setText(om.toZenkaku(DepartTime[0] +":"+ DepartTime[1]));
+                        labelLine3DepartSec.setText(DepartTime[2]);
+                    }
+                }
+                else
+                {
+                    labelLine3Depart.setText("");
+                    labelLine3DepartSec.setText("");
+                }
+
+                Track track = repo.getTrack(sta[2].trackId);
+                if(track != null)
+                {
+                    labelLine3Track.setText(om.toZenkaku(track.name));
+                }
+                else
+                {
+                    labelLine3Track.setText("");
+                }
+
+                String enterLimit = om.formatSpeedLimit(sta[2].enterLimit);
+                String exitLimit  = om.formatSpeedLimit(sta[2].exitLimit);
+
+                if(enterLimit != "" || exitLimit != "")
+                {
+                    labelLine3Limit.setText(String.format("%2s / %2s", enterLimit, exitLimit));
+                }
+                else
+                {
+                    labelLine3Limit.setText("");
+                }
+            }
             else
+            {
                 System.out.println("null");
+                labelLine3Sta.setText("");
+                labelLine3Arrive.setText("");
+                labelLine3ArriveSec.setText("");
+                labelLine3Depart.setText("");
+                labelLine3DepartSec.setText("");
+                labelLine3Track.setText("");
+                labelLine3Limit.setText("");
+            }
         }
     }
 
@@ -280,7 +707,67 @@ public class D01AA extends BaseController
     {
         if (core != null && core.tc != null)
         {
-            
+            if(om.getTrainNumber() != null && om.getLine() != null)
+            {
+                if(tc.ew.isArrivedStation() || tc.ew.isPassedStation())
+                {
+                    DcrLine line = om.getLine();
+                    Direction direction = om.getDirection();
+                    float kilopost = tc.getMove();
+                    TimeTable timeTable = om.getTimeTable();
+
+                    // 次の駅ってどれ？
+                    TimeTableEntry sta = repo.getNextStation(kilopost /1000f, line, direction, timeTable);
+
+                    // 次駅更新
+                    om.setStation(repo.getStation(sta.stationId));
+                    om.setLine(repo.getLine(repo.getStation(sta.stationId).lineId));
+
+                    nm.sendCommand("send", "move", 1000f * repo.getStation(sta.stationId).linePost);
+
+                    // すぐ更新すると変わらないので2秒まつ！
+                    ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+                    exec.schedule(() ->
+                    {
+                        safeUpdate(() ->
+                        {
+                            refreshTimeTable();
+                        });
+                    }, 2, TimeUnit.SECONDS);
+
+                    tc.ew.resetArriveEvent();
+                    tc.ew.resetPassingEvent();
+                }
+            }
+
+            if(labelDoorState != null && rectDoorState != null && rectCarState != null)
+            {
+                switch (tc.getSpeedState()) {
+                    case Up:
+                        for(Rectangle s: rectCarState)
+                        {
+                            if(s != null)
+                                s.setFill(Color.LIGHTBLUE);
+                        }
+                        break;
+
+                    case Down:
+                        for(Rectangle s: rectCarState)
+                        {
+                            if(s != null)
+                                s.setFill(Color.YELLOW);
+                        }
+                        break;
+                
+                    default:
+                        for(Rectangle s: rectCarState)
+                        {
+                            if(s != null)
+                                s.setFill(Color.GRAY);
+                        }
+                        break;
+                }
+            }
         }
     }
 
@@ -387,7 +874,7 @@ public class D01AA extends BaseController
                     om.toZenkaku
                     (
                         // 3. Stringにする formatで
-                        String.format("%.1f", value) // ()だけだから ; つけるな！！
+                        String.format("%.1f", (float)value / 1000f) // ()だけだから ; つけるな！！
                     ) +"km" // 単位ここで付けとく 全角にしたあとね
                 );
             });

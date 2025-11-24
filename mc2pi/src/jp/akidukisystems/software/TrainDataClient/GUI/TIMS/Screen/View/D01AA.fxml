@@ -3,15 +3,19 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.shape.Line?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Polygon?>
 
 <BorderPane 
     xmlns="http://javafx.com/javafx"
@@ -217,153 +221,509 @@
 
                     <Label
                         fx:id="labelLine1Sta"
-                        text=" 上  野"
+                        text="ああああ"
                         AnchorPane.leftAnchor="0"
                         AnchorPane.topAnchor="20"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine1Arrive"
-                        text="１０：２６"
+                        text="９９：９９"
                         AnchorPane.leftAnchor="220"
                         AnchorPane.topAnchor="20"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine1ArriveSec"
-                        text="００"
+                        text="99"
                         AnchorPane.leftAnchor="420"
                         AnchorPane.topAnchor="20"
-                        styleClass="plane-text-ff"
+                        styleClass="text-second"
                     />
                     <Label
                         fx:id="labelLine1Depart"
-                        text="１０：２８"
+                        text="９９：９９"
                         AnchorPane.leftAnchor="540"
                         AnchorPane.topAnchor="20"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine1DepartSec"
-                        text="００"
+                        text="99"
                         AnchorPane.leftAnchor="740"
                         AnchorPane.topAnchor="20"
-                        styleClass="plane-text-ff"
+                        styleClass="text-second"
                     />
                     <Label
                         fx:id="labelLine1Track"
-                        text="６"
+                        text="９９"
                         AnchorPane.leftAnchor="820"
                         AnchorPane.topAnchor="20"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine1Limit"
-                        text=""
+                        text="99 / 99"
                         AnchorPane.rightAnchor="0"
                         AnchorPane.topAnchor="20"
-                        styleClass="plane-text-ff"
+                        styleClass="speedLimit"
                     />
 
                     <Label
                         fx:id="labelLine2Sta"
-                        text="青物横丁"
+                        text="いいいい"
                         AnchorPane.leftAnchor="0"
                         AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2Arrive"
-                        text="     ⇩"
+                        text="９９：９９"
                         AnchorPane.leftAnchor="220"
                         AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2ArriveSec"
-                        text=""
+                        text="99"
                         AnchorPane.leftAnchor="420"
                         AnchorPane.topAnchor="70"
-                        styleClass="plane-text-ff"
+                        styleClass="text-second"
                     />
                     <Label
                         fx:id="labelLine2Depart"
-                        text="      ３８"
+                        text="９９：９９"
                         AnchorPane.leftAnchor="540"
                         AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2DepartSec"
-                        text="１５"
+                        text="99"
                         AnchorPane.leftAnchor="740"
                         AnchorPane.topAnchor="70"
-                        styleClass="plane-text-ff"
+                        styleClass="text-second"
                     />
                     <Label
                         fx:id="labelLine2Track"
-                        text=""
+                        text="９９"
                         AnchorPane.leftAnchor="820"
                         AnchorPane.topAnchor="70"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine2Limit"
-                        text="45 / 60"
+                        text="99 / 99"
                         AnchorPane.rightAnchor="0"
                         AnchorPane.topAnchor="70"
-                        styleClass="plane-text-ff"
+                        styleClass="speedLimit"
                     />
 
                     <Label
                         fx:id="labelLine3Sta"
-                        text=" やべっ"
+                        text="ああああ"
                         AnchorPane.leftAnchor="0"
                         AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3Arrive"
-                        text="      ３９"
+                        text="９９：９９"
                         AnchorPane.leftAnchor="220"
                         AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3ArriveSec"
-                        text="４５"
+                        text="99"
                         AnchorPane.leftAnchor="420"
                         AnchorPane.topAnchor="120"
-                        styleClass="plane-text-ff"
+                        styleClass="text-second"
                     />
                     <Label
                         fx:id="labelLine3Depart"
-                        text="      ４１"
+                        text="９９：９９"
                         AnchorPane.leftAnchor="540"
                         AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3DepartSec"
-                        text="１５"
+                        text="99"
                         AnchorPane.leftAnchor="740"
                         AnchorPane.topAnchor="120"
-                        styleClass="plane-text-ff"
+                        styleClass="text-second"
                     />
                     <Label
                         fx:id="labelLine3Track"
-                        text="１０"
+                        text="９９"
                         AnchorPane.leftAnchor="820"
                         AnchorPane.topAnchor="120"
                         styleClass="plane-text-ff"
                     />
                     <Label
                         fx:id="labelLine3Limit"
-                        text="45 /   "
+                        text="99 / 99"
                         AnchorPane.rightAnchor="0"
                         AnchorPane.topAnchor="120"
-                        styleClass="plane-text-ff"
+                        styleClass="speedLimit"
                     />
+                </AnchorPane>
+            </StackPane>
+
+            <StackPane
+                AnchorPane.bottomAnchor="60"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0"
+            >
+                <Rectangle
+                    width="920"
+                    height="120"
+                    fill="#000000"
+                />
+
+                <AnchorPane>
+                    <Label
+                        text="ドア"
+                        AnchorPane.leftAnchor="30"
+                        AnchorPane.topAnchor="10"
+                        styleClass="plane-text"
+                    />
+                    <HBox
+                        fx:id="formationHBox"
+                        AnchorPane.leftAnchor="0"
+                        AnchorPane.rightAnchor="0"
+                        AnchorPane.topAnchor="0"
+                        AnchorPane.bottomAnchor="0"
+                        alignment="CENTER"
+                        spacing="5"
+                    >
+                    <!--
+                        <VBox
+                            alignment="CENTER" spacing="1"
+                        >
+                            <StackPane>
+                                <Rectangle
+                                    width="40"
+                                    height="20"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                                <Label
+                                    text="閉"
+                                    styleClass="plane-text-ff"
+                                />
+                            </StackPane>
+
+                            <Region prefHeight="20"/>
+
+                            <HBox
+                                alignment="CENTER"
+                                spacing="25"
+                            >
+                                <Group>
+                                    <Line
+                                        startX="3" startY="0"
+                                        endX="0" endY="3"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                    <Line
+                                        startX="0" startY="3"
+                                        endX="3" endY="6"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                </Group>
+                                <Group>
+                                    <Line
+                                        startX="0" startY="0"
+                                        endX="3" endY="3"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                    <Line
+                                        startX="3" startY="3"
+                                        endX="0" endY="6"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                </Group>
+                            </HBox>
+                            
+                            <StackPane>
+                                <Rectangle
+                                    width="50"
+                                    height="20"
+                                    stroke="#ffffff"
+                                    fill="#2f3e56"
+                                />
+                                <Label
+                                    text="１"
+                                    styleClass="plane-text-ff"
+                                />
+                            </StackPane>
+
+                            <HBox
+                                alignment="CENTER" spacing="25"
+                            >
+                                <Circle
+                                    radius="4"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                                <Circle
+                                    radius="4"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                            </HBox>
+                        </VBox>
+
+                        <VBox
+                            alignment="CENTER" spacing="1"
+                        >
+                            <StackPane>
+                                <Rectangle
+                                    width="40"
+                                    height="20"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                                <Label
+                                    text="閉"
+                                    styleClass="plane-text-ff"
+                                />
+                            </StackPane>
+
+                            <Region prefHeight="20"/>
+                            
+                            <HBox
+                                alignment="CENTER"
+                                spacing="25"
+                            >
+                                <Group>
+                                    <Line
+                                        startX="3" startY="0"
+                                        endX="0" endY="3"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                    <Line
+                                        startX="0" startY="3"
+                                        endX="3" endY="6"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                </Group>
+                                <Group>
+                                    <Line
+                                        startX="0" startY="0"
+                                        endX="3" endY="3"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                    <Line
+                                        startX="3" startY="3"
+                                        endX="0" endY="6"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                </Group>
+                            </HBox>
+                            
+                            <StackPane>
+                                <Rectangle
+                                    width="50"
+                                    height="20"
+                                    stroke="#ffffff"
+                                    fill="#2f3e56"
+                                />
+                                <Label
+                                    text="２"
+                                    styleClass="plane-text-ff"
+                                />
+                            </StackPane>
+
+                            <HBox
+                                alignment="CENTER" spacing="25"
+                            >
+                                <Circle
+                                    radius="4"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                                <Circle
+                                    radius="4"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                            </HBox>
+                        </VBox>
+
+                        <VBox
+                            alignment="CENTER" spacing="1"
+                        >
+                            <StackPane>
+                                <Rectangle
+                                    width="40"
+                                    height="20"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                                <Label
+                                    text="閉"
+                                    styleClass="plane-text-ff"
+                                />
+                            </StackPane>
+
+                            <Region prefHeight="20"/>
+
+                            <HBox
+                                alignment="CENTER"
+                                spacing="25"
+                            >
+                                <Group>
+                                    <Line
+                                        startX="3" startY="0"
+                                        endX="0" endY="3"
+                                        stroke="#ffff00"
+                                        strokeWidth="1"
+                                    />
+                                    <Line
+                                        startX="0" startY="3"
+                                        endX="3" endY="6"
+                                        stroke="#ffff00"
+                                        strokeWidth="1"
+                                    />
+                                </Group>
+                                <Group>
+                                    <Line
+                                        startX="0" startY="0"
+                                        endX="3" endY="3"
+                                        stroke="#ffff00"
+                                        strokeWidth="1"
+                                    />
+                                    <Line
+                                        startX="3" startY="3"
+                                        endX="0" endY="6"
+                                        stroke="#ffff00"
+                                        strokeWidth="1"
+                                    />
+                                </Group>
+                            </HBox>
+                            
+                            <StackPane>
+                                <Rectangle
+                                    width="50"
+                                    height="20"
+                                    stroke="#ffffff"
+                                    fill="#2f3e56"
+                                />
+                                <Label
+                                    text="３"
+                                    styleClass="plane-text-ff"
+                                />
+                            </StackPane>
+
+                            <HBox
+                                alignment="CENTER" spacing="25"
+                            >
+                                <Circle
+                                    radius="4"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                                <Circle
+                                    radius="4"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                            </HBox>
+                        </VBox>
+
+                        <VBox
+                            alignment="CENTER" spacing="1"
+                        >
+                            <StackPane>
+                                <Rectangle
+                                    width="40"
+                                    height="20"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                                <Label
+                                    text="閉"
+                                    styleClass="plane-text-ff"
+                                />
+                            </StackPane>
+
+                            <Region prefHeight="20"/>
+
+                            <HBox
+                                alignment="CENTER"
+                                spacing="25"
+                            >
+                                <Group>
+                                    <Line
+                                        startX="3" startY="0"
+                                        endX="0" endY="3"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                    <Line
+                                        startX="0" startY="3"
+                                        endX="3" endY="6"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                </Group>
+                                <Group>
+                                    <Line
+                                        startX="0" startY="0"
+                                        endX="3" endY="3"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                    <Line
+                                        startX="3" startY="3"
+                                        endX="0" endY="6"
+                                        stroke="#000000"
+                                        strokeWidth="1"
+                                    />
+                                </Group>
+                            </HBox>
+                            
+                            <StackPane>
+                                <Rectangle
+                                    width="50"
+                                    height="20"
+                                    stroke="#ffffff"
+                                    fill="#2f3e56"
+                                />
+                                <Label
+                                    text="４"
+                                    styleClass="plane-text-ff"
+                                />
+                            </StackPane>
+
+                            <HBox
+                                alignment="CENTER" spacing="25"
+                            >
+                                <Circle
+                                    radius="4"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                                <Circle
+                                    radius="4"
+                                    stroke="#ffffff"
+                                    fill="#000000"
+                                />
+                            </HBox>
+                        </VBox>
+                        -->
+                    </HBox>
                 </AnchorPane>
             </StackPane>
 
@@ -374,7 +734,7 @@
                 styleClass="normal-button, tims-button"
                 prefWidth="150"
                 prefHeight="50"
-                AnchorPane.rightAnchor="160"
+                AnchorPane.rightAnchor="170"
                 AnchorPane.bottomAnchor="5"
             />
             <Button
@@ -383,7 +743,7 @@
                 styleClass="normal-button, tims-button"
                 prefWidth="150"
                 prefHeight="50"
-                AnchorPane.rightAnchor="5"
+                AnchorPane.rightAnchor="20"
                 AnchorPane.bottomAnchor="5"
             />
         </AnchorPane>

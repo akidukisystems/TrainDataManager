@@ -3,6 +3,8 @@ package jp.akidukisystems.software.TrainDataClient;
 /* 処理系 */
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+
 import org.json.JSONObject;
 
 /* AWT系 */
@@ -36,19 +38,13 @@ import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator;
 import jp.akidukisystems.software.TrainDataClient.GUI.NetworkIndicator.TRTYPE;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.TimsSetup;
 import jp.akidukisystems.software.TrainDataClient.Protector.ATSPController;
-import jp.akidukisystems.software.TrainDataClient.duty.OperationManager;
+import jp.akidukisystems.software.TrainDataClient.duty.TimsToolkit;
 import jp.akidukisystems.software.utilty.DutyCardRepository;
 import jp.akidukisystems.software.utilty.NetworkManager;
 import jp.akidukisystems.software.utilty.WrapLayout;
 
 public class TDCCore 
-{
-    enum ADRS_LIST {ADRS_LAPTOP, ADRS_LOCALHOST};
-    private static final ADRS_LIST ADRS_SELECT = ADRS_LIST.ADRS_LOCALHOST;
-    private static final String ADRS_LAPTOP = "192.168.137.1";
-    private static final String ADRS_LOCALHOST = "localhost";
-    
-    private static final int PORT = 34575;
+{  
     public static final int DOOR_CLOSE = 0;
     public static final int DOOR_RIGHT = 1;
     public static final int DOOR_LEFT = 2;
@@ -69,6 +65,7 @@ public class TDCCore
     private static final String NA = "N/A"; 
 
     String address = null;
+    int port = 34575;
 
     String distanceSetText = "0";
 
@@ -122,9 +119,11 @@ public class TDCCore
     public TrainNumber tn = null;   
     public TrainControl tc = null;   
     public DutyCardRepository dcr = null;
-    public OperationManager om = null;
-    private ATSPController atsp = null;
+    public TimsToolkit om = null;
     public TimsUpdater timsUpdater = null;
+
+    private ATSPController atsp = null;
+    private ConfigManager cfg = null;
     
     public static void main(String[] args) 
     {
@@ -756,28 +755,21 @@ public class TDCCore
     // MARK: 
     public void running()
     {
-        switch (ADRS_SELECT) {
-            case ADRS_LIST.ADRS_LOCALHOST:
-                address = ADRS_LOCALHOST;
-                break;
+        cfg = new ConfigManager();
+        cfg.load();
 
-            case ADRS_LIST.ADRS_LAPTOP:
-                address = ADRS_LAPTOP;
-                break;
-        
-            default:
-                break;
-        }
+        address = cfg.get("ipAddress", "localhost");
+        port = Integer.parseInt(cfg.get("port", "34575"));
 
         tn = new TrainNumber();
         networkManager = new NetworkManager();
-        networkManager.clientInit(address, PORT, 60000, 32768);
+        networkManager.clientInit(address, port, 60000, 32768);
 
         tc = new TrainControl();
         tc.boolTrainStatInit(128);
 
         dcr = new DutyCardRepository();
-        om = new OperationManager();
+        om = new TimsToolkit();
 
         timsUpdater = new TimsUpdater();
         timsUpdater.init(tc);
@@ -799,7 +791,7 @@ public class TDCCore
             }
         }));
 
-        System.out.println("client starting on "+ address +":"+ PORT +"...");
+        System.out.println("client starting on "+ address +":"+ port +"...");
 
         tc.refreshTimer();
         reset();
@@ -825,6 +817,11 @@ public class TDCCore
             TimsSetup.setCore(this);
             Application.launch(TimsSetup.class);
         }).start();
+
+        // new Thread(() -> {
+        //     GaugeController.setCore(this);
+        //     Application.launch(GaugeController.class);
+        // }).start();
 
         new Thread(() ->
         {
@@ -863,6 +860,7 @@ public class TDCCore
                                 tc.setMr(jsonObj.getInt("mr"));
                                 tc.setMove(jsonObj.getFloat("move"));
                                 tc.setMoveTo(jsonObj.getInt("moveTo"));
+                                tc.setTotalMove(jsonObj.getFloat("totalMove"));
                                 tc.setReverser(jsonObj.getInt("reverser"));
                                 tc.setLimit(jsonObj.getInt("speedLimit"));
                                 tc.setTASCEnable(jsonObj.getBoolean("isTASCEnable"));
@@ -876,6 +874,9 @@ public class TDCCore
                                 tc.handleRunningOpen();
                                 atsp.handleATSNW();
                                 tc.handleArrivingStation();
+                                tc.handleEvent();
+                                tc.setFormation(tc.getCars(), null);
+                       
                                 // GUI更新
                                 onEdt(() ->
                                 {

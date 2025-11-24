@@ -66,7 +66,14 @@ public class TrainLogger {
     // キロ程
     private float movedDistance;
     private int moveTo;
+    private float totalMove;
 
+    public float getTotalMove() {
+        return totalMove;
+    }
+    public void setTotalMove(float totalMove) {
+        this.totalMove = totalMove;
+    }
     // Getter and Setter
     public int getBc() {
         return bc;
@@ -116,8 +123,8 @@ public class TrainLogger {
     private static final float SCALE_MR = 0.311f;                   // 0.311倍すると現実的な値になる
     private static final float SCALE_DISTANCE = 1000f /3600f /2f;   // 1km / 1h / 何故か2倍した値なので /2
     private static final int TICK_GET_DATA_INTERVAL = 10;           // 10tickごとに列車データ取得
-    private static final int MOVE_DIRECTION_UP = 1;                 // 上り方向
-    private static final int MOVE_DIRECTION_DOWN = 0;               // 下り方向
+    private static final int MOVE_DIRECTION_UP = 0;                 // 上り方向
+    private static final int MOVE_DIRECTION_DOWN = 1;               // 下り方向
 
     private boolean isFirst = true;
 
@@ -156,6 +163,7 @@ public class TrainLogger {
         // moveTo = 0...上り（カウントダウン）　1...下り（カウントアップ）
         this.movedDistance = 0f;
         this.moveTo = 1;
+        this.totalMove = 0f;
 
         this.formation = 0;
     }
@@ -326,13 +334,15 @@ public class TrainLogger {
 
             // 上りで0未満になってしまうならカウントアップ
             float move1sec = (float)this.speed * SCALE_DISTANCE;
-            if ((moveTo == MOVE_DIRECTION_DOWN) && ((this.movedDistance - move1sec) < 0f )) moveTo = MOVE_DIRECTION_UP;
+            if ((moveTo == MOVE_DIRECTION_UP) && ((this.movedDistance - move1sec) < 0f )) moveTo = MOVE_DIRECTION_DOWN;
 
             if (moveTo == MOVE_DIRECTION_DOWN) {
-                this.movedDistance -= move1sec;
-            } else {
                 this.movedDistance += move1sec;
+            } else {
+                this.movedDistance -= move1sec;
             }
+
+            this.totalMove += move1sec;
             
             
             // 出力 jsonにするよ～
@@ -363,6 +373,7 @@ public class TrainLogger {
 
                 this.movedDistance, 
                 this.moveTo,
+                this.totalMove,
                 this.formation,
 
                 this.isOnRail, 

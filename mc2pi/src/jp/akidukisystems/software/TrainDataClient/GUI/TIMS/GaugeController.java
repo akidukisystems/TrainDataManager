@@ -1,7 +1,7 @@
 package jp.akidukisystems.software.TrainDataClient.GUI.TIMS;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Background;
@@ -11,20 +11,22 @@ import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
-import jp.akidukisystems.software.TrainDataClient.TimsUpdater;
 import jp.akidukisystems.software.TrainDataClient.TrainControl;
 import jp.akidukisystems.software.TrainDataClient.TrainNumber;
 import jp.akidukisystems.software.TrainDataClient.duty.TimsToolkit;
 import jp.akidukisystems.software.utilty.DutyCardRepository;
 import jp.akidukisystems.software.utilty.NetworkManager;
 
-public class TimsSetup extends Application
-{
+public class GaugeController extends Application {
+
     private static TDCCore staticCore;
 
     private TDCCore core;
@@ -38,8 +40,6 @@ public class TimsSetup extends Application
     private TrainNumber tn;
     @SuppressWarnings("unused")
     private NetworkManager nm;
-    @SuppressWarnings("unused")
-    private TimsUpdater tu;
 
     private final double baseWidth = 1280;
     private final double baseHeight = 720;
@@ -58,13 +58,10 @@ public class TimsSetup extends Application
         this.om = (core != null) ? core.om : null;
         this.tn = (core != null) ? core.tn : null;
         this.nm = (core != null) ? core.networkManager : null;
-        this.tu = (core != null) ? core.timsUpdater : null;
     }
 
     @Override
-    public void start(Stage stage) throws Exception
-    {
-        // 親を作る
+    public void start(Stage stage) {
         StackPane root = new StackPane();
         root.setPrefSize(1280, 720);
 
@@ -73,22 +70,9 @@ public class TimsSetup extends Application
         container.setPrefSize(960, 720);
         root.getChildren().add(container);
 
-        FXMLLoader loader = new FXMLLoader
-        (
-            getClass().getResource
-            (
-                "/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/S00AB.fxml"
-            )
-        );
+        Parent child = createChildContent();
 
-        Parent child = loader.load();
 
-        Object controller = loader.getController();
-        if (controller instanceof BaseController c)
-        {
-            c.init(core);
-            c.setContainer(container);
-        }
 
         if (child instanceof Region r) {
             r.setPrefSize(960, 720);
@@ -102,22 +86,25 @@ public class TimsSetup extends Application
             )));
         }
 
-        // コンテナの子にFXMLの中身ぶちまけ
         container.getChildren().setAll(child);
         container.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
 
         Scene scene = new Scene(root, baseWidth, baseHeight);
 
-        scene.getStylesheets().add
-        (
-            getClass().getResource
-            (
-                "/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/style.css"
-            ).toExternalForm()
-        );
-
         stage.setScene(scene);
         stage.setTitle("TIMS");
         stage.show();
+    }
+
+    private Parent createChildContent() {
+
+        StackPane root = new StackPane();
+        root.setPrefSize(960, 720);
+
+        return root;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

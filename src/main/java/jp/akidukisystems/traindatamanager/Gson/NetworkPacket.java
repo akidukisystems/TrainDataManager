@@ -27,6 +27,7 @@ public class NetworkPacket {
 
     public float move;
     public int moveTo;
+    public float totalMove;
     
     public int formation;
 
@@ -60,6 +61,7 @@ public class NetworkPacket {
 
         float move, 
         int moveTo,
+        float totalMove,
 
         int formation,
 
@@ -92,6 +94,7 @@ public class NetworkPacket {
 
         this.move = move;
         this.moveTo = moveTo;
+        this.totalMove = totalMove;
 
         this.formation = formation;
 

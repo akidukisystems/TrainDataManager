@@ -53,7 +53,7 @@ public class ATSPController
         this.distance = distance;
         if(distance != 0)
         {
-            catchedDistance = train.getMove();
+            catchedDistance = train.getTotalMove();
             targetSpeed = -1; // 停止パターンなのでターゲット速度は0にする
             isPatternActive = true;
 
@@ -70,7 +70,7 @@ public class ATSPController
 
         targetSpeed = targetSpeedTemp;
         distance = distancetemp;
-        catchedDistance = train.getMove();
+        catchedDistance = train.getTotalMove();
         isPatternActive = true;
 
         // ビーコン受信してパターン生成したら緩解表示は消える
@@ -91,8 +91,7 @@ public class ATSPController
                     if (isPatternActive && train.getboolTrainStat(TrainControl.ATS_POWER)
                             && train.getboolTrainStat(TrainControl.ATS_P_POWER) && train.getboolTrainStat(TrainControl.ATS_P_ACTIVE))
                     {
-                        float movedDistance = train.getMove() - catchedDistance;
-                        if (movedDistance < 0) movedDistance *= -1;
+                        float movedDistance = train.getTotalMove() - catchedDistance;
 
                         float remain = distance - movedDistance -5; // 余裕持って5m手前にする
                         float speed = train.getSpeed();

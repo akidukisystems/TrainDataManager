@@ -5,7 +5,6 @@ import jp.akidukisystems.software.TrainDataClient.Protector.ATSPController;
 
 public class TrainControl
 {
-
     public static final int ATS_OPERATING = 0;
     public static final int ATS_POWER = 1;
     public static final int ATS_P_ERROR = 2;
@@ -46,17 +45,124 @@ public class TrainControl
     Timer ebTimer;
     Timer ebActiveTimer;
 
-    enum formationInfo
+    public EventWatcher ew = null;
+
+    public enum formationInfo
     {
-        Tc,
-        T,
-        M,
-        Mc
+        Tc, // クハ
+        T,  // サハ
+        Tm, // モハ パンタなし
+        M,  // モハ パンタあり
+        Mc  // クモハ パンタあり
+    }
+
+    private formationInfo[] formation = null;
+
+    public void setFormation(int cars, formationInfo[] newFormation)
+    {
+        if(newFormation == null)
+        {
+            // Javaのおもろいところ
+            // 式は左から右に評価が進む
+            // たとえば、 (A && B) という条件式を評価するとき
+            // A = false の場合、(A && B) = false となるので、
+            // Bは評価する必要がない。
+            // なので、Javaはこの場合Bを評価しない！！
+            
+            if(this.formation != null && this.formation.length == cars)
+                return; // 編成変わらないなら何もしない
+
+            switch (cars)
+            {
+                case 2:
+                    this.formation = new formationInfo[]
+                    {
+                        // 1号車 クハ
+                        // 2号車 クモハ
+                        formationInfo.Tc,
+                        formationInfo.Mc
+                    };
+                    break;
+
+                case 3:
+                    this.formation = new formationInfo[]
+                    {
+                        // 1号車 クハ
+                        // 2号車 モハ
+                        // 3号車 クハ
+                        formationInfo.Tc,
+                        formationInfo.M,
+                        formationInfo.Tc
+                    };
+                    break;
+
+                case 4:
+                    this.formation = new formationInfo[]
+                    {
+                        // 1号車 クハ
+                        // 2号車 モハ ユニット1-a
+                        // 3号車 モハ ユニット1-b
+                        // 4号車 クハ
+                        formationInfo.Tc,
+                        formationInfo.M,
+                        formationInfo.Tm,
+                        formationInfo.Tc
+                    };
+                    break;
+
+                case 8:
+                    this.formation = new formationInfo[]
+                    {
+                        // 1号車 クハ
+                        // 2号車 サハ
+                        // 3号車 モハ unit1-a
+                        // 4号車 モハ unit1-b
+                        // 5号車 サハ
+                        // 6号車 サハ
+                        // 7号車 モハ unit1-b
+                        // 8号車 クモハ unit1-a
+                        formationInfo.Tc,
+                        formationInfo.T,
+                        formationInfo.M,
+                        formationInfo.Tm,
+                        formationInfo.T,
+                        formationInfo.T,
+                        formationInfo.Tm,
+                        formationInfo.Mc
+                    };
+                    break;
+            
+                default:
+                    this.formation = null;
+                    break;
+            }
+        }
+        else
+        {
+            if(newFormation.length == cars)
+                this.formation = newFormation; // 長さが合うときだけ代入
+        }
+    }
+
+    public formationInfo[] getFormations()
+    {
+        return formation;
+    }
+
+    // carは号車番号-1
+    // 1号車=0 2号車=1 ... n号車=n-1
+    public formationInfo getFormationFromCar(int car)
+    {
+        if(formation != null && car >= 0 && car < formation.length)
+            return formation[car];
+
+        return null;
     }
 
     public TrainControl()
     {
         atspController = new ATSPController(this);
+        ew = new EventWatcher();
     }
     
     private ATSPController atspController;
@@ -144,6 +250,15 @@ public class TrainControl
     public void setMove(float move)
     {
         this.move = move;
+    }
+
+    private float totalMove = 0f;
+
+    public float getTotalMove() {
+        return totalMove;
+    }
+    public void setTotalMove(float totalMove) {
+        this.totalMove = totalMove;
     }
 
     private int moveTo = 1;
@@ -303,42 +418,55 @@ public class TrainControl
         return (speed > 5f);
     }
 
+    public void handleEvent()
+    {
+        ew.eventsCheck(isArrivingStation, door, speed);
+    }
+
     public void handleArrivingStation()
     {
         // 次駅まで300m未満
         if (beaconGetedPos != 0f)
         {
-            System.out.println(beaconGetedPos + 300f - move);
+            System.out.println(beaconGetedPos + 300f - totalMove);
             System.out.println(speed * 3);
 
             // 次駅接近報知
             if (!isArrivingStation)
             {
                 // 今の速度から駅までの予想停車距離を計算し、駅までの距離を上回ったら報知
-                if ((speed * 3) > (beaconGetedPos + 300f - move))
+                if ((speed * 3) > (beaconGetedPos + 300f - totalMove))
                 {
                     isArrivingStation = true;
                 }
             }
-        }
 
-        // 所定停目付近に停車か、100m以上通過した場合解除
-        if ((0 >= (beaconGetedPos + 300f - move + 100f)) || (!isRunningTrain() && (5f >= (beaconGetedPos + 300f - move))))
-        {
-            isArrivingStation = false;
-            beaconGetedPos = 0f;
+            // 100m以上通過
+            if (0 >= (beaconGetedPos + 300f - totalMove + 100f))
+            {
+                isArrivingStation = false;
+                beaconGetedPos = 0f;
+                ew.passingEventRaise();
+            }
+
+            // 停車予測地点に停車
+            if (!isRunningTrain() && (5f >= (beaconGetedPos + 300f - totalMove)))
+            {
+                isArrivingStation = false;
+                beaconGetedPos = 0f;
+            }
         }
     }
 
     // 列車接近報知機の地上子設定
     public void setArraivingStation(int signal_1)
     {
-        if (signal_1 == 1) beaconGetedPos = move;
+        if (signal_1 == 1) beaconGetedPos = totalMove;
         if (signal_1 == 2)
         {
             // 強制的に通過判定
-            beaconGetedPos = 0f;
             isArrivingStation = false;
+            beaconGetedPos = 0f;
         }
     }
 
@@ -623,4 +751,28 @@ public class TrainControl
         });
     }
     
+    float prevSpeed = 0f;
+    public enum speedState
+    {
+        None,
+        Up,
+        Down
+    }
+
+    public speedState getSpeedState()
+    {
+        if(notch > 0 && prevSpeed < speed)
+        {
+            prevSpeed = speed;
+            return speedState.Up;
+        }
+
+        if(notch < 0 && prevSpeed > speed)
+        {
+            prevSpeed = speed;
+            return speedState.Down;
+        }
+
+        return speedState.None;
+    }
 }

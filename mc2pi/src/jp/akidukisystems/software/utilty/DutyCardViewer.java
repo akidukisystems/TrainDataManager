@@ -134,14 +134,14 @@ public class DutyCardViewer extends JFrame {
 
     // ====== Lines ======
     private JTable makeLinesTable() {
-        List<Line> list = new ArrayList<>(data.lines.values());
+        List<DcrLine> list = new ArrayList<>(data.lines.values());
         list.sort(Comparator.comparingInt(l -> l.id));
         return new JTable(new AbstractTableModel() {
             @Override public int getRowCount() { return list.size(); }
             @Override public int getColumnCount() { return 2; }
             @Override public String getColumnName(int c) { return new String[]{"ID","LineName"}[c]; }
             @Override public Object getValueAt(int r, int c) {
-                Line x = list.get(r);
+                DcrLine x = list.get(r);
                 return switch (c) { case 0 -> x.id; case 1 -> x.name; default -> ""; };
             }
         });

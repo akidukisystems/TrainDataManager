@@ -27,7 +27,7 @@ public class DutyCardRepository {
             System.out.println(s.id + ": " + s.name);
         }
 
-        for (DutyCardReader.Line s : dcr.getLines()) {
+        for (DutyCardReader.DcrLine s : dcr.getLines()) {
             System.out.println(s.id + ": " + s.name);
         }
 
@@ -91,11 +91,11 @@ public class DutyCardRepository {
     }
 
     // ===== Line =====
-    public DutyCardReader.Line getLine(int id) {
+    public DutyCardReader.DcrLine getLine(int id) {
         return data.lines.get(id);
     }
 
-    public Collection<DutyCardReader.Line> getLines() {
+    public Collection<DutyCardReader.DcrLine> getLines() {
         return data.lines.values();
     }
 
@@ -128,23 +128,27 @@ public class DutyCardRepository {
         return null; // 見つからないとき
     }
 
-    public DutyCardReader.Station[] getSurroundingStations(
-            double currentKilopost,
-            DutyCardReader.Line line,
-            DutyCardReader.Direction direction,
-            DutyCardReader.TimeTable timeTable) {
+    public DutyCardReader.TimeTableEntry[] getSurroundingStations
+    (
+        double currentKilopost,
+        DutyCardReader.DcrLine line,
+        DutyCardReader.Direction direction,
+        DutyCardReader.TimeTable timeTable
+    ) {
 
-        if (timeTable == null || timeTable.entries == null || timeTable.entries.isEmpty()) {
-            return new DutyCardReader.Station[]{null, null, null};
+        if (timeTable == null || timeTable.entries == null || timeTable.entries.isEmpty())
+        {
+            return new DutyCardReader.TimeTableEntry[]{null, null, null};
         }
 
         List<DutyCardReader.TimeTableEntry> entries = new ArrayList<>(timeTable.entries);
 
-        DutyCardReader.Station prevStation = null;
-        DutyCardReader.Station nextStation = null;
-        DutyCardReader.Station nextNextStation = null;
+        DutyCardReader.TimeTableEntry prevStation = null;
+        DutyCardReader.TimeTableEntry nextStation = null;
+        DutyCardReader.TimeTableEntry nextNextStation = null;
 
-        for (int i = 0; i < entries.size(); i++) {
+        for (int i = 0; i < entries.size(); i++)
+        {
             DutyCardReader.TimeTableEntry e = entries.get(i);
             DutyCardReader.Station station = getStation(e.stationId);
 
@@ -152,18 +156,26 @@ public class DutyCardRepository {
 
             if (station == null || station.lineId != line.id) continue;
 
-            if ((direction == DutyCardReader.Direction.UP && stationKilopost < currentKilopost) ||
-                (direction == DutyCardReader.Direction.DOWN && stationKilopost > currentKilopost)) {
+            if
+            (
+                (direction == DutyCardReader.Direction.UP   && stationKilopost < currentKilopost) ||
+                (direction == DutyCardReader.Direction.DOWN && stationKilopost > currentKilopost)
+            ) {
 
-                if(nextStation == null) nextStation = station;
+                if(nextStation == null) nextStation = e;
             }
             
-            // 現在地点と同じキロポストなら次の駅とする
-            if (Math.round(stationKilopost * 100.0) / 100.0 == Math.round(currentKilopost * 100.0) / 100.0) {
-                nextStation = station;
+            // 現在地点と同じキロポストなら
+            // その次の駅が次駅になる
+            // その次の駅が無いなら（つまり、終点）
+            // 仕方ないのでこの駅を次駅にする
+            if (Math.round(stationKilopost * 100.0) / 100.0 == Math.round(currentKilopost * 100.0) / 100.0)
+            {
+                if((i +1) < entries.size())
+                    nextStation = entries.get(i +1);
+                else
+                    nextStation = e;
             }
-
-            
         }
 
         // 次の駅がわからなかったとき 境界駅の可能性があるので、とりあえず境界駅を探してみる
@@ -182,7 +194,7 @@ public class DutyCardRepository {
                 {
                     if(prevStationKilopost < stationKilopost)
                     {
-                        nextStation = station;
+                        nextStation = e;
                         break;
                     }
                 }
@@ -191,7 +203,7 @@ public class DutyCardRepository {
                 {
                     if(prevStationKilopost > stationKilopost)
                     {
-                        nextStation = station;
+                        nextStation = e;
                         break;
                     }
                 }
@@ -201,32 +213,128 @@ public class DutyCardRepository {
         }
 
         // ひとまず次の駅をもってくる
-        System.out.println(nextStation.name);
 
         // この「次の駅」とやらが時刻表で何駅目か探す
         int index = -1;
-        for (int i = 0; i < entries.size(); i++) {
+        for (int i = 0; i < entries.size(); i++)
+        {
             DutyCardReader.TimeTableEntry e = entries.get(i);
-            if (e.stationId == nextStation.id) {
+            if (e == nextStation)
+            {
                 index = i;
                 break;
             }
         }
 
-        if (index != -1) {
+        if (index != -1)
+        {
             // 前の駅！
-            if (index - 1 >= 0) {
-                prevStation = getStation(entries.get(index - 1).stationId);
+            if (index - 1 >= 0)
+            {
+                prevStation = entries.get(index - 1);
             }
 
             // 次の次の駅！
-            if (index + 1 < entries.size()) {
-                nextNextStation = getStation(entries.get(index + 1).stationId);
+            if (index + 1 < entries.size())
+            {
+                nextNextStation = entries.get(index + 1);
             }
         }
 
-        return new DutyCardReader.Station[]{prevStation, nextStation, nextNextStation};
+        return new DutyCardReader.TimeTableEntry[]
+        {
+            prevStation,
+            nextStation,
+            nextNextStation
+        };
     }
+
+
+    public DutyCardReader.TimeTableEntry getNextStation
+    (
+        double currentKilopost,
+        DutyCardReader.DcrLine line,
+        DutyCardReader.Direction direction,
+        DutyCardReader.TimeTable timeTable
+    ) {
+
+        if (timeTable == null || timeTable.entries == null || timeTable.entries.isEmpty())
+        {
+            return null;
+        }
+
+        List<DutyCardReader.TimeTableEntry> entries = new ArrayList<>(timeTable.entries);
+
+        DutyCardReader.TimeTableEntry nextStation = null;
+
+        for (int i = 0; i < entries.size(); i++)
+        {
+            DutyCardReader.TimeTableEntry e = entries.get(i);
+            DutyCardReader.Station station = getStation(e.stationId);
+
+            double stationKilopost = station.linePost;
+
+            if (station == null || station.lineId != line.id) continue;
+
+            if
+            (
+                (direction == DutyCardReader.Direction.UP   && stationKilopost < currentKilopost) ||
+                (direction == DutyCardReader.Direction.DOWN && stationKilopost > currentKilopost)
+            ) {
+
+                if(nextStation == null) nextStation = e;
+            }
+            
+            // 現在地点と同じキロポストなら
+            // その次の駅が次駅になる
+            // その次の駅が無いなら（つまり、終点）
+            // 仕方ないのでこの駅を次駅にする
+            if (Math.round(stationKilopost * 100.0) / 100.0 == Math.round(currentKilopost * 100.0) / 100.0)
+            {
+                if((i +1) < entries.size())
+                    nextStation = entries.get(i +1);
+                else
+                    nextStation = e;
+            }
+        }
+
+        // 次の駅がわからなかったとき 境界駅の可能性があるので、とりあえず境界駅を探してみる
+        if(nextStation == null)
+        {
+            double prevStationKilopost = -1.0;
+
+            for (int i = 0; i < entries.size(); i++)
+            {
+                DutyCardReader.TimeTableEntry e = entries.get(i);
+                DutyCardReader.Station station = getStation(e.stationId);
+
+                double stationKilopost = station.linePost;
+
+                if ((prevStationKilopost != -1.0) && (direction == DutyCardReader.Direction.UP))
+                {
+                    if(prevStationKilopost < stationKilopost)
+                    {
+                        nextStation = e;
+                        break;
+                    }
+                }
+
+                if ((prevStationKilopost != -1.0) && (direction == DutyCardReader.Direction.DOWN))
+                {
+                    if(prevStationKilopost > stationKilopost)
+                    {
+                        nextStation = e;
+                        break;
+                    }
+                }
+
+                prevStationKilopost = stationKilopost;
+            }
+        }
+
+        return nextStation;
+    }
+
     // ===== TrainType =====
     public DutyCardReader.TrainType getTrainType(int id) {
         return data.trainTypes.get(id);

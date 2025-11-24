@@ -72,19 +72,24 @@ public class D13AA extends BaseController
                 om.setStation(repo.getStationByName(stationEntry));
                 om.setLine(repo.getLine(repo.getStationByName(stationEntry).lineId));
 
-                nm.sendCommand("send", "move", 1000f * repo.getStationByName(stationEntry).linePost);
-                
-                switch (om.getDirection()) {
-                    case UP:
-                        nm.sendCommand("send", "moveTo", 0);
-                        break;
+                double kilopost = repo.getStationByName(stationEntry).linePost;
+
+                if(kilopost != -1.0)
+                {
+                    nm.sendCommand("send", "move", 1000f * kilopost);
                     
-                    case DOWN:
-                        nm.sendCommand("send", "moveTo", 1);
-                        break;
-                
-                    default:
-                        break;
+                    switch (om.getDirection()) {
+                        case UP:
+                            nm.sendCommand("send", "moveTo", 0);
+                            break;
+                        
+                        case DOWN:
+                            nm.sendCommand("send", "moveTo", 1);
+                            break;
+                    
+                        default:
+                            break;
+                    }
                 }
 
 
