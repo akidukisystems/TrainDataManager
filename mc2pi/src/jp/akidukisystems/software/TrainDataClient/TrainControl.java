@@ -752,27 +752,38 @@ public class TrainControl
     }
     
     float prevSpeed = 0f;
-    public enum speedState
+    public enum SpeedState
     {
         None,
         Up,
         Down
     }
 
-    public speedState getSpeedState()
-    {
-        if(notch > 0 && prevSpeed < speed)
-        {
-            prevSpeed = speed;
-            return speedState.Up;
-        }
+    private SpeedState speedState;
 
-        if(notch < 0 && prevSpeed > speed)
-        {
-            prevSpeed = speed;
-            return speedState.Down;
-        }
-
-        return speedState.None;
+    public void setSpeedState(SpeedState speedState) {
+        this.speedState = speedState;
     }
+
+    public SpeedState getSpeedState()
+    {
+        return speedState;
+    }
+
+    public SpeedState convertSpeedStateFromInt(int value)
+    {
+        switch (value) {
+            case 0:
+                return SpeedState.None;
+
+            case 1:
+                return SpeedState.Up;
+            case -1:
+                return SpeedState.Down;
+        
+            default:
+                return null;
+        }
+    }
+    
 }

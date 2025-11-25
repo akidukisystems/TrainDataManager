@@ -3,8 +3,6 @@ package jp.akidukisystems.software.TrainDataClient;
 /* 処理系 */
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-
 import org.json.JSONObject;
 
 /* AWT系 */
@@ -866,6 +864,7 @@ public class TDCCore
                                 tc.setTASCEnable(jsonObj.getBoolean("isTASCEnable"));
                                 tc.setTASCBraking(jsonObj.getBoolean("isTASCBraking"));
                                 tc.setCars(jsonObj.getInt("formation"));
+                                tc.setSpeedState(tc.convertSpeedStateFromInt(jsonObj.getInt("speedState")));
 
                                 tc.handleDoors();
                                 tc.handleTEunlock();

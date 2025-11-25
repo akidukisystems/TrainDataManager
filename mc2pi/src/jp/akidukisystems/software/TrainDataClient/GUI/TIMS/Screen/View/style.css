@@ -28,6 +28,15 @@
     -fx-font-size: 20px;
 }
 
+.plane-text-yellow {
+    -fx-text-fill: #ffff00;
+    -fx-font-size: 20px;
+}
+
+.plane-text-no-textFill {
+    -fx-font-size: 20px;
+}
+
 .speedLimit {
     -fx-text-fill: #ffff00;
     -fx-font-size: 20px;

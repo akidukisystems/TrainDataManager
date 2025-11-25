@@ -371,6 +371,40 @@
                 </AnchorPane>
             </StackPane>
 
+            <AnchorPane
+                AnchorPane.bottomAnchor="190"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0"
+            >
+                <Label
+                    text="次停車駅"
+                    AnchorPane.leftAnchor="100"
+                    AnchorPane.topAnchor="20"
+                    styleClass="plane-text-ff"
+                />
+                <Label
+                    fx:id="labelNextStopStaName"
+                    text="ああああ"
+                    AnchorPane.leftAnchor="200"
+                    AnchorPane.topAnchor="20"
+                    styleClass="plane-text-yellow"
+                />
+                <Label
+                    fx:id="labelNextStopStaArrive"
+                    text="９９：９９"
+                    AnchorPane.leftAnchor="420"
+                    AnchorPane.topAnchor="20"
+                    styleClass="plane-text-ff"
+                />
+                <Label
+                    fx:id="labelNextStopStaArriveSec"
+                    text="99"
+                    AnchorPane.leftAnchor="620"
+                    AnchorPane.topAnchor="20"
+                    styleClass="text-second"
+                />
+            </AnchorPane>
+
             <StackPane
                 AnchorPane.bottomAnchor="60"
                 AnchorPane.leftAnchor="0"

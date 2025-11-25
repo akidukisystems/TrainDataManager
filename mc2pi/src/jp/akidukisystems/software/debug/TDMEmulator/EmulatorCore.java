@@ -22,6 +22,7 @@ public class EmulatorCore
     volatile int reverser = 1;
     volatile float move = 0f;
     volatile int moveTo = 0;
+    volatile int speedState = 0;
 
     public static void main(String[] args)
     {
@@ -56,7 +57,7 @@ public class EmulatorCore
                 @Override
                 public void run()
                 {
-
+                    float beforeSpeed = speed;
                     int beforeBC = bc;
 
                     if(bc > targetBc)
@@ -88,6 +89,19 @@ public class EmulatorCore
                         if(speed < 0f)
                             speed = 0f;
                     
+                    }
+
+                    if((speed > beforeSpeed) && (notch > 0))
+                    {
+                        speedState = 1;
+                    }
+                    else if((speed < beforeSpeed) && (notch < 0))
+                    {
+                        speedState = -1;
+                    }
+                    else
+                    {
+                        speedState = 0;
                     }
                 }
             }, 0, 80);
@@ -163,7 +177,7 @@ public class EmulatorCore
                     }
                 }
 
-                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":"+ move +",\"moveTo\":"+ moveTo +",\"totalMove\":0.0,\"formation\":8,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +"}");
+                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":"+ move +",\"moveTo\":"+ moveTo +",\"totalMove\":0.0,\"formation\":8,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +",\"speedState\":"+ speedState +"}");
                 
             }
         }).start();

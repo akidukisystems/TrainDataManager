@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -85,6 +86,10 @@ public class D01AA extends BaseController
     @FXML private Label labelLine3DepartSec;
     @FXML private Label labelLine3Track;
     @FXML private Label labelLine3Limit;
+
+    @FXML private Label labelNextStopStaName;
+    @FXML private Label labelNextStopStaArrive;
+    @FXML private Label labelNextStopStaArriveSec;
     
     Timeline timeline;
     Timeline blink;
@@ -94,10 +99,12 @@ public class D01AA extends BaseController
     private Label[] labelLine1;
     private Label[] labelLine2;
     private Label[] labelLine3;
+    private Label[] labelLineNextStopSta;
 
-     Rectangle[] rectDoorState;
+    Rectangle[] rectDoorState;
     Label[] labelDoorState;
-    Rectangle[] rectCarState;
+    Node[] nodeCarState;
+    Label[] labelCarState;
 
     @Override
     public void init(TDCCore core)
@@ -108,7 +115,7 @@ public class D01AA extends BaseController
         (
             new KeyFrame
             (
-                Duration.millis(600),   // 更新間隔（ms）
+                Duration.millis(100),   // 更新間隔（ms）
                 e -> update()
             )
         );
@@ -145,6 +152,13 @@ public class D01AA extends BaseController
             labelLine3ArriveSec,
             labelLine3Depart,
             labelLine3DepartSec
+        };
+
+        labelLineNextStopSta = new Label[]
+        {
+            labelNextStopStaName,
+            labelNextStopStaArrive,
+            labelNextStopStaArriveSec
         };
 
         btnS00AB.setOnAction(e -> goNext("/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/S00AB.fxml"));
@@ -195,6 +209,11 @@ public class D01AA extends BaseController
 
 
         for(Label s : labelLine3)
+        {
+            s.getTransforms().add(new Scale(2, 1, 0, 0));
+        }
+
+        for(Label s : labelLineNextStopSta)
         {
             s.getTransforms().add(new Scale(2, 1, 0, 0));
         }
@@ -260,9 +279,11 @@ public class D01AA extends BaseController
 
         int n = tc.getCars();
 
+        // rectCarStateはM, Tmしか入らないし、polyに関してはMcしか入らないので、正直こんなに配列いらない。
         rectDoorState  = new Rectangle[n];
         labelDoorState = new Label[n];
-        rectCarState   = new Rectangle[n];
+        nodeCarState   = new Node[n];
+        labelCarState  = new Label[n];
 
         for(int i = 0; i < n; i++)
         {
@@ -270,7 +291,7 @@ public class D01AA extends BaseController
             box.setAlignment(Pos.CENTER);
             box.setSpacing(1);
 
-            // ----------- 上の「閉」 -----------
+            // ----------- 上のダァ -----------
             StackPane sp1 = new StackPane();
 
             Rectangle r1 = new Rectangle(40, 20);
@@ -286,9 +307,9 @@ public class D01AA extends BaseController
 
             // ----------- 空白 -----------
             Region gap = new Region();
-            gap.setPrefHeight(20);
+            gap.setPrefHeight(25);
 
-            // ----------- パンタ（統合部分） -----------
+            // ----------- パンタ -----------
             HBox pantagraph = new HBox();
             pantagraph.setAlignment(Pos.CENTER);
             pantagraph.setSpacing(25);
@@ -320,17 +341,62 @@ public class D01AA extends BaseController
             // ----------- 下の編成 -----------
             StackPane sp2 = new StackPane();
 
-            Rectangle r2 = new Rectangle(50, 20);
-            r2.setStroke(Color.WHITE);
-            r2.setFill(Color.web("#2f3e56"));
-
-            if(List.of(formationInfo.M, formationInfo.Mc, formationInfo.Tm).contains(tc.getFormationFromCar(i)))
-                rectCarState[i] = r2;
-
             Label l2 = new Label(om.toZenkaku(Integer.toString(i + 1)));
-            l2.getStyleClass().add("plane-text-ff");
+            l2.getStyleClass().add("plane-text-no-textFill");
+            l2.setTextFill(Color.WHITE);
 
-            sp2.getChildren().addAll(r2, l2);
+            // めっちゃがんばって先頭車両つくってる
+            if(List.of(formationInfo.Mc, formationInfo.Tc).contains(tc.getFormationFromCar(i)))
+            {
+                Polygon poly;
+                if(i == 0)
+                {
+                    poly = new Polygon
+                    (
+                            50.0, 0.0,
+                            15.0, 0.0,
+                            0.0, 5.0,
+                            0.0, 20.0,
+                            50.0, 20.0
+                    );
+                }
+                else
+                {
+                    poly = new Polygon
+                    (
+                            0.0, 0.0,
+                            35.0, 0.0,
+                            50.0, 5.0,
+                            50.0, 20.0,
+                            0.0, 20.0
+                    );
+                }
+ 
+                poly.setStroke(Color.WHITE);
+                poly.setFill(Color.web("#2f3e56"));
+
+                sp2.getChildren().addAll(poly, l2);
+
+                if(List.of(formationInfo.Mc).contains(tc.getFormationFromCar(i)))
+                {
+                    nodeCarState[i] = poly;
+                    labelCarState[i] = l2;
+                }
+            }
+            else
+            {
+                Rectangle r2 = new Rectangle(50, 20);
+                r2.setStroke(Color.WHITE);
+                r2.setFill(Color.web("#2f3e56"));
+
+                sp2.getChildren().addAll(r2, l2);
+
+                if(List.of(formationInfo.M, formationInfo.Tm).contains(tc.getFormationFromCar(i)))
+                {
+                    nodeCarState[i] = r2;
+                    labelCarState[i] = l2;
+                }
+            }   
 
             // ----------- 丸2つ -----------
             HBox h = new HBox();
@@ -346,10 +412,21 @@ public class D01AA extends BaseController
                     c1.setFill(Color.WHITE);
                     c2.setStroke(Color.GRAY);
                     c2.setFill(Color.WHITE);
-                    g1_l1.setStroke(Color.YELLOW);
-                    g1_l2.setStroke(Color.YELLOW);
-                    g2_l1.setStroke(Color.YELLOW);
-                    g2_l2.setStroke(Color.YELLOW);
+
+                    if(i == 0)
+                    {
+                        g1_l1.setStroke(Color.BLACK);
+                        g1_l2.setStroke(Color.BLACK);
+                        g2_l1.setStroke(Color.YELLOW);
+                        g2_l2.setStroke(Color.YELLOW);
+                    }
+                    else
+                    {
+                        g1_l1.setStroke(Color.YELLOW);
+                        g1_l2.setStroke(Color.YELLOW);
+                        g2_l1.setStroke(Color.BLACK);
+                        g2_l2.setStroke(Color.BLACK);
+                    }
                     break;
 
                 case M:
@@ -450,6 +527,7 @@ public class D01AA extends BaseController
                     {
                         // ほんとうは0.5文字分のスペースが追加でほしい。
                         labelLine1Arrive.setText("    ⇩");
+                        labelLine1ArriveSec.setText("");
                     }
                     else
                     {
@@ -458,6 +536,7 @@ public class D01AA extends BaseController
                         labelLine1ArriveSec.setText(ArriveTime[2]);
                     }
                 }
+                else
                 {
                     labelLine1Arrive.setText("");
                     labelLine1ArriveSec.setText("");
@@ -465,14 +544,27 @@ public class D01AA extends BaseController
 
                 if(DepartTime != null)
                 {
-                    labelLine1Depart.setText(om.toZenkaku(DepartTime[0] +":"+ DepartTime[1]));
-                    labelLine1DepartSec.setText(DepartTime[2]);
-                    timeHolder = DepartTime[0];
+                    if(timeHolder.equals(DepartTime[0]))
+                    {
+                        labelLine1Depart.setText(om.toZenkaku("      "+ DepartTime[1]));
+                        labelLine1DepartSec.setText(DepartTime[2]);
+                    }
+                    else if(DepartTime[0].equals("="))
+                    {
+                        labelLine1Depart.setText("    ＝");
+                        labelLine1DepartSec.setText("");
+                    }
+                    else
+                    {
+                        labelLine1Depart.setText(om.toZenkaku(DepartTime[0] +":"+ DepartTime[1]));
+                        labelLine1DepartSec.setText(DepartTime[2]);
+                        timeHolder = DepartTime[0];
+                    }
                 }
                 else
                 {
-                    labelLine2Depart.setText("");
-                    labelLine2DepartSec.setText("");
+                    labelLine1Depart.setText("");
+                    labelLine1DepartSec.setText("");
                 }
 
                 // 到着番線
@@ -531,6 +623,7 @@ public class D01AA extends BaseController
                     if(ArriveTime[0].equals("レ"))
                     {
                         labelLine2Arrive.setText("    ⇩");
+                        labelLine2ArriveSec.setText("");
                     }
                     else
                     {
@@ -562,6 +655,7 @@ public class D01AA extends BaseController
                     else if(DepartTime[0].equals("="))
                     {
                         labelLine2Depart.setText("    ＝");
+                        labelLine2DepartSec.setText("");
                     }
                     else
                     {
@@ -623,6 +717,7 @@ public class D01AA extends BaseController
                     if(ArriveTime[0].equals("レ"))
                     {
                         labelLine3Arrive.setText("    ⇩");
+                        labelLine3ArriveSec.setText("");
                     }
                     else
                     {
@@ -654,6 +749,7 @@ public class D01AA extends BaseController
                     else if(DepartTime[0].equals("="))
                     {
                         labelLine3Depart.setText("    ＝");
+                        labelLine3DepartSec.setText("");
                     }
                     else
                     {
@@ -700,6 +796,52 @@ public class D01AA extends BaseController
                 labelLine3Track.setText("");
                 labelLine3Limit.setText("");
             }
+
+            TimeTableEntry nextStopStationEntry = repo.getNextStopStation(kilopost /1000f, line, direction, timeTable);
+
+            if(nextStopStationEntry != null)
+            {
+                System.out.println(repo.getStation(nextStopStationEntry.stationId).name);
+
+                labelNextStopStaName.setText(om.formatString(repo.getStation(nextStopStationEntry.stationId).name));
+
+                String[] ArriveTime = om.splitTime(nextStopStationEntry.arrive);
+
+                if(ArriveTime != null)
+                {
+                    if(ArriveTime[0].equals("レ"))
+                    {
+                        labelNextStopStaArrive.setText("    ⇩");
+                        labelNextStopStaArriveSec.setText("");
+                    }
+                    else
+                    {
+                        if(timeHolder.equals(ArriveTime[0]))
+                        {
+                            labelNextStopStaArrive.setText(om.toZenkaku("      "+ ArriveTime[1]));
+                        }
+                        else
+                        {
+                            labelNextStopStaArrive.setText(om.toZenkaku(ArriveTime[0] +":"+ ArriveTime[1]));
+                        }
+
+                        labelNextStopStaArriveSec.setText(ArriveTime[2]);
+                    }
+                }
+                else
+                {
+                    labelNextStopStaArrive.setText("");
+                    labelNextStopStaArriveSec.setText("");
+                }
+            }
+            else
+            {
+                System.out.println("null");
+                labelNextStopStaName.setText("");
+                labelNextStopStaArrive.setText("");
+                labelNextStopStaArriveSec.setText("");
+            }
+                
         }
     }
 
@@ -720,50 +862,80 @@ public class D01AA extends BaseController
                     TimeTableEntry sta = repo.getNextStation(kilopost /1000f, line, direction, timeTable);
 
                     // 次駅更新
-                    om.setStation(repo.getStation(sta.stationId));
-                    om.setLine(repo.getLine(repo.getStation(sta.stationId).lineId));
-
-                    nm.sendCommand("send", "move", 1000f * repo.getStation(sta.stationId).linePost);
-
-                    // すぐ更新すると変わらないので2秒まつ！
-                    ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
-                    exec.schedule(() ->
+                    if(sta != null)
                     {
-                        safeUpdate(() ->
+                        om.setStation(repo.getStation(sta.stationId));
+                        om.setLine(repo.getLine(repo.getStation(sta.stationId).lineId));
+
+                        nm.sendCommand("send", "move", 1000f * repo.getStation(sta.stationId).linePost);
+
+                        // すぐ更新すると変わらないので2秒まつ！
+                        ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+                        exec.schedule(() ->
                         {
-                            refreshTimeTable();
-                        });
-                    }, 2, TimeUnit.SECONDS);
+                            safeUpdate(() ->
+                            {
+                                refreshTimeTable();
+                            });
+                        }, 2, TimeUnit.SECONDS);
+                    }
 
                     tc.ew.resetArriveEvent();
                     tc.ew.resetPassingEvent();
                 }
             }
 
-            if(labelDoorState != null && rectDoorState != null && rectCarState != null)
+            if(labelDoorState != null && rectDoorState != null && nodeCarState != null)
             {
                 switch (tc.getSpeedState()) {
                     case Up:
-                        for(Rectangle s: rectCarState)
+                        for(Node n: nodeCarState)
+                        {
+                            if((n != null) && (n instanceof Rectangle s))
+                                s.setFill(Color.web("#80FFE8"));
+
+                            if((n != null) && (n instanceof Polygon p))
+                                p.setFill(Color.web("#80FFE8"));
+                        }
+
+                        for(Label s: labelCarState)
                         {
                             if(s != null)
-                                s.setFill(Color.LIGHTBLUE);
+                                s.setTextFill(Color.BLACK);
                         }
                         break;
 
                     case Down:
-                        for(Rectangle s: rectCarState)
+                        for(Node n: nodeCarState)
+                        {
+                            if((n != null) && (n instanceof Rectangle s))
+                                s.setFill(Color.YELLOW);
+
+                            if((n != null) && (n instanceof Polygon p))
+                                p.setFill(Color.YELLOW);
+                        }
+
+                        for(Label s: labelCarState)
                         {
                             if(s != null)
-                                s.setFill(Color.YELLOW);
+                                s.setTextFill(Color.BLACK);
                         }
                         break;
                 
                     default:
-                        for(Rectangle s: rectCarState)
+                        for(Node n: nodeCarState)
+                        {
+                            if((n != null) && (n instanceof Rectangle s))
+                                s.setFill(Color.web("#2f3e56"));
+
+                            if((n != null) && (n instanceof Polygon p))
+                                p.setFill(Color.web("#2f3e56"));
+                        }
+
+                        for(Label s: labelCarState)
                         {
                             if(s != null)
-                                s.setFill(Color.GRAY);
+                                s.setTextFill(Color.WHITE);
                         }
                         break;
                 }
