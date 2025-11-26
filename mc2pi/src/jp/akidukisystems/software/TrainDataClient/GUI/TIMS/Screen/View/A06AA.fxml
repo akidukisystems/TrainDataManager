@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.Group?>
 
 <BorderPane 
@@ -62,6 +64,30 @@
                 alignment="CENTER"
                 textAlignment="CENTER"
             />
+
+            <StackPane
+                AnchorPane.bottomAnchor="60"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0"
+            >
+                <Rectangle
+                    width="920"
+                    height="120"
+                    fill="#000000"
+                />
+
+                <AnchorPane>
+                    <HBox
+                        fx:id="formationHBox"
+                        AnchorPane.leftAnchor="0"
+                        AnchorPane.rightAnchor="0"
+                        AnchorPane.topAnchor="0"
+                        AnchorPane.bottomAnchor="0"
+                        alignment="CENTER"
+                        spacing="5"
+                    />
+                </AnchorPane>
+            </StackPane>
 
         </AnchorPane>
     </center>

@@ -94,6 +94,8 @@ public class D01AA extends BaseController
     
     Timeline timeline;
     Timeline blink;
+
+    Timeline nextStaBlink;
     
     private Button selectedButton = null;
 
@@ -122,6 +124,27 @@ public class D01AA extends BaseController
         );
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
+
+        nextStaBlink = new Timeline
+        (
+            new KeyFrame
+            (
+                Duration.seconds(0.5),
+                e -> 
+                {
+                    if (labelNextStopStaName.getStyleClass().contains("blink-nextSta"))
+                    {
+                        labelNextStopStaName.getStyleClass().remove("blink-nextSta");
+                    }
+                    else
+                    {
+                        labelNextStopStaName.getStyleClass().add("blink-nextSta");
+                    }
+                }
+            )
+        );
+        nextStaBlink.setCycleCount(Animation.INDEFINITE);
+
         update();
     }
     
@@ -865,6 +888,7 @@ public class D01AA extends BaseController
                     // 次駅更新
                     if(sta != null)
                     {
+                        System.out.println(repo.getStation(sta.stationId).name);
                         om.setStation(repo.getStation(sta.stationId));
                         om.setLine(repo.getLine(repo.getStation(sta.stationId).lineId));
 
@@ -880,11 +904,28 @@ public class D01AA extends BaseController
                             });
                         }, 2, TimeUnit.SECONDS);
                     }
-
-                    tc.ew.resetArriveEvent();
-                    tc.ew.resetPassingEvent();
                 }
             }
+
+            if(tc.ew.isArrivingSetted())
+            {
+                if(nextStaBlink.getStatus() != Animation.Status.RUNNING)
+                {
+                    nextStaBlink.play();
+                }
+            }
+
+            if(tc.ew.isArrivingCreared())
+            {
+                if(nextStaBlink.getStatus() == Animation.Status.RUNNING)
+                {
+                    nextStaBlink.stop();
+                    labelNextStopStaName.getStyleClass().remove("blink-nextSta");
+                }
+            }
+
+            tc.ew.resetArriveEvent();
+            tc.ew.resetPassingEvent();
 
             if(labelDoorState != null && rectDoorState != null && nodeCarState != null)
             {

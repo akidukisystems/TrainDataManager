@@ -88,6 +88,10 @@
         #FFE699 !important;   /* ← 本体色 */
 }
 
+.blink-nextSta {
+    -fx-text-fill: transparent !important;
+}
+
 .menu-button {
     -fx-text-fill: #ffffff;
     -fx-font-size: 32px;

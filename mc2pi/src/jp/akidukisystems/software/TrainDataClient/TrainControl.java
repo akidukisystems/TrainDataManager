@@ -322,6 +322,11 @@ public class TrainControl
     }
 
     private boolean isArrivingStation = false;
+
+    public boolean isArrivingStation() {
+        return isArrivingStation;
+    }
+
     private float beaconGetedPos = 0;
     private boolean isRaisingEP = false;
     private boolean isCatchingEP = false;

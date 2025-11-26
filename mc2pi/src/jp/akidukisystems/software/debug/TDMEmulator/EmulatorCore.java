@@ -188,7 +188,6 @@ public class EmulatorCore
                 }
 
                 networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":"+ move +",\"moveTo\":"+ moveTo +",\"totalMove\":"+ totalMove +",\"formation\":4,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +",\"speedState\":"+ speedState +"}");
-                
             }
         }).start();
 

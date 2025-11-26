@@ -13,6 +13,7 @@ public class EventWatcher
     private boolean passing    = false;
 
     private boolean arrivingCleared = false;
+    private boolean arrivingSetted = false;
     private boolean trainStopped = false;
     private boolean doorOpened = false;
 
@@ -69,6 +70,16 @@ public class EventWatcher
 
         if
         (
+            !this.isArrivingStation &&
+            this.isArrivingStation != isArrivingStation &&
+            isArrivingStation
+        )
+        {
+            arrivingSetted = true;
+        }
+
+        if
+        (
             arrivingCleared &&
             this.speed > 0f &&
             this.speed != speed &&
@@ -112,6 +123,7 @@ public class EventWatcher
     public void resetArriveEvent()
     {
         arrivingCleared = false;
+        arrivingSetted = false;
         trainStopped = false;
         doorOpened = false;
     }
@@ -125,5 +137,15 @@ public class EventWatcher
     public boolean isPassedStation()
     {
         return passing;
+    }
+
+    public boolean isArrivingSetted()
+    {
+        return arrivingSetted;
+    }
+
+    public boolean isArrivingCreared()
+    {
+        return arrivingCleared;
     }
 }
