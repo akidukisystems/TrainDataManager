@@ -7,6 +7,7 @@ public class EventWatcher
     boolean isArrivingStation = false;
 
     private boolean doorClosed = false;
+    @SuppressWarnings("unused")
     private boolean tractionOn = false;
 
     private boolean passing    = false;

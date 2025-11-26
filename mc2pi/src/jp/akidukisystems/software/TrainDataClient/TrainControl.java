@@ -388,6 +388,10 @@ public class TrainControl
     String txtTrainStatEx = "";
 
     private boolean isDoorClose = true;
+    public boolean isDoorClose() {
+        return isDoorClose;
+    }
+
     private boolean isRunningDoorOpen = false;
 
     private int prevDoor = -1;

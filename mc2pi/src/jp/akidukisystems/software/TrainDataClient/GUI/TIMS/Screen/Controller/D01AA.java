@@ -245,7 +245,7 @@ public class D01AA extends BaseController
         String trainNumberFull = tn.getFull();
         String trainNumber = tn.getHalf();
 
-        if(trainNumberFull == null)
+        if(trainNumberFull == null || trainNumberFull == "")
         {
             trainNumberFull = trainNumber;
         }
@@ -962,7 +962,7 @@ public class D01AA extends BaseController
                         break;
                 }
 
-                if(tc.getDoor() != 0)
+                if(!tc.isDoorClose())
                 {
                     for(Rectangle r: rectDoorState)
                     {
