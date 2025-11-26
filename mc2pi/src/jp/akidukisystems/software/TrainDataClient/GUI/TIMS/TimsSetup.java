@@ -119,5 +119,7 @@ public class TimsSetup extends Application
         stage.setScene(scene);
         stage.setTitle("TIMS");
         stage.show();
+
+        core.readyTimsTimerRefresh();
     }
 }

@@ -22,6 +22,7 @@ public class EmulatorCore
     volatile int reverser = 1;
     volatile float move = 0f;
     volatile int moveTo = 0;
+    volatile float totalMove = 0f;
     volatile int speedState = 0;
 
     public static void main(String[] args)
@@ -103,6 +104,15 @@ public class EmulatorCore
                     {
                         speedState = 0;
                     }
+
+                    float distancePerCycle = (speed * 1000f / 3600f) * 0.08f;
+
+                    if(moveTo == 0)
+                        move -= distancePerCycle;
+                    else
+                        move += distancePerCycle;
+
+                    totalMove += distancePerCycle;
                 }
             }, 0, 80);
             
@@ -177,7 +187,7 @@ public class EmulatorCore
                     }
                 }
 
-                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":"+ move +",\"moveTo\":"+ moveTo +",\"totalMove\":0.0,\"formation\":8,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +",\"speedState\":"+ speedState +"}");
+                networkManager.sendString("{\"type\":\"send\",\"message\":\"none\",\"id\":0,\"id2\":0,\"speed\":\""+ speed +"\",\"notch\":"+ notch +",\"bc\":"+ bc +",\"mr\":"+ (int) mr +",\"door\":"+ door +",\"reverser\":"+ reverser +",\"destination\":0,\"speedLimit\":95,\"isTASCEnable\":true,\"isTASCBraking\":false,\"isTASCStopPos\":false,\"move\":"+ move +",\"moveTo\":"+ moveTo +",\"totalMove\":"+ totalMove +",\"formation\":4,\"isOnRail\":true,\"isComplessorActive\":"+ isComplessorActive +",\"speedState\":"+ speedState +"}");
                 
             }
         }).start();

@@ -29,7 +29,7 @@
             <Label
                 text="A06AA"
                 layoutX="25"
-                layoutY="64"
+                layoutY="70"
                 styleClass="screen-code"
             />
 
@@ -38,7 +38,7 @@
                 fx:id="title"
                 text=""
                 layoutX="96"
-                layoutY="64"
+                layoutY="70"
                 styleClass="title"
             />
 

@@ -29,6 +29,7 @@ import javafx.scene.transform.Scale;
 import javafx.scene.shape.Line;
 import javafx.util.Duration;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
+import jp.akidukisystems.software.TrainDataClient.TrainControl;
 import jp.akidukisystems.software.TrainDataClient.GUI.TIMS.BaseController;
 import jp.akidukisystems.software.TrainDataClient.TrainControl.formationInfo;
 import jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader.Direction;
@@ -906,20 +907,41 @@ public class D01AA extends BaseController
                         break;
 
                     case Down:
-                        for(Node n: nodeCarState)
+                        if(tc.getNotch() == TrainControl.NOTCH_EB)
                         {
-                            if((n != null) && (n instanceof Rectangle s))
-                                s.setFill(Color.YELLOW);
+                            for(Node n: nodeCarState)
+                            {
+                                if((n != null) && (n instanceof Rectangle s))
+                                    s.setFill(Color.web("#2f3e56"));
 
-                            if((n != null) && (n instanceof Polygon p))
-                                p.setFill(Color.YELLOW);
+                                if((n != null) && (n instanceof Polygon p))
+                                    p.setFill(Color.web("#2f3e56"));
+                            }
+
+                            for(Label s: labelCarState)
+                            {
+                                if(s != null)
+                                    s.setTextFill(Color.WHITE);
+                            }
                         }
-
-                        for(Label s: labelCarState)
+                        else
                         {
-                            if(s != null)
-                                s.setTextFill(Color.BLACK);
+                            for(Node n: nodeCarState)
+                            {
+                                if((n != null) && (n instanceof Rectangle s))
+                                    s.setFill(Color.YELLOW);
+
+                                if((n != null) && (n instanceof Polygon p))
+                                    p.setFill(Color.YELLOW);
+                            }
+
+                            for(Label s: labelCarState)
+                            {
+                                if(s != null)
+                                    s.setTextFill(Color.BLACK);
+                            }
                         }
+                        
                         break;
                 
                     default:
@@ -938,6 +960,31 @@ public class D01AA extends BaseController
                                 s.setTextFill(Color.WHITE);
                         }
                         break;
+                }
+
+                if(tc.getDoor() != 0)
+                {
+                    for(Rectangle r: rectDoorState)
+                    {
+                        r.setFill(Color.RED);
+                    }
+
+                    for(Label l: labelDoorState)
+                    {
+                        l.setText("開");
+                    }
+                }
+                else
+                {
+                    for(Rectangle r: rectDoorState)
+                    {
+                        r.setFill(Color.BLACK);
+                    }
+
+                    for(Label l: labelDoorState)
+                    {
+                        l.setText("閉");
+                    }
                 }
             }
         }

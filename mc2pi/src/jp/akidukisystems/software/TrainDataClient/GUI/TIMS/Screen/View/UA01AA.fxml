@@ -41,7 +41,7 @@
             <Label
                 text="UA01AA"
                 layoutX="25"
-                layoutY="10"
+                layoutY="0"
                 styleClass="screen-code"
             />
 
@@ -50,7 +50,7 @@
                 fx:id="title"
                 text="一般情報"
                 layoutX="96"
-                layoutY="10"
+                layoutY="0"
                 styleClass="title"
             />
             

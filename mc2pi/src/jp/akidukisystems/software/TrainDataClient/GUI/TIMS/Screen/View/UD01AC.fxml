@@ -46,7 +46,7 @@
             <Label
                 text="UD01AC"
                 layoutX="25"
-                layoutY="10"
+                layoutY="0"
                 styleClass="screen-code"
             />
 
@@ -55,7 +55,7 @@
                 fx:id="title"
                 text="行路選択"
                 layoutX="96"
-                layoutY="10"
+                layoutY="0"
                 styleClass="title"
             />
 

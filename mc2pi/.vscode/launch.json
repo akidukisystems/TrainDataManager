@@ -1,184 +1,34 @@
 {
-    // IntelliSense を使用して利用可能な属性を学べます。
-    // 既存の属性の説明をホバーして表示します。
-    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
     "configurations": [
         {
             "type": "java",
-            "name": "GaugeController",
+            "name": "EmulatorCore Common",
             "request": "launch",
-            "mainClass": "jp.akidukisystems.software.TrainDataClient.GUI.TIMS.GaugeController",
-            "projectName": "mc2pi_1378da23",
+            "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
+            "projectName": "mc2pi_8acefe3b"
+        },
+        {
+            "type": "java",
+            "name": "BridgeCore Common",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",
+            "projectName": "mc2pi_8acefe3b"
+        },
+        {
+            "type": "java",
+            "name": "TDCCore Laptop Env.",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
+            "projectName": "mc2pi_8acefe3b",
+            "vmArgs": "--module-path \"C:/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
+        },
+        {
+            "type": "java",
+            "name": "TDCCore Desktop Env.",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
+            "projectName": "mc2pi_8acefe3b",
             "vmArgs": "--module-path \"C:/Program Files/Java/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
-        },
-        {
-            "type": "java",
-            "name": "ScreenManager",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.utilty.ScreenManager",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "Test",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.utilty.Test",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "FullscreenDemo",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.utilty.FullscreenDemo",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "DutyCardRepository",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.utilty.DutyCardRepository",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "DutyCardReader",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.TrainDataClient.duty.DutyCardReader",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "BridgeCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",
-            "projectName": "mc2pi_f6ec6239"
-        },
-        {
-            "type": "java",
-            "name": "EmulatorCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
-            "projectName": "mc2pi_f6ec6239"
-        },
-        {
-            "type": "java",
-            "name": "TDCCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
-            "projectName": "mc2pi_f6ec6239"
-        },
-        {
-            "type": "java",
-            "name": "TimsSetup",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.TrainDataClient.GUI.TIMS.TimsSetup",
-            "projectName": "mc2pi_1378da23",
-            "vmArgs": "--module-path \"C:/Program Files/Java/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
-        },
-        {
-            "type": "java",
-            "name": "Indicator",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.MasconBridge.GUI.Indicator",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "EmulatorCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "BridgeCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "TDCCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "DutyCardViewer",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.utilty.DutyCardViewer",
-            "projectName": "mc2pi_8acefe3b"
-        },
-        {
-            "type": "java",
-            "name": "DutyCardViewer",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.utilty.DutyCardViewer",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "TDCCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
-            "projectName": "mc2pi_8acefe3b"
-        },
-        {
-            "type": "java",
-            "name": "BridgeCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",
-            "projectName": "mc2pi_8acefe3b"
-        },
-        {
-            "type": "java",
-            "name": "EmulatorCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
-            "projectName": "mc2pi_8acefe3b"
-        },
-        {
-            "type": "java",
-            "name": "TesterCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.debug.MasconTester.TesterCore",
-            "projectName": "mc2pi_8acefe3b"
-        },
-        {
-            "type": "java",
-            "name": "MBCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.masconbridge.MBCore",
-            "projectName": "mc2pi_8acefe3b"
-        },
-        {
-            "type": "java",
-            "name": "TDCCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.traindataclient.TDCCore",
-            "projectName": "mc2pi_8acefe3b"
-        },
-        {
-            "type": "java",
-            "name": "TDCCore",
-            "request": "launch",
-            "mainClass": "TDCCore",
-            "projectName": "mc2pi_1378da23"
-        },
-        {
-            "type": "java",
-            "name": "Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "TDCCore",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.traindataclient.TDCCore",
-            "projectName": "mc2pi_1378da23"
         }
     ]
 }

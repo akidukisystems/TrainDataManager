@@ -15,7 +15,7 @@
     <Label
         text="S00AB"
         layoutX="25"
-        layoutY="80"
+        layoutY="70"
         styleClass="screen-code"
     />
 
@@ -24,7 +24,7 @@
         fx:id="title"
         text="初期選択"
         layoutX="96"
-        layoutY="80"
+        layoutY="70"
         styleClass="title"
     />
 

@@ -748,6 +748,14 @@ public class TDCCore
         tn.reset();
     }
 
+    public void readyTimsTimerRefresh()
+    {
+        timsRefreshTimer = new Timer(1000, e -> 
+        {
+            timsUpdater.refresh();
+        });
+    }
+
 
 
     // MARK: 
@@ -771,11 +779,6 @@ public class TDCCore
 
         timsUpdater = new TimsUpdater();
         timsUpdater.init(tc);
-
-        timsRefreshTimer = new Timer(1000, e -> 
-        {
-            timsUpdater.refresh();
-        });
 
         indicator = new NetworkIndicator();
         networkManager.setOnSendCallback(() -> onEdt(() -> indicator.flash(TRTYPE.SEND)));
@@ -885,7 +888,7 @@ public class TDCCore
                                     }
                                 });
 
-                                if(!timsRefreshTimer.isRunning())
+                                if(timsRefreshTimer != null && !timsRefreshTimer.isRunning())
                                 {
                                     timsRefreshTimer.start();
                                 }

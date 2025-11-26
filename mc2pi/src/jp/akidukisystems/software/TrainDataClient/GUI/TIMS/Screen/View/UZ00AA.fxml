@@ -41,7 +41,7 @@
             <Label
                 text="UZ00AA"
                 layoutX="25"
-                layoutY="10"
+                layoutY="0"
                 styleClass="screen-code"
             />
 
@@ -49,7 +49,7 @@
                 fx:id="title"
                 text="特殊機能"
                 layoutX="96"
-                layoutY="10"
+                layoutY="0"
                 styleClass="title"
             />
 
