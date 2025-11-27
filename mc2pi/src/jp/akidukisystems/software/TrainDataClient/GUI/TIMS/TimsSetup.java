@@ -1,5 +1,7 @@
 package jp.akidukisystems.software.TrainDataClient.GUI.TIMS;
 
+import java.io.FileInputStream;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,6 +16,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import jp.akidukisystems.software.TrainDataClient.TDCCore;
 import jp.akidukisystems.software.TrainDataClient.TimsUpdater;
@@ -80,6 +83,8 @@ public class TimsSetup extends Application
                 "/jp/akidukisystems/software/TrainDataClient/GUI/TIMS/Screen/View/S00AB.fxml"
             )
         );
+
+        Font font = Font.loadFont(new FileInputStream("resources/DotGothic16-Regular.ttf"), 20);
 
         Parent child = loader.load();
 

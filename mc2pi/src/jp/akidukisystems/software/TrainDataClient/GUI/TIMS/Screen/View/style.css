@@ -3,6 +3,13 @@
     -fx-font-family: "MS Gothic";
 }
 
+.x2, .title {
+    -fx-font-smoothing-type: gray;
+    -fx-font-family: "DotGothic16";
+    -fx-translate-y: -3px;
+}
+
+
 .title {
     -fx-text-fill: #76D0B2;
     -fx-font-size: 20px;

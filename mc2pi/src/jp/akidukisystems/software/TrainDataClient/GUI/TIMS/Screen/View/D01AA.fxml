@@ -60,6 +60,24 @@
                 stroke="#2f3e56"
                 strokeWidth="2"
             />
+
+            <VBox
+                spacing="5"
+                AnchorPane.rightAnchor="100"
+                AnchorPane.topAnchor="10"
+                alignment="TOP_RIGHT"
+            >
+                <Rectangle
+                    width="240"
+                    height="20"
+                    fill="#475065"
+                />
+                <Rectangle
+                    width="240"
+                    height="20"
+                    fill="#475065"
+                />
+            </VBox>
             <!-- 初期選択 -->
             <Button
                 fx:id="btnS00AB"
@@ -111,7 +129,7 @@
                 text=""
                 AnchorPane.leftAnchor="180"
                 AnchorPane.topAnchor="20"
-                styleClass="trainNumber"
+                styleClass="trainNumber, x2"
             />
 
             <Label
@@ -224,42 +242,42 @@
                         text="ああああ"
                         AnchorPane.leftAnchor="0"
                         AnchorPane.topAnchor="20"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine1Arrive"
                         text="９９：９９"
-                        AnchorPane.leftAnchor="220"
+                        AnchorPane.rightAnchor="640"
                         AnchorPane.topAnchor="20"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine1ArriveSec"
                         text="99"
-                        AnchorPane.leftAnchor="420"
+                        AnchorPane.rightAnchor="520"
                         AnchorPane.topAnchor="20"
-                        styleClass="text-second"
+                        styleClass="text-second, x2"
                     />
                     <Label
                         fx:id="labelLine1Depart"
                         text="９９：９９"
-                        AnchorPane.leftAnchor="540"
+                        AnchorPane.rightAnchor="320"
                         AnchorPane.topAnchor="20"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine1DepartSec"
                         text="99"
-                        AnchorPane.leftAnchor="740"
+                        AnchorPane.rightAnchor="200"
                         AnchorPane.topAnchor="20"
-                        styleClass="text-second"
+                        styleClass="text-second, x2"
                     />
                     <Label
                         fx:id="labelLine1Track"
                         text="９９"
                         AnchorPane.leftAnchor="820"
                         AnchorPane.topAnchor="20"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine1Limit"
@@ -274,42 +292,42 @@
                         text="いいいい"
                         AnchorPane.leftAnchor="0"
                         AnchorPane.topAnchor="70"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine2Arrive"
                         text="９９：９９"
-                        AnchorPane.leftAnchor="220"
+                        AnchorPane.rightAnchor="640"
                         AnchorPane.topAnchor="70"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine2ArriveSec"
                         text="99"
-                        AnchorPane.leftAnchor="420"
+                        AnchorPane.rightAnchor="520"
                         AnchorPane.topAnchor="70"
-                        styleClass="text-second"
+                        styleClass="text-second, x2"
                     />
                     <Label
                         fx:id="labelLine2Depart"
                         text="９９：９９"
-                        AnchorPane.leftAnchor="540"
+                        AnchorPane.rightAnchor="320"
                         AnchorPane.topAnchor="70"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine2DepartSec"
                         text="99"
-                        AnchorPane.leftAnchor="740"
+                        AnchorPane.rightAnchor="200"
                         AnchorPane.topAnchor="70"
-                        styleClass="text-second"
+                        styleClass="text-second, x2"
                     />
                     <Label
                         fx:id="labelLine2Track"
                         text="９９"
                         AnchorPane.leftAnchor="820"
                         AnchorPane.topAnchor="70"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine2Limit"
@@ -324,42 +342,42 @@
                         text="ああああ"
                         AnchorPane.leftAnchor="0"
                         AnchorPane.topAnchor="120"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine3Arrive"
                         text="９９：９９"
-                        AnchorPane.leftAnchor="220"
+                        AnchorPane.rightAnchor="640"
                         AnchorPane.topAnchor="120"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine3ArriveSec"
                         text="99"
-                        AnchorPane.leftAnchor="420"
+                        AnchorPane.rightAnchor="520"
                         AnchorPane.topAnchor="120"
-                        styleClass="text-second"
+                        styleClass="text-second, x2"
                     />
                     <Label
                         fx:id="labelLine3Depart"
                         text="９９：９９"
-                        AnchorPane.leftAnchor="540"
+                        AnchorPane.rightAnchor="320"
                         AnchorPane.topAnchor="120"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine3DepartSec"
                         text="99"
-                        AnchorPane.leftAnchor="740"
+                        AnchorPane.rightAnchor="200"
                         AnchorPane.topAnchor="120"
-                        styleClass="text-second"
+                        styleClass="text-second, x2"
                     />
                     <Label
                         fx:id="labelLine3Track"
                         text="９９"
                         AnchorPane.leftAnchor="820"
                         AnchorPane.topAnchor="120"
-                        styleClass="plane-text-ff"
+                        styleClass="plane-text-ff, x2"
                     />
                     <Label
                         fx:id="labelLine3Limit"
@@ -387,21 +405,21 @@
                     text="ああああ"
                     AnchorPane.leftAnchor="200"
                     AnchorPane.topAnchor="20"
-                    styleClass="plane-text-yellow"
+                    styleClass="plane-text-yellow, x2"
                 />
                 <Label
                     fx:id="labelNextStopStaArrive"
                     text="９９：９９"
-                    AnchorPane.leftAnchor="420"
+                    AnchorPane.rightAnchor="400"
                     AnchorPane.topAnchor="20"
-                    styleClass="plane-text-ff"
+                    styleClass="plane-text-ff, x2"
                 />
                 <Label
                     fx:id="labelNextStopStaArriveSec"
                     text="99"
-                    AnchorPane.leftAnchor="620"
+                    AnchorPane.rightAnchor="280"
                     AnchorPane.topAnchor="20"
-                    styleClass="text-second"
+                    styleClass="text-second, x2"
                 />
             </AnchorPane>
 
