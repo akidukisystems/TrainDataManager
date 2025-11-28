@@ -2,14 +2,36 @@
     "configurations": [
         {
             "type": "java",
-            "name": "EmulatorCore Common",
+            "name": "EmulatorCore Desktop Env.",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
+            "projectName": "mc2pi_1378da23",
+            "vmArgs": "--module-path \"C:/Program Files/Java/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
+        },
+        {
+            "type": "java",
+            "name": "BridgeCore Desktop Env.",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "TDCCore Desktop Env.",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
+            "projectName": "mc2pi_1378da23"
+        },
+        {
+            "type": "java",
+            "name": "EmulatorCore Laptop Env.",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
             "projectName": "mc2pi_8acefe3b"
         },
         {
             "type": "java",
-            "name": "BridgeCore Common",
+            "name": "BridgeCore Laptop Env.",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.MasconBridge.BridgeCore",
             "projectName": "mc2pi_8acefe3b"
@@ -21,14 +43,6 @@
             "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
             "projectName": "mc2pi_8acefe3b",
             "vmArgs": "--module-path \"C:/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
-        },
-        {
-            "type": "java",
-            "name": "TDCCore Desktop Env.",
-            "request": "launch",
-            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
-            "projectName": "mc2pi_8acefe3b",
-            "vmArgs": "--module-path \"C:/Program Files/Java/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
         }
     ]
 }
