@@ -34,6 +34,8 @@ public class NetworkPacket {
     public boolean isOnRail;
     public boolean isComplessorActive;
 
+    public int speedState;
+
     public NetworkPacket(
         String type, 
         String message, 
@@ -66,7 +68,9 @@ public class NetworkPacket {
         int formation,
 
         boolean isOnRail, 
-        boolean isComplessorActive
+        boolean isComplessorActive,
+
+        int speedState
     ) {
         this.type = type;
         this.message = message;
@@ -100,5 +104,7 @@ public class NetworkPacket {
 
         this.isOnRail = isOnRail;
         this.isComplessorActive = isComplessorActive;
+
+        this.speedState = speedState;
     }
 }

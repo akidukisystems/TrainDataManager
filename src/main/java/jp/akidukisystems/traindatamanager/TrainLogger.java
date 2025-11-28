@@ -46,6 +46,9 @@ public class TrainLogger {
     private float speed;
     private int notch;
 
+    private float beforeSpeed = speed;
+    private int speedState;
+
     // BC MR圧力
     private int bc;
     private int mr;
@@ -145,6 +148,8 @@ public class TrainLogger {
         this.speed = 0f;
         this.notch = 0;
 
+        beforeSpeed = 0f;
+
         // BC MR圧力
         this.bc = 0;
         this.mr = 0;
@@ -226,6 +231,7 @@ public class TrainLogger {
 
         switch (command) {
             case NOTCH:
+                if (train == null) break;
                 int notchLevel = getDataParsed.notch;
                 if((-9<notchLevel) && (notchLevel<6)) {
                     this.train.setNotch(notchLevel);
@@ -233,6 +239,7 @@ public class TrainLogger {
                 break;
         
             case DOOR:
+                if (vehicle == null) break;
                 byte doorStatus = (byte) getDataParsed.door;
                 if(doorStatus < 4) {
                     this.vehicle.setVehicleState(TrainState.TrainStateType.Door, doorStatus);
@@ -248,6 +255,7 @@ public class TrainLogger {
                 break;
 
             case REVERSER:
+                if (vehicle == null) break;
                 this.vehicle.setVehicleState(TrainState.TrainStateType.Role, (byte)getDataParsed.reverser);
                 break;
         
@@ -303,13 +311,27 @@ public class TrainLogger {
             String getData = null;
             boolean refreshedTrain = false;
 
+            tickCounter++;
+
+            if (tickCounter >= TICK_GET_DATA_INTERVAL) 
+            {
+                System.out.println("1");
+                System.out.println(beforeSpeed);
+                System.out.println(speed);
+                beforeSpeed = speed;
+            }
+
             while ((getData = networkManager.getLatestReceivedString()) != null)
             {
                 System.out.println(getData);
-                if(!refreshedTrain)
+                if (!refreshedTrain)
                 {
                     refreshedTrain = true;
+
+                    System.out.println("2");
+                    System.out.println(speed);
                     getTrainData(player);
+                    System.out.println(speed);
                 }
                 handleGetData(getData);   // オラッ！全部吐け！！お前が握ってるのは知ってんだよ！！！！（データを全部吐かせる）
             }
@@ -322,8 +344,14 @@ public class TrainLogger {
 
             // 列車情報取得
             // 取得情報処理
-            tickCounter++;
-            if (!refreshedTrain && tickCounter >= TICK_GET_DATA_INTERVAL) getTrainData(player);
+            
+            if (!refreshedTrain && tickCounter >= TICK_GET_DATA_INTERVAL)
+            {
+                System.out.println("3");
+                System.out.println(speed);
+                getTrainData(player);
+                System.out.println(speed);
+            }
 
             if (tickCounter < TICK_GET_DATA_INTERVAL) return; // 10tickごと
             tickCounter = 0;
@@ -343,6 +371,23 @@ public class TrainLogger {
             }
 
             this.totalMove += move1sec;
+
+            System.out.println("4");
+            System.out.println(speed);
+            System.out.println(beforeSpeed);
+
+            if(speedCompare(true) && (notch > 0))
+            {
+                speedState = 1;
+            }
+            else if(speedCompare(false) && (notch < 0))
+            {
+                speedState = -1;
+            }
+            else
+            {
+                speedState = 0;
+            }
             
             
             // 出力 jsonにするよ～
@@ -377,7 +422,8 @@ public class TrainLogger {
                 this.formation,
 
                 this.isOnRail, 
-                this.isComplessorActive
+                this.isComplessorActive,
+                this.speedState
             );
 
             // 送信
@@ -400,5 +446,34 @@ public class TrainLogger {
             networkManager.serverClose();
         }
         isFirst = true;
+    }
+
+    private boolean speedCompare(boolean accelarate)
+    {
+        if(accelarate) {
+            if(speed == 0.0f && beforeSpeed == 0.0f)
+            {
+                return false;
+            }
+            if((speed + 0.001f) > beforeSpeed)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        else
+        {
+            if(speed == 0.0f && beforeSpeed == 0.0f)
+            {
+                return false;
+            }
+            if((speed - 0.001f) < beforeSpeed)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
