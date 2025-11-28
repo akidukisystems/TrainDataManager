@@ -145,4 +145,14 @@ public class TimsToolkit
         String[] parts = p1.split(":");
         return parts;
     }
+
+    public String formattingHourTime(String p1)
+    {
+        if(p1.length() == 1)
+        {
+            return "  "+ p1;
+        }
+
+        return p1;
+    }
 }

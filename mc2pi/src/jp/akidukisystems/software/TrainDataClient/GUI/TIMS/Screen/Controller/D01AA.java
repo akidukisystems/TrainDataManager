@@ -550,13 +550,13 @@ public class D01AA extends BaseController
                     if(ArriveTime[0].equals("レ"))
                     {
                         // ほんとうは0.5文字分のスペースが追加でほしい。
-                        labelLine1Arrive.setText("    ⇩");
+                        labelLine1Arrive.setText("⇩ ");
                         labelLine1ArriveSec.setText("");
                     }
                     else
                     {
                         // 時刻はhh:mm:ssとなって格納されているので、予め分割してもらい、hh:mmとssでわけて表示
-                        labelLine1Arrive.setText(om.toZenkaku(ArriveTime[0] +":"+ ArriveTime[1]));
+                        labelLine1Arrive.setText(om.toZenkaku(om.formattingHourTime(ArriveTime[0]) +":"+ ArriveTime[1]));
                         labelLine1ArriveSec.setText(ArriveTime[2]);
                     }
                 }
@@ -580,7 +580,7 @@ public class D01AA extends BaseController
                     }
                     else
                     {
-                        labelLine1Depart.setText(om.toZenkaku(DepartTime[0] +":"+ DepartTime[1]));
+                        labelLine1Depart.setText(om.toZenkaku(om.formattingHourTime(DepartTime[0]) +":"+ DepartTime[1]));
                         labelLine1DepartSec.setText(DepartTime[2]);
                         timeHolder = DepartTime[0];
                     }
@@ -646,7 +646,7 @@ public class D01AA extends BaseController
                 {
                     if(ArriveTime[0].equals("レ"))
                     {
-                        labelLine2Arrive.setText("    ⇩");
+                        labelLine2Arrive.setText("⇩ ");
                         labelLine2ArriveSec.setText("");
                     }
                     else
@@ -657,7 +657,7 @@ public class D01AA extends BaseController
                         }
                         else
                         {
-                            labelLine2Arrive.setText(om.toZenkaku(ArriveTime[0] +":"+ ArriveTime[1]));
+                            labelLine2Arrive.setText(om.toZenkaku(om.formattingHourTime(ArriveTime[0]) +":"+ ArriveTime[1]));
                         }
                         
                         labelLine2ArriveSec.setText(ArriveTime[2]);
@@ -683,7 +683,7 @@ public class D01AA extends BaseController
                     }
                     else
                     {
-                        labelLine2Depart.setText(om.toZenkaku(DepartTime[0] +":"+ DepartTime[1]));
+                        labelLine2Depart.setText(om.toZenkaku(om.formattingHourTime(DepartTime[0]) +":"+ DepartTime[1]));
                         labelLine2DepartSec.setText(DepartTime[2]);
                         timeHolder = DepartTime[0];
                     }
@@ -740,7 +740,7 @@ public class D01AA extends BaseController
                 {
                     if(ArriveTime[0].equals("レ"))
                     {
-                        labelLine3Arrive.setText("    ⇩");
+                        labelLine3Arrive.setText("⇩ ");
                         labelLine3ArriveSec.setText("");
                     }
                     else
@@ -751,7 +751,7 @@ public class D01AA extends BaseController
                         }
                         else
                         {
-                            labelLine3Arrive.setText(om.toZenkaku(ArriveTime[0] +":"+ ArriveTime[1]));
+                            labelLine3Arrive.setText(om.toZenkaku(om.formattingHourTime(ArriveTime[0]) +":"+ ArriveTime[1]));
                         }
 
                         labelLine3ArriveSec.setText(ArriveTime[2]);
@@ -777,7 +777,7 @@ public class D01AA extends BaseController
                     }
                     else
                     {
-                        labelLine3Depart.setText(om.toZenkaku(DepartTime[0] +":"+ DepartTime[1]));
+                        labelLine3Depart.setText(om.toZenkaku(om.formattingHourTime(DepartTime[0]) +":"+ DepartTime[1]));
                         labelLine3DepartSec.setText(DepartTime[2]);
                     }
                 }
@@ -835,7 +835,7 @@ public class D01AA extends BaseController
                 {
                     if(ArriveTime[0].equals("レ"))
                     {
-                        labelNextStopStaArrive.setText("    ⇩");
+                        labelNextStopStaArrive.setText("⇩ ");
                         labelNextStopStaArriveSec.setText("");
                     }
                     else
@@ -846,7 +846,7 @@ public class D01AA extends BaseController
                         }
                         else
                         {
-                            labelNextStopStaArrive.setText(om.toZenkaku(ArriveTime[0] +":"+ ArriveTime[1]));
+                            labelNextStopStaArrive.setText(om.toZenkaku(om.formattingHourTime(ArriveTime[0]) +":"+ ArriveTime[1]));
                         }
 
                         labelNextStopStaArriveSec.setText(ArriveTime[2]);
@@ -904,6 +904,9 @@ public class D01AA extends BaseController
                             });
                         }, 2, TimeUnit.SECONDS);
                     }
+
+                    tc.ew.resetArriveEvent();
+                    tc.ew.resetPassingEvent();
                 }
             }
 
@@ -924,8 +927,7 @@ public class D01AA extends BaseController
                 }
             }
 
-            tc.ew.resetArriveEvent();
-            tc.ew.resetPassingEvent();
+            tc.ew.resetNotifyEvent();
 
             if(labelDoorState != null && rectDoorState != null && nodeCarState != null)
             {

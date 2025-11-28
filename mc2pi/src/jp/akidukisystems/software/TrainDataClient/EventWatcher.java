@@ -13,6 +13,7 @@ public class EventWatcher
     private boolean passing    = false;
 
     private boolean arrivingCleared = false;
+    private boolean arrivingClearedAEC = false;
     private boolean arrivingSetted = false;
     private boolean trainStopped = false;
     private boolean doorOpened = false;
@@ -21,6 +22,7 @@ public class EventWatcher
     {
         departEventCheck(door, speed);
         arriveEventCheck(isArrivingStation, door, speed);
+        arriveNotifyCheck(isArrivingStation);
 
         this.door = door;
         this.speed = speed;
@@ -65,22 +67,12 @@ public class EventWatcher
             !isArrivingStation
         )
         {
-            arrivingCleared = true;
+            arrivingClearedAEC = true;
         }
 
         if
         (
-            !this.isArrivingStation &&
-            this.isArrivingStation != isArrivingStation &&
-            isArrivingStation
-        )
-        {
-            arrivingSetted = true;
-        }
-
-        if
-        (
-            arrivingCleared &&
+            arrivingClearedAEC &&
             this.speed > 0f &&
             this.speed != speed &&
             speed == 0f
@@ -92,13 +84,45 @@ public class EventWatcher
         if
         (
             trainStopped &&
-            arrivingCleared &&
+            arrivingClearedAEC &&
             this.door == 0 &&
             this.door != door &&
             door != 0
         )
         {
             doorOpened = true;
+        }
+
+        System.out.println("aaaaaa");
+        System.out.println(arrivingClearedAEC);
+        System.out.println(trainStopped);
+        System.out.println(doorOpened);
+    }
+
+    private void arriveNotifyCheck(boolean isArrivingStation)
+    {
+        // isArrivingStation が true → false    (次駅接近状態が解除された状態) かつ
+        // speed が             >0f → 0f        (列車が停車した瞬間～停車中) かつ
+        // door が              0 → !=0         (ドアが開いた瞬間～今開いている) 状態
+
+        if
+        (
+            this.isArrivingStation &&
+            this.isArrivingStation != isArrivingStation &&
+            !isArrivingStation
+        )
+        {
+            arrivingCleared = true;
+        }
+
+        if
+        (
+            !this.isArrivingStation &&
+            this.isArrivingStation != isArrivingStation &&
+            isArrivingStation
+        )
+        {
+            arrivingSetted = true;
         }
     }
 
@@ -122,16 +146,21 @@ public class EventWatcher
 
     public void resetArriveEvent()
     {
-        arrivingCleared = false;
-        arrivingSetted = false;
+        arrivingClearedAEC = false;
         trainStopped = false;
         doorOpened = false;
+    }
+
+    public void resetNotifyEvent()
+    {
+        arrivingCleared = false;
+        arrivingSetted = false;
     }
 
     
     public boolean isArrivedStation()
     {
-        return (arrivingCleared && trainStopped && doorOpened);
+        return (arrivingClearedAEC && trainStopped && doorOpened);
     }
 
     public boolean isPassedStation()
