@@ -34,3 +34,4 @@ mc2pi/lib/
 mc2pi/*.txt
 mc2pi/src/jp/akidukisystems/software/utilty/WrapLayout.java
 mc2pi/resources/*.ttf
+mc2pi/resources/*.ttc

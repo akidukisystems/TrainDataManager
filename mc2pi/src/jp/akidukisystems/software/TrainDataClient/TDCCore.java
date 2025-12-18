@@ -40,6 +40,7 @@ import jp.akidukisystems.software.TrainDataClient.duty.TimsToolkit;
 import jp.akidukisystems.software.utilty.DutyCardRepository;
 import jp.akidukisystems.software.utilty.NetworkManager;
 import jp.akidukisystems.software.utilty.WrapLayout;
+import jp.akidukisystems.software.utilty.Serial;
 
 public class TDCCore 
 {  
@@ -112,6 +113,8 @@ public class TDCCore
     JButton ActionButton;
 
     NetworkIndicator indicator;
+
+    Serial serial;
 
     public NetworkManager networkManager = null;   
     public TrainNumber tn = null;   
@@ -771,7 +774,10 @@ public class TDCCore
         networkManager = new NetworkManager();
         networkManager.clientInit(address, port, 60000, 32768);
 
-        tc = new TrainControl();
+        serial = new Serial();
+        serial.initialize("COM9");
+
+        tc = new TrainControl(serial);
         tc.boolTrainStatInit(128);
 
         dcr = new DutyCardRepository();
@@ -827,6 +833,8 @@ public class TDCCore
         new Thread(() ->
         {
             String fetchData = null;
+
+            serial.sendRawJson("{\"type\":\"start\"}");
 
             while(true)
             {
@@ -897,6 +905,14 @@ public class TDCCore
 
                             case "kill":
                                 networkManager.clientClose();
+                                JSONObject json = new JSONObject();
+                                json.put("type", "send");
+                                json.put("message", "door");
+                                json.put("door", buttonDo);
+
+                                serial.send(json);
+
+                                serial.close();
                                 // System.exit(0);
                                 break;
 

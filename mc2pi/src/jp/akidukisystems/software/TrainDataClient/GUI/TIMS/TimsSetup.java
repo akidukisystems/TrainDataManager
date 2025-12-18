@@ -84,7 +84,11 @@ public class TimsSetup extends Application
             )
         );
 
-        Font font = Font.loadFont(new FileInputStream("resources/DotGothic16-Regular.ttf"), 20);
+        @SuppressWarnings("unused")
+        Font fontDefaut = Font.loadFont(new FileInputStream("resources/msgothic.ttc"), 20);
+
+        @SuppressWarnings("unused")
+        Font fontWide = Font.loadFont(new FileInputStream("resources/DotGothic16-Regular.ttf"), 20);
 
         Parent child = loader.load();
 
