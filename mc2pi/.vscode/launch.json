@@ -2,11 +2,18 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TDCCore Pi Env.",
+            "request": "launch",
+            "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
+            "projectName": "mc2pi_f6ec6239",
+            "vmArgs": "--module-path \"/home/admin/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
+        },
+        {
+            "type": "java",
             "name": "EmulatorCore Desktop Env.",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.debug.TDMEmulator.EmulatorCore",
-            "projectName": "mc2pi_1378da23",
-            "vmArgs": "--module-path \"C:/Program Files/Java/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
+            "projectName": "mc2pi_1378da23"
         },
         {
             "type": "java",
@@ -20,7 +27,8 @@
             "name": "TDCCore Desktop Env.",
             "request": "launch",
             "mainClass": "jp.akidukisystems.software.TrainDataClient.TDCCore",
-            "projectName": "mc2pi_1378da23"
+            "projectName": "mc2pi_1378da23",
+            "vmArgs": "--module-path \"C:/Program Files/Java/JavaFX/lib\" --add-modules javafx.controls,javafx.fxml -Dprism.lcdtext=false -Dprism.text=t2k"
         },
         {
             "type": "java",
