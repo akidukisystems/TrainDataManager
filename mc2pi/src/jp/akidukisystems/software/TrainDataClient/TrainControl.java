@@ -1,7 +1,9 @@
 package jp.akidukisystems.software.TrainDataClient;
 
 import javax.swing.Timer;
+import org.json.JSONObject;
 import jp.akidukisystems.software.TrainDataClient.Protector.ATSPController;
+import jp.akidukisystems.software.utilty.Serial;
 
 public class TrainControl
 {
@@ -46,6 +48,8 @@ public class TrainControl
     Timer ebActiveTimer;
 
     public EventWatcher ew = null;
+
+    Serial serial;
 
     public enum formationInfo
     {
@@ -159,10 +163,12 @@ public class TrainControl
         return null;
     }
 
-    public TrainControl()
+    public TrainControl(Serial serial)
     {
         atspController = new ATSPController(this);
         ew = new EventWatcher();
+
+        this.serial = serial;
     }
     
     private ATSPController atspController;
@@ -554,6 +560,8 @@ public class TrainControl
 
     public void handleDoors()
     {
+        boolean prevDoorState = isDoorClose;
+
         // ドア閉めるとき時間差で表示
         if (door == 0)
         {
@@ -571,6 +579,18 @@ public class TrainControl
             doorCloseCount = 0;
             isDoorClose = false;
         }
+
+        if(prevDoorState != isDoorClose)
+        {
+            JSONObject json = new JSONObject();
+            json.put("type", "send");
+            json.put("message", "isDoorClose");
+            json.put("value", isDoorClose);
+
+            serial.send(json);
+        }
+
+        prevDoorState = isDoorClose;
     }
 
     private boolean isTestingATS = false;

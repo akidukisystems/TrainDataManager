@@ -436,7 +436,7 @@ public class DutyCardRepository {
         }
 
         // とりあえず次の駅はわかった
-        // そすたら、外丸駅をさがす
+        // そしたら、外丸駅をさがす
 
         int index = -1;
         for (int i = 0; i < entries.size(); i++)
@@ -448,6 +448,9 @@ public class DutyCardRepository {
                 break;
             }
         }
+
+        if (index == -1)
+            return null;
 
         for (int i = index; i < entries.size(); i++)
         {
